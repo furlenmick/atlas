@@ -48,8 +48,17 @@ hr{border:none;border-top:1px solid var(--line);margin:28px 0}
 .tag{display:inline-block;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:2px 10px;font-size:13px;margin:0 6px 6px 0;color:var(--muted);font-family:ui-monospace,"JetBrains Mono",Menlo,monospace}
 /* --- homepage --- */
 .topbar{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--line);padding:14px 0}
+.topbar-inner{display:flex;justify-content:space-between;align-items:center;gap:10px;min-width:0}
+.brand{font-family:"Noto Serif SC","Songti SC","STSong",serif;font-weight:900;font-size:20px;color:var(--ink);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.brand:hover{text-decoration:none;color:var(--accent)}
 .top-actions{display:flex;gap:10px;align-items:center;margin:16px 0 4px;flex-wrap:wrap;min-width:0}
 .top-actions>*{min-width:0}
+/* article-list pagination (max 20 per page) */
+.pagination{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;margin:28px 0 8px}
+.page-num{min-width:36px;text-align:center}
+.page-num.active{background:var(--pine);color:#fff;border-color:var(--pine)}
+.page-btn:disabled,.page-num:disabled{opacity:.45;cursor:default}
+.page-info{color:var(--muted);font-size:13px;margin-left:4px}
 /* homepage title */
 .site-title{margin:28px 0 6px}
 .site-title h1{font-size:46px;font-weight:900;margin:0;line-height:1.2}
@@ -371,33 +380,39 @@ def build_home(arts):
            a["id_int"], esc(a["title"]), esc(a["summary"]),
            "".join('<span class="tag">%s</span>' % esc(t) for t in a["tags_list"]))
         for a in pinned)
-    grouped = []
-    for cat in sorted(cats, key=lambda c: -len(cats[c])):
-        items = "".join(
-            '<article class="card" data-article-id="%d" data-cat="%s" data-search="%s"><h3><a href="articles/%d.html">%s</a>%s</h3>'
-            '<p>%s</p><div><span class="date">%s</span> %s</div></article>'
-            % (a["id_int"], esc(a["category"]), esc(a["title"] + " " + a["summary"] + " " + " ".join(a["tags_list"])),
-               a["id_int"], esc(a["title"]),
-               '<span class="pinned">置顶</span>' if a["pinned_bool"] else "",
-               esc(a["summary"]), esc(a.get("updated_at", "")[:10]),
-               "".join('<span class="tag">%s</span>' % esc(t) for t in a["tags_list"]))
-            for a in cats[cat])
-        grouped.append('<section><h2 class="sechead">%s（%d 篇）</h2>%s</section>' % (esc(cat), len(cats[cat]), items))
+    # flat article list (no per-category sections, no "全部文章" heading);
+    # paginated client-side by scripts/atlas.js, max 20 per page
+    list_html = "".join(
+        '<article class="card" data-article-id="%d" data-cat="%s" data-search="%s"><h3><a href="articles/%d.html">%s</a>%s</h3>'
+        '<p>%s</p><div><span class="date">%s</span> %s</div></article>'
+        % (a["id_int"], esc(a["category"]), esc(a["title"] + " " + a["summary"] + " " + " ".join(a["tags_list"])),
+           a["id_int"], esc(a["title"]),
+           '<span class="pinned">置顶</span>' if a["pinned_bool"] else "",
+           esc(a["summary"]), esc(a.get("updated_at", "")[:10]),
+           "".join('<span class="tag">%s</span>' % esc(t) for t in a["tags_list"]))
+        for a in arts)
+    pagination_html = (
+        '<nav class="pagination" id="pagination" aria-label="文章分页">'
+        '<button class="btn page-btn" id="page-prev" type="button" onclick="atlasGoToPage(\'prev\')" disabled>← 上一页</button>'
+        '<span class="page-numbers" id="page-numbers"><button class="btn page-num active" type="button">1</button></span>'
+        '<button class="btn page-btn" id="page-next" type="button" onclick="atlasGoToPage(\'next\')" disabled>下一页 →</button>'
+        '<span class="page-info" id="page-info">第 1 / 1 页</span></nav>')
     body = (
-        '<div class="topbar"><div class="wrap" style="padding-bottom:0">'
-        '<input class="search" placeholder="搜索文章、标签、摘要…" oninput="filterCards(this.value)">'
+        '<div class="topbar"><div class="wrap topbar-inner" style="padding-bottom:0">'
+        '<a class="brand" href="index.html">Atlas</a>'
+        '<span><button class="btn btn-primary" type="button" onclick="atlasNewArticle()">＋ 新增文章</button>'
+        ' <span id="atlas-pending" style="display:none"></span></span>'
         '</div></div>'
-        '<div class="wrap"><header class="site-title" id="siteTitle"><h1>Atlas</h1><p>我的个人知识库 — 流程、工具和踩过的坑，都沉淀在这里。</p></header><div class="top-actions">'
-        '<button class="btn btn-primary" type="button" onclick="atlasNewArticle()">＋ 新增文章</button>'
-        '<button class="btn" type="button" onclick="atlasExportChanges()">导出改动</button>'
-        '<span id="atlas-pending" style="display:none"></span></div>'
+        '<div class="wrap"><header class="site-title" id="siteTitle"><h1>Atlas</h1><p>我的个人知识库 — 流程、工具和踩过的坑，都沉淀在这里。</p></header>'
+        '<input class="search" placeholder="搜关键词：流程、工具、踩过的坑…" oninput="filterCards(this.value)">'
         '<p class="overview">共 %d 篇 · %d 个分类</p>'
         '<div class="catgrid">%s</div>'
         '<section class="pinned-sec"><h2>置顶推荐</h2>%s</section>'
-        '<div class="chips">%s</div>%s'
+        '<div class="chips">%s</div>'
+        '<div id="article-list">%s</div>%s'
         '%s</div>'
-        % (len(arts), len(cats), "".join(cat_cards), pinned_html, "".join(chips), "".join(grouped),
-           footer_html(len(arts), len(cats))))
+        % (len(arts), len(cats), "".join(cat_cards), pinned_html, "".join(chips), list_html,
+           pagination_html, footer_html(len(arts), len(cats))))
     data = {"articles": [article_data(a) for a in arts],
             "categories": sorted({a["category"] for a in arts})}
     return page("Atlas", data_script(data) + body, ATLAS_JS)

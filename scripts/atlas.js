@@ -4,9 +4,15 @@
  * All adds/edits/deletes are stored in localStorage under key
  * "atlas_overrides" and applied on top of the built-in articles:
  *   { v: 1, added: [article...], edited: {id: article}, deleted: [id...] }
- * Nothing leaves the browser until the user clicks "导出改动" on the
- * homepage, downloads the changed Markdown files, puts them into
- * articles/, rebuilds and pushes to GitHub.
+ * Nothing leaves the browser on its own. The export helper
+ * (atlasExportChanges) is still in this file and can be called from the
+ * console to download the changed Markdown files, which then go into
+ * articles/ and are rebuilt and pushed to GitHub. There is no visible
+ * export button on the homepage (removed at the user's request,
+ * 2026-11-26).
+ *
+ * Article list pagination: the homepage list is a flat list, max 20
+ * articles per page, with prev/next + page numbers below the list.
  */
 (function () {
   "use strict";
@@ -169,23 +175,86 @@
     return { html: out.join("\n"), toc: toc };
   }
 
-  /* ---------- homepage search / filter (used by inline handlers) ---------- */
-  window.filterCards = function (q) {
-    q = (q || "").trim().toLowerCase();
-    var title = document.getElementById("siteTitle");
-    if (title) title.hidden = !!q;
-    document.querySelectorAll("[data-search]").forEach(function (el) {
-      el.style.display = (!q || el.dataset.search.toLowerCase().indexOf(q) !== -1) ? "" : "none";
+  /* ---------- homepage search / filter + pagination (inline handlers) ---------- */
+  var PAGE_SIZE = 20;
+  var currentPage = 1;
+  var currentQuery = "";
+  var currentCat = "全部";
+  function cardMatches(card) {
+    if (currentCat !== "全部" && card.getAttribute("data-cat") !== currentCat) return false;
+    if (currentQuery) {
+      var s = (card.getAttribute("data-search") || "").toLowerCase();
+      if (s.indexOf(currentQuery) === -1) return false;
+    }
+    return true;
+  }
+  function listCards() {
+    var list = document.getElementById("article-list");
+    if (!list) return [];
+    return Array.prototype.slice.call(list.querySelectorAll(".card[data-article-id]"));
+  }
+  function renderPagination(totalPages) {
+    var nav = document.getElementById("pagination");
+    if (!nav) return;
+    var prev = document.getElementById("page-prev");
+    var next = document.getElementById("page-next");
+    var nums = document.getElementById("page-numbers");
+    var info = document.getElementById("page-info");
+    if (prev) prev.disabled = currentPage <= 1;
+    if (next) next.disabled = currentPage >= totalPages;
+    if (info) info.textContent = "第 " + currentPage + " / " + totalPages + " 页";
+    if (nums) {
+      var html = "";
+      for (var p = 1; p <= totalPages; p++) {
+        html += '<button class="btn page-num' + (p === currentPage ? " active" : "") +
+          '" type="button" onclick="atlasGoToPage(' + p + ')"' + (p === currentPage ? " disabled" : "") + ">" + p + "</button>";
+      }
+      nums.innerHTML = html;
+    }
+  }
+  function applyPagination() {
+    var cards = listCards();
+    var visible = cards.filter(cardMatches);
+    var totalPages = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+    var start = (currentPage - 1) * PAGE_SIZE;
+    var pageCards = visible.slice(start, start + PAGE_SIZE);
+    cards.forEach(function (card) {
+      card.style.display = pageCards.indexOf(card) !== -1 ? "" : "none";
     });
+    /* pinned section is not paginated: it just follows the same filter */
+    document.querySelectorAll(".pinned-sec .card[data-article-id]").forEach(function (card) {
+      card.style.display = cardMatches(card) ? "" : "none";
+    });
+    renderPagination(totalPages);
+  }
+  window.atlasGoToPage = function (target) {
+    var cards = listCards();
+    var visible = cards.filter(cardMatches);
+    var totalPages = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
+    if (target === "prev") currentPage = Math.max(1, currentPage - 1);
+    else if (target === "next") currentPage = Math.min(totalPages, currentPage + 1);
+    else if (typeof target === "number") currentPage = Math.min(totalPages, Math.max(1, target));
+    applyPagination();
+    var list = document.getElementById("article-list");
+    if (list) list.scrollIntoView({ block: "start" });
+  };
+  window.filterCards = function (q) {
+    currentQuery = (q || "").trim().toLowerCase();
+    currentPage = 1;
+    var title = document.getElementById("siteTitle");
+    if (title) title.hidden = !!currentQuery;
+    applyPagination();
   };
   window.setChip = function (btn, cat) {
+    currentCat = cat;
+    currentPage = 1;
     var title = document.getElementById("siteTitle");
     if (title) title.hidden = cat !== "全部";
     document.querySelectorAll(".chip").forEach(function (c) { c.classList.remove("active"); });
     btn.classList.add("active");
-    document.querySelectorAll("[data-cat]").forEach(function (el) {
-      el.style.display = (cat === "全部" || el.dataset.cat === cat) ? "" : "none";
-    });
+    applyPagination();
   };
 
   /* ---------- editor modal ---------- */
@@ -207,7 +276,7 @@
       '<label class="field">正文（Markdown）<textarea id="ed-body" rows="14"></textarea></label>' +
       '<div class="modal-actions"><button class="btn btn-primary" id="ed-save">保存</button>' +
       '<button class="btn" type="button" onclick="atlasCloseModal()">取消</button></div>' +
-      '<p class="modal-note">保存后只存在本浏览器（localStorage），需在首页点“导出改动”，把文件放回 articles/ 并重新构建、推送到 GitHub，才会同步到其它主机。</p></div>';
+      '<p class="modal-note">保存后只存在本浏览器（localStorage），不会自动同步到 GitHub；要同步到其它主机，需把改动过的 Markdown 文件放回仓库的 articles/，重新构建并推送。</p></div>';
     document.body.appendChild(div);
     document.getElementById("ed-category").addEventListener("change", function () {
       document.getElementById("ed-category-new").hidden = this.value !== "__new__";
@@ -288,7 +357,7 @@
     if (id == null) return;
     var a = getArticle(id);
     if (!a) return;
-    if (!confirm("确定删除「" + a.title + "」吗？\n删除后只在本地生效，需导出改动并推送到 GitHub 才会同步。")) return;
+    if (!confirm("确定删除「" + a.title + "」吗？\n删除后只在本地生效，需把改动同步到 GitHub 才会对其它主机生效。")) return;
     var o = loadOverrides();
     delete o.edited[id];
     o.added = o.added.filter(function (x) { return x.id !== id; });
@@ -325,7 +394,7 @@
     var delRows = deleted.map(function (d) {
       return "<li>删除：" + esc(d.title) + (d.file ? " — 在 articles/ 里删掉 " + esc(d.file) : "") + "</li>";
     }).join("");
-    div.innerHTML = '<div class="modal-card"><h3>导出改动</h3>' +
+    div.innerHTML = '<div class="modal-card"><h3>导出本地改动</h3>' +
       "<p>以下改动只存在本浏览器（localStorage），还没有同步到 GitHub：</p><ul>" + rows + delRows + "</ul>" +
       '<p><button class="btn btn-primary" id="exp-json">下载全部改动 (atlas-changes.json)</button> ' +
       '<button class="btn" type="button" onclick="atlasCloseModal()">关闭</button></p>' +
@@ -362,11 +431,7 @@
     if (!document.querySelector(".card[data-article-id]")) return;
     var all = getAllArticles();
     var pinnedSec = document.querySelector(".pinned-sec");
-    var sections = {};
-    document.querySelectorAll("section").forEach(function (sec) {
-      var h = sec.querySelector("h2.sechead");
-      if (h) sections[h.textContent.replace(/（\d+ 篇）$/, "")] = sec;
-    });
+    var listEl = document.getElementById("article-list");
     // hide deleted / patch edited cards in place
     document.querySelectorAll(".card[data-article-id]").forEach(function (card) {
       var id = parseInt(card.getAttribute("data-article-id"), 10);
@@ -405,13 +470,11 @@
       if (!groupedCard) {
         var wrap = document.createElement("div"); wrap.innerHTML = cardHtml(a);
         var newCard = wrap.firstChild;
-        var target = sections[a.category];
-        if (!target) {
-          target = document.createElement("section");
-          target.innerHTML = '<h2 class="sechead"></h2>';
-          var footer = document.querySelector("footer");
-          (footer ? footer.parentNode : document.body).insertBefore(target, footer);
-          sections[a.category] = target;
+        if (listEl) listEl.appendChild(newCard);
+        /* new category: add a filter chip (the list itself stays flat) */
+        var chipExists = false;
+        document.querySelectorAll(".chip").forEach(function (c) { if (c.textContent === a.category) chipExists = true; });
+        if (!chipExists) {
           var chipRow = document.querySelector(".chips");
           if (chipRow) {
             var chip = document.createElement("button");
@@ -420,7 +483,6 @@
             chipRow.appendChild(chip);
           }
         }
-        target.appendChild(newCard);
       }
     });
     // recount: overview, category cards, section headings
@@ -433,16 +495,11 @@
       var p = cc.querySelector("p");
       if (p) p.textContent = list.length + " 篇 · 最新：" + list[0].title;
     });
-    document.querySelectorAll("section h2.sechead").forEach(function (h) {
-      var cat = h.textContent.replace(/（\d+ 篇）$/, "");
-      var n = all.filter(function (a) { return a.category === cat; }).length;
-      h.textContent = cat + "（" + n + " 篇）";
-    });
     // pending-changes badge
     var badge = document.getElementById("atlas-pending");
     if (badge) {
       var n = pendingCount();
-      badge.textContent = n ? ("本地有 " + n + " 处改动未导出") : "";
+      badge.textContent = n ? ("本地有 " + n + " 处改动") : "";
       badge.style.display = n ? "" : "none";
     }
   }
@@ -566,7 +623,11 @@
 
   /* ---------- boot ---------- */
   if (document.getElementById("view-main")) renderViewPage();
-  else { applyHomepageOverrides(); applyDetailOverride(); }
+  else {
+    applyHomepageOverrides();
+    applyDetailOverride();
+    if (document.getElementById("pagination")) applyPagination();
+  }
   if (document.getElementById("progress")) initScrollspy();
   var topBtn = document.getElementById("toTop");
   if (topBtn && !spyInit) topBtn.addEventListener("click", function () {
