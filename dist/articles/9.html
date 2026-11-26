@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>住宅出口与链式代理选型定版 · Atlas</title>
+<style>
+:root{--ink:#26221e;--muted:#6f6a63;--paper:#faf7f2;--surface:#fff;--line:#e8e0d5;
+--accent:#d94f30;--accent-soft:#fdeee9;--pine:#2e6b4f;--pine-soft:#e8f2ec}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;font-size:17px;line-height:1.85}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+h1,h2,h3,h4{font-family:"Noto Serif SC","Songti SC","STSong",serif;line-height:1.35}
+code{font-family:ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f1ece4;padding:1px 6px;border-radius:4px}
+pre{background:#26221e;color:#f5efe6;padding:16px 18px;border-radius:10px;overflow-x:auto}
+pre code{background:none;color:inherit;padding:0}
+blockquote{border-left:3px solid var(--accent);background:var(--accent-soft);margin:20px 0;padding:12px 18px;color:#5a4a44}
+blockquote p{margin:0}
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:15px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:8px 12px;text-align:left}
+th{background:#f1ece4}
+img{max-width:100%}
+figure{margin:20px 0;text-align:center}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px}
+hr{border:none;border-top:1px solid var(--line);margin:28px 0}
+.tag{display:inline-block;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:2px 10px;font-size:13px;margin:0 6px 6px 0;color:var(--muted);font-family:ui-monospace,"JetBrains Mono",Menlo,monospace}
+/* --- homepage --- */
+.topbar{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--line);padding:14px 0}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 64px}
+.search{width:100%;font-size:16px;padding:12px 16px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-family:inherit}
+.search:focus{outline:2px solid var(--accent);outline-offset:1px}
+.overview{color:var(--muted);font-size:14px;margin:20px 0 4px}
+.catgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:18px 0 8px}
+@media(min-width:900px){.catgrid{grid-template-columns:repeat(3,1fr)}}
+.catcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:0 1px 4px rgba(38,34,30,.06)}
+.catcard h3{margin:0 0 4px;font-size:19px}
+.catcard p{margin:4px 0;color:var(--muted);font-size:14px}
+.pinned-sec{margin:28px 0}
+.pinned-sec h2,.sechead{font-size:22px;font-weight:900;margin:0 0 12px;padding-bottom:6px}
+.pinned-sec h2::before{content:"";display:block;width:32px;height:4px;background:var(--accent);border-radius:2px;margin-bottom:10px}
+.chips{margin:18px 0;display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 14px;font-size:14px;cursor:pointer}
+.chip.active{background:var(--pine);color:#fff;border-color:var(--pine)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0;box-shadow:0 1px 4px rgba(38,34,30,.06)}
+.card h3{margin:0 0 6px;font-size:19px}
+.card h3 a{color:var(--ink)}
+.card p{margin:6px 0;color:var(--muted);font-size:15px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .catline{color:var(--pine);font-size:13px;font-weight:700}
+.pinned{display:inline-block;background:var(--accent);color:#fff;border-radius:4px;font-size:12px;padding:2px 8px;margin-left:8px;vertical-align:middle}
+.date{color:var(--muted);font-size:13px}
+/* --- detail --- */
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:50}
+.layout{display:grid;grid-template-columns:240px 1fr;gap:32px;max-width:1080px;margin:0 auto;padding:24px}
+@media(max-width:860px){.layout{grid-template-columns:1fr}}
+.toc{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto;scrollbar-width:thin;align-self:start}
+.toc h4{margin:0 0 8px;font-size:14px}
+.toc ol{margin:0;padding-left:0;list-style:none}
+.toc li{margin:2px 0}
+.toc a{display:block;padding:5px 10px;border-radius:8px;color:var(--ink);font-size:14px;line-height:1.5}
+.toc a.active{background:var(--accent-soft);color:var(--accent);font-weight:700}
+.toc-mobile{display:none}
+@media(max-width:860px){.toc{display:none}.toc-mobile{display:block;position:sticky;top:0;z-index:15;background:var(--paper);padding:10px 0;border-bottom:1px solid var(--line)}}
+.kicker{color:var(--accent);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.article h1{font-size:32px;font-weight:900;margin:8px 0}
+.lead{color:var(--muted);font-size:15px}
+.meta{color:var(--muted);font-size:14px;margin:10px 0}
+.sec-head{display:flex;gap:12px;align-items:baseline;margin:36px 0 12px}
+.sec-head h2{margin:0;font-size:24px;font-weight:900}
+.badge{flex:0 0 auto;border:2px solid var(--accent);color:var(--accent);border-radius:8px;font-family:ui-monospace,"JetBrains Mono",monospace;font-weight:700;font-size:14px;padding:1px 8px}
+.img-note{border:1px dashed var(--line);border-radius:10px;padding:14px;color:var(--muted);font-size:14px;text-align:center;margin:20px 0}
+nav.back{margin-bottom:16px;font-size:15px}
+nav.pager{display:flex;justify-content:space-between;gap:16px;margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-size:15px}
+#toTop{position:fixed;right:20px;bottom:20px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);opacity:.75;font-size:18px;cursor:pointer;z-index:40}
+footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid var(--line);padding-top:16px}
+@media(max-width:640px){body{font-size:16px}.article h1{font-size:26px}.layout{padding:16px}}
+</style>
+</head>
+<body>
+<div id="progress"></div><button id="toTop" title="回到顶部">↑</button><div class="layout"><aside><nav class="toc"><h4>目录（4 节）</h4><ol><li style=""><a href="#sec-1"> 定版结论：主力链式出口</a></li><li style=""><a href="#sec-2"> 备用与试用线</a></li><li style=""><a href="#sec-3"> 选型规则（踩出来的）</a></li><li style=""><a href="#sec-4"> 踩坑记录</a></li></ol></nav></aside><main class="article"><nav class="back"><a href="../index.html">← 返回 Atlas</a></nav><div class="kicker">节点与代理</div><h1>住宅出口与链式代理选型定版</h1><p class="lead">主力链定版：RackNerd 前置 + Proxy-Seller Verizon 静态住宅末跳；1024proxy 只作试用，Cliproxy 洛杉矶粘性线测试中；附买前核实清单与选型排序。</p><div><span class="tag">链式代理</span><span class="tag">住宅IP</span><span class="tag">RackNerd</span><span class="tag">Verizon</span><span class="tag">Cliproxy</span></div><p class="meta">约 927 字 · 阅读约 2 分钟 · 更新 2026-11-26</p><div class="toc-mobile"><details><summary>目录（4 节）</summary><ol><li style=""><a href="#sec-1"> 定版结论：主力链式出口</a></li><li style=""><a href="#sec-2"> 备用与试用线</a></li><li style=""><a href="#sec-3"> 选型规则（踩出来的）</a></li><li style=""><a href="#sec-4"> 踩坑记录</a></li></ol></details></div>
+<blockquote><p>定版：2026-10-15/18 链式出口已定；Cliproxy 洛杉矶线 2026-11-23 测试中。<br>用途：给地区敏感账号准备干净出口，以及给节点做前置链。先看结论，再看细节。</p></blockquote>
+<div class="sec-head" id="sec-1"><span class="badge">01</span><h2>定版结论：主力链式出口</h2></div>
+<ul><li>结构：RackNerd VPS 作 vless 入口中转（前置链）→ Proxy-Seller Verizon Business 静态 IP 作末跳出口。</li><li>末跳属性：住宅属性、human 81.77% / IPPure 1%、原生 IP；GeoIP 大区美东，设备时区按 America/New_York 钉死。</li><li>待办：跑业务实测 + 完成 RackNerd 前置链式配置，之后才把敏感账号迁过来。</li></ul>
+<div class="sec-head" id="sec-2"><span class="badge">02</span><h2>备用与试用线</h2></div>
+<ul><li><strong>1024proxy</strong>：只留 $0.99 动态住宅试用，给谷歌重试当非美出口用，不作主力。</li><li><strong>Cliproxy 洛杉矶</strong>（测试中）：us.cliproxy.io:3010，SOCKS5，粘性会话约 120 分钟。自测出口 ***，Charter/Spectrum AS20001 住宅 IP，时区 America/Los_Angeles。注意：非固定 IP，约 120 分钟后可能换 IP，用前必须重测；尚未决定是否用它替换 Verizon 作主力末跳。</li></ul>
+<div class="sec-head" id="sec-3"><span class="badge">03</span><h2>选型规则（踩出来的）</h2></div>
+<ul><li><strong>机场大多做不了链式前置</strong>：买前必须核实是否支持中转 / UDP / ToS；TikTok 等场景必须 UDP 通，不通直接排除。</li><li><strong>Proxy-Seller 不支持选地区</strong>：ISP 静态线只有美 / 英 / 德 / 法 / 日 5 国；要城市级定位只能找客服。</li><li><strong>住宅静态 &gt; 动态住宅 &gt; 机房 IP</strong>：敏感账号只认第一档；动态住宅只配做重试和非敏感业务；机房 IP 只能当节点中转，绝不直接登敏感账号（与《Claude 账号防封与付款完整流程》的定级一致）。</li></ul>
+<div class="sec-head" id="sec-4"><span class="badge">04</span><h2>踩坑记录</h2></div>
+<ul><li><strong>链式能不能搭，先问再买</strong>：前置链需要中转支持，很多机场套餐买完才发现不支持——核实顺序要在付款之前。</li><li><strong>粘性会话不是固定 IP</strong>：Cliproxy 的&quot;粘性&quot;只有约 120 分钟，拿它当固定出口用会在换 IP 时翻车；每次用前重测出口 IP 和归属。</li></ul><nav class="pager"><span><a href="8.html">← Claude 账号防封与付款完整流程（定版）</a></span><span><a href="10.html">Cloady 免费档部署 Xray 链式节点（定版） →</a></span></nav></main></div>
+<script>
+var bar=document.getElementById('progress');
+var links=Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+var secs=links.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
+function onScroll(){var st=window.scrollY||document.documentElement.scrollTop;var h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?(st/h*100):0)+'%';var cur=secs[0];secs.forEach(function(s){if(s.getBoundingClientRect().top<=120)cur=s;});links.forEach(function(a){var on=a.getAttribute('href')==='#'+(cur&&cur.id);a.classList.toggle('active',on);if(on)a.scrollIntoView({block:'nearest'});});}
+window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+document.getElementById('toTop').addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+</script>
+</body>
+</html>

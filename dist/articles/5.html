@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>开题图文稿第 6 页：三行卡片做图版 · Atlas</title>
+<style>
+:root{--ink:#26221e;--muted:#6f6a63;--paper:#faf7f2;--surface:#fff;--line:#e8e0d5;
+--accent:#d94f30;--accent-soft:#fdeee9;--pine:#2e6b4f;--pine-soft:#e8f2ec}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;font-size:17px;line-height:1.85}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+h1,h2,h3,h4{font-family:"Noto Serif SC","Songti SC","STSong",serif;line-height:1.35}
+code{font-family:ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f1ece4;padding:1px 6px;border-radius:4px}
+pre{background:#26221e;color:#f5efe6;padding:16px 18px;border-radius:10px;overflow-x:auto}
+pre code{background:none;color:inherit;padding:0}
+blockquote{border-left:3px solid var(--accent);background:var(--accent-soft);margin:20px 0;padding:12px 18px;color:#5a4a44}
+blockquote p{margin:0}
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:15px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:8px 12px;text-align:left}
+th{background:#f1ece4}
+img{max-width:100%}
+figure{margin:20px 0;text-align:center}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px}
+hr{border:none;border-top:1px solid var(--line);margin:28px 0}
+.tag{display:inline-block;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:2px 10px;font-size:13px;margin:0 6px 6px 0;color:var(--muted);font-family:ui-monospace,"JetBrains Mono",Menlo,monospace}
+/* --- homepage --- */
+.topbar{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--line);padding:14px 0}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 64px}
+.search{width:100%;font-size:16px;padding:12px 16px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-family:inherit}
+.search:focus{outline:2px solid var(--accent);outline-offset:1px}
+.overview{color:var(--muted);font-size:14px;margin:20px 0 4px}
+.catgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:18px 0 8px}
+@media(min-width:900px){.catgrid{grid-template-columns:repeat(3,1fr)}}
+.catcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:0 1px 4px rgba(38,34,30,.06)}
+.catcard h3{margin:0 0 4px;font-size:19px}
+.catcard p{margin:4px 0;color:var(--muted);font-size:14px}
+.pinned-sec{margin:28px 0}
+.pinned-sec h2,.sechead{font-size:22px;font-weight:900;margin:0 0 12px;padding-bottom:6px}
+.pinned-sec h2::before{content:"";display:block;width:32px;height:4px;background:var(--accent);border-radius:2px;margin-bottom:10px}
+.chips{margin:18px 0;display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 14px;font-size:14px;cursor:pointer}
+.chip.active{background:var(--pine);color:#fff;border-color:var(--pine)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0;box-shadow:0 1px 4px rgba(38,34,30,.06)}
+.card h3{margin:0 0 6px;font-size:19px}
+.card h3 a{color:var(--ink)}
+.card p{margin:6px 0;color:var(--muted);font-size:15px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .catline{color:var(--pine);font-size:13px;font-weight:700}
+.pinned{display:inline-block;background:var(--accent);color:#fff;border-radius:4px;font-size:12px;padding:2px 8px;margin-left:8px;vertical-align:middle}
+.date{color:var(--muted);font-size:13px}
+/* --- detail --- */
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:50}
+.layout{display:grid;grid-template-columns:240px 1fr;gap:32px;max-width:1080px;margin:0 auto;padding:24px}
+@media(max-width:860px){.layout{grid-template-columns:1fr}}
+.toc{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto;scrollbar-width:thin;align-self:start}
+.toc h4{margin:0 0 8px;font-size:14px}
+.toc ol{margin:0;padding-left:0;list-style:none}
+.toc li{margin:2px 0}
+.toc a{display:block;padding:5px 10px;border-radius:8px;color:var(--ink);font-size:14px;line-height:1.5}
+.toc a.active{background:var(--accent-soft);color:var(--accent);font-weight:700}
+.toc-mobile{display:none}
+@media(max-width:860px){.toc{display:none}.toc-mobile{display:block;position:sticky;top:0;z-index:15;background:var(--paper);padding:10px 0;border-bottom:1px solid var(--line)}}
+.kicker{color:var(--accent);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.article h1{font-size:32px;font-weight:900;margin:8px 0}
+.lead{color:var(--muted);font-size:15px}
+.meta{color:var(--muted);font-size:14px;margin:10px 0}
+.sec-head{display:flex;gap:12px;align-items:baseline;margin:36px 0 12px}
+.sec-head h2{margin:0;font-size:24px;font-weight:900}
+.badge{flex:0 0 auto;border:2px solid var(--accent);color:var(--accent);border-radius:8px;font-family:ui-monospace,"JetBrains Mono",monospace;font-weight:700;font-size:14px;padding:1px 8px}
+.img-note{border:1px dashed var(--line);border-radius:10px;padding:14px;color:var(--muted);font-size:14px;text-align:center;margin:20px 0}
+nav.back{margin-bottom:16px;font-size:15px}
+nav.pager{display:flex;justify-content:space-between;gap:16px;margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-size:15px}
+#toTop{position:fixed;right:20px;bottom:20px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);opacity:.75;font-size:18px;cursor:pointer;z-index:40}
+footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid var(--line);padding-top:16px}
+@media(max-width:640px){body{font-size:16px}.article h1{font-size:26px}.layout{padding:16px}}
+</style>
+</head>
+<body>
+<div id="progress"></div><button id="toTop" title="回到顶部">↑</button><div class="layout"><aside><nav class="toc"><h4>目录（6 节）</h4><ol><li style=""><a href="#sec-1"> 第 6 页标题（卡片上方共用）</a></li><li style=""><a href="#sec-2"> 卡片 1</a></li><li style=""><a href="#sec-3"> 卡片 2</a></li><li style=""><a href="#sec-4"> 卡片 3</a></li><li style=""><a href="#sec-5"> 自查句（放在 3 张卡片下方）</a></li><li style=""><a href="#sec-6"> 做图提醒</a></li></ol></nav></aside><main class="article"><nav class="back"><a href="../index.html">← 返回 Atlas</a></nav><div class="kicker">创作与内容</div><h1>开题图文稿第 6 页：三行卡片做图版</h1><p class="lead">第 6 页的做图替代方案：把原表格拆成 3 张卡片，避免手机上表格字糊；规格 3:4 竖版 1080×1440。</p><div><span class="tag">小红书</span><span class="tag">做图</span><span class="tag">卡片版</span></div><p class="meta">约 351 字 · 阅读约 1 分钟 · 更新 2026-11-26</p><div class="toc-mobile"><details><summary>目录（6 节）</summary><ol><li style=""><a href="#sec-1"> 第 6 页标题（卡片上方共用）</a></li><li style=""><a href="#sec-2"> 卡片 1</a></li><li style=""><a href="#sec-3"> 卡片 2</a></li><li style=""><a href="#sec-4"> 卡片 3</a></li><li style=""><a href="#sec-5"> 自查句（放在 3 张卡片下方）</a></li><li style=""><a href="#sec-6"> 做图提醒</a></li></ol></details></div>
+<p>图片规格：3:4 竖版 1080×1440，每张卡片只放一行。</p>
+<div class="sec-head" id="sec-1"><span class="badge">01</span><h2>第 6 页标题（卡片上方共用）</h2></div>
+<p>画出这张表，脱节一眼就能看出来</p>
+<hr>
+<div class="sec-head" id="sec-2"><span class="badge">02</span><h2>卡片 1</h2></div>
+<p>问题：报名统计易错、签到排队 目标：实现报名、签到、统计功能 方法：需求访谈 + 原型开发</p>
+<div class="sec-head" id="sec-3"><span class="badge">03</span><h2>卡片 2</h2></div>
+<p>问题：事后统计靠人工、数据不准 目标：统计结果自动生成、可导出 方法：原型开发 + 功能测试</p>
+<div class="sec-head" id="sec-4"><span class="badge">04</span><h2>卡片 3</h2></div>
+<p>问题：不知道好不好用 目标：完成一轮用户测试并修改 方法：用户测试 + 修改记录</p>
+<hr>
+<div class="sec-head" id="sec-5"><span class="badge">05</span><h2>自查句（放在 3 张卡片下方）</h2></div>
+<p>同一行讲不通，就改那一行，不要全篇重写。</p>
+<div class="sec-head" id="sec-6"><span class="badge">06</span><h2>做图提醒</h2></div>
+<ul><li>每张卡片一行对应关系，不要把三行挤进一张图。</li><li>卡片内三行顺序固定：问题 → 目标 → 方法。</li><li>示例仍是“校园社团报名与签到小程序”的结构示范，换课题重填，不要直接抄。</li></ul><nav class="pager"><span><a href="4.html">← 小红书图文稿：毕设开题“问题、目标、方法”三段怎么写</a></span><span><a href="6.html">暖暖豚融合版角色设定（路线 ② 可执行版） →</a></span></nav></main></div>
+<script>
+var bar=document.getElementById('progress');
+var links=Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+var secs=links.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
+function onScroll(){var st=window.scrollY||document.documentElement.scrollTop;var h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?(st/h*100):0)+'%';var cur=secs[0];secs.forEach(function(s){if(s.getBoundingClientRect().top<=120)cur=s;});links.forEach(function(a){var on=a.getAttribute('href')==='#'+(cur&&cur.id);a.classList.toggle('active',on);if(on)a.scrollIntoView({block:'nearest'});});}
+window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+document.getElementById('toTop').addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+</script>
+</body>
+</html>

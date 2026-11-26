@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>暖暖豚融合版角色设定（路线 ② 可执行版） · Atlas</title>
+<style>
+:root{--ink:#26221e;--muted:#6f6a63;--paper:#faf7f2;--surface:#fff;--line:#e8e0d5;
+--accent:#d94f30;--accent-soft:#fdeee9;--pine:#2e6b4f;--pine-soft:#e8f2ec}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;font-size:17px;line-height:1.85}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+h1,h2,h3,h4{font-family:"Noto Serif SC","Songti SC","STSong",serif;line-height:1.35}
+code{font-family:ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f1ece4;padding:1px 6px;border-radius:4px}
+pre{background:#26221e;color:#f5efe6;padding:16px 18px;border-radius:10px;overflow-x:auto}
+pre code{background:none;color:inherit;padding:0}
+blockquote{border-left:3px solid var(--accent);background:var(--accent-soft);margin:20px 0;padding:12px 18px;color:#5a4a44}
+blockquote p{margin:0}
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:15px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:8px 12px;text-align:left}
+th{background:#f1ece4}
+img{max-width:100%}
+figure{margin:20px 0;text-align:center}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px}
+hr{border:none;border-top:1px solid var(--line);margin:28px 0}
+.tag{display:inline-block;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:2px 10px;font-size:13px;margin:0 6px 6px 0;color:var(--muted);font-family:ui-monospace,"JetBrains Mono",Menlo,monospace}
+/* --- homepage --- */
+.topbar{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--line);padding:14px 0}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 64px}
+.search{width:100%;font-size:16px;padding:12px 16px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-family:inherit}
+.search:focus{outline:2px solid var(--accent);outline-offset:1px}
+.overview{color:var(--muted);font-size:14px;margin:20px 0 4px}
+.catgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:18px 0 8px}
+@media(min-width:900px){.catgrid{grid-template-columns:repeat(3,1fr)}}
+.catcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:0 1px 4px rgba(38,34,30,.06)}
+.catcard h3{margin:0 0 4px;font-size:19px}
+.catcard p{margin:4px 0;color:var(--muted);font-size:14px}
+.pinned-sec{margin:28px 0}
+.pinned-sec h2,.sechead{font-size:22px;font-weight:900;margin:0 0 12px;padding-bottom:6px}
+.pinned-sec h2::before{content:"";display:block;width:32px;height:4px;background:var(--accent);border-radius:2px;margin-bottom:10px}
+.chips{margin:18px 0;display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 14px;font-size:14px;cursor:pointer}
+.chip.active{background:var(--pine);color:#fff;border-color:var(--pine)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0;box-shadow:0 1px 4px rgba(38,34,30,.06)}
+.card h3{margin:0 0 6px;font-size:19px}
+.card h3 a{color:var(--ink)}
+.card p{margin:6px 0;color:var(--muted);font-size:15px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .catline{color:var(--pine);font-size:13px;font-weight:700}
+.pinned{display:inline-block;background:var(--accent);color:#fff;border-radius:4px;font-size:12px;padding:2px 8px;margin-left:8px;vertical-align:middle}
+.date{color:var(--muted);font-size:13px}
+/* --- detail --- */
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:50}
+.layout{display:grid;grid-template-columns:240px 1fr;gap:32px;max-width:1080px;margin:0 auto;padding:24px}
+@media(max-width:860px){.layout{grid-template-columns:1fr}}
+.toc{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto;scrollbar-width:thin;align-self:start}
+.toc h4{margin:0 0 8px;font-size:14px}
+.toc ol{margin:0;padding-left:0;list-style:none}
+.toc li{margin:2px 0}
+.toc a{display:block;padding:5px 10px;border-radius:8px;color:var(--ink);font-size:14px;line-height:1.5}
+.toc a.active{background:var(--accent-soft);color:var(--accent);font-weight:700}
+.toc-mobile{display:none}
+@media(max-width:860px){.toc{display:none}.toc-mobile{display:block;position:sticky;top:0;z-index:15;background:var(--paper);padding:10px 0;border-bottom:1px solid var(--line)}}
+.kicker{color:var(--accent);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.article h1{font-size:32px;font-weight:900;margin:8px 0}
+.lead{color:var(--muted);font-size:15px}
+.meta{color:var(--muted);font-size:14px;margin:10px 0}
+.sec-head{display:flex;gap:12px;align-items:baseline;margin:36px 0 12px}
+.sec-head h2{margin:0;font-size:24px;font-weight:900}
+.badge{flex:0 0 auto;border:2px solid var(--accent);color:var(--accent);border-radius:8px;font-family:ui-monospace,"JetBrains Mono",monospace;font-weight:700;font-size:14px;padding:1px 8px}
+.img-note{border:1px dashed var(--line);border-radius:10px;padding:14px;color:var(--muted);font-size:14px;text-align:center;margin:20px 0}
+nav.back{margin-bottom:16px;font-size:15px}
+nav.pager{display:flex;justify-content:space-between;gap:16px;margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-size:15px}
+#toTop{position:fixed;right:20px;bottom:20px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);opacity:.75;font-size:18px;cursor:pointer;z-index:40}
+footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid var(--line);padding-top:16px}
+@media(max-width:640px){body{font-size:16px}.article h1{font-size:26px}.layout{padding:16px}}
+</style>
+</head>
+<body>
+<div id="progress"></div><button id="toTop" title="回到顶部">↑</button><div class="layout"><aside><nav class="toc"><h4>目录（7 节）</h4><ol><li style=""><a href="#sec-1"> 定死的身份（两版都已确认，不动）</a></li><li style=""><a href="#sec-2"> 融合表：每处取哪一版，写死</a></li><li style=""><a href="#sec-3"> 不能碰的线（之前已定过）</a></li><li style=""><a href="#sec-4"> 张静态表情（融合版动作，含之前两处待改）</a></li><li style=""><a href="#sec-5"> 发给 Codex 的提示词（融合版，直接复制）</a></li><li style=""><a href="#sec-6"> 验收（设定图出来后按这 3 条看）</a></li><li style=""><a href="#sec-7"> 备注</a></li></ol></nav></aside><main class="article"><nav class="back"><a href="../index.html">← 返回 Atlas</a></nav><div class="kicker">创作与内容</div><h1>暖暖豚融合版角色设定（路线 ② 可执行版）</h1><p class="lead">水豚 IP「暖暖豚」的融合版设定定稿：保留可爱版大眼睛、粉腮红、奶茶色，鼻子改回长方形大鼻头、脸拉长；含已定死的身份项与待查商标类别。</p><div><span class="tag">暖暖豚</span><span class="tag">角色设定</span><span class="tag">水豚</span><span class="tag">IP</span></div><p class="meta">约 2793 字 · 阅读约 6 分钟 · 更新 2026-11-26</p><div class="toc-mobile"><details><summary>目录（7 节）</summary><ol><li style=""><a href="#sec-1"> 定死的身份（两版都已确认，不动）</a></li><li style=""><a href="#sec-2"> 融合表：每处取哪一版，写死</a></li><li style=""><a href="#sec-3"> 不能碰的线（之前已定过）</a></li><li style=""><a href="#sec-4"> 张静态表情（融合版动作，含之前两处待改）</a></li><li style=""><a href="#sec-5"> 发给 Codex 的提示词（融合版，直接复制）</a></li><li style=""><a href="#sec-6"> 验收（设定图出来后按这 3 条看）</a></li><li style=""><a href="#sec-7"> 备注</a></li></ol></details></div>
+<p>状态：2026-11-06 17:25（北京时间）备好，未经他确认。这份只落实侧聊里他已选过的方向，不替他改定位、不新开路线。 他最后一次反馈（2026-11-06 16:49）：第一版 8 张“形象有点丑，不够呆萌”，主攻学生群和年轻女性群。 侧聊里给他留的二选一仍在等他回：① 可爱优先（水豚特征弱一点也接受）；② 两版融合（保留可爱版的大眼睛、粉腮红、奶茶色，把鼻子改回长方形大鼻头、脸再拉长一点点）。 这份就是路线 ② 的可执行版：他只要回“按融合版做”，不用再复述一遍改法，直接拿去画设定图或发给 Codex。</p>
+<div class="sec-head" id="sec-1"><span class="badge">01</span><h2>定死的身份（两版都已确认，不动）</h2></div>
+<ul><li>物种：水豚（卡皮巴拉），不要画成仓鼠、熊、猫</li><li>暂定名：暖暖豚（正式上架前先去中国商标网查 9、16、28、35、41 类）</li><li>定位一句话：暖暖的，但天塌下来也不急</li><li>性格：温暖、淡定、情绪稳定、慢吞吞；核心卖点不是单纯可爱，是“累了还能稳住”的治愈感</li><li>主客群：赶毕设、找工作的学生 + 年轻女性</li><li>先做静态 8 张测试，动态以后再说，这次不做动态 GIF</li></ul>
+<div class="sec-head" id="sec-2"><span class="badge">02</span><h2>融合表：每处取哪一版，写死</h2></div>
+<table><thead><tr><th>部位</th><th>融合决定</th><th>来源</th></tr></thead><tbody><tr><td>脸型</td><td>长方形打底、边角揉圆：比可爱版拉长约 1/5，比第一版短一点，不再是圆球脸</td><td>第一版脸太圆像仓鼠/熊；可爱版更圆，水豚特征丢了</td></tr><tr><td>鼻子</td><td>改回水豚长方形大鼻头，但边角倒圆、颜色用暖棕不做粉色小鼻子</td><td>可爱版粉色小鼻子是“像仓鼠”最主要的原因</td></tr><tr><td>嘴</td><td>小小的 <code>w</code> 形，微微上扬的小微笑（第一版嘴太小太淡，暖的感觉弱）</td><td>第一版自查点</td></tr><tr><td>眼睛</td><td>大圆亮晶晶、带睫毛和高光，但上眼睑压下来一点点：大眼睛 + 半分淡定，不做全睁的惊讶眼，也不做半闭的困眼</td><td>第一版半闭眼像没睡醒；可爱版大眼睛是对的</td></tr><tr><td>眉毛</td><td>抬高、平一点，不斜着（斜眉毛看着凶）</td><td>可爱版已改对，保留</td></tr><tr><td>腮红</td><td>大大的粉色腮红，保留；不用 <code>//</code> 两道线</td><td>可爱版已改对，保留</td></tr><tr><td>颜色</td><td>奶茶色身体 + 奶油肚子，描边用中粗深棕（介于第一版粗描边和可爱版细描边之间）；全套固定 2–3 个主色，不每张换色</td><td>第一版深橙棕太深太硬；可爱版奶茶色是对的</td></tr><tr><td>头身比</td><td>大头小身，头占整体 55%–60%，脸在 240×240 里一眼看清；肚子比第一版小，不占身体一半</td><td>两版共识</td></tr><tr><td>叶子</td><td>只留一片带咬痕的叶子，微微歪一点；开心竖起、累了耷拉（跟着情绪动）。不做可爱版的两片发芽——50×50 下两片会糊成一团</td><td>咬痕是记忆点；小图清晰优先</td></tr><tr><td>姿态</td><td>双手捧在胸前、头微微歪一点的“求抱抱”感保留到中性站姿里</td><td>可爱版最讨女生喜欢的一点</td></tr></tbody></table>
+<p>建议色号（只是起稿值，定稿以设定图为准，之后全套锁定不再改）：奶茶棕 #C89B6D、奶油肚 #F7EEDD、深棕描边 #6B4A2F、粉腮红 #F5A8B8、叶绿 #7FB069。</p>
+<div class="sec-head" id="sec-3"><span class="badge">03</span><h2>不能碰的线（之前已定过）</h2></div>
+<ul><li>不模仿水豚噜噜（头顶橘子的黄色水豚）、轻松熊、Chiikawa、Loopy、LINE Friends；提示词里不写“像 XX 风格”“XX 同款”</li><li>不加黄色光线、不用 <code>//</code> 腮红、不用网上抠图和他人字体；表情文字只用下面 8 句</li><li>剪影测试：涂黑只看轮廓能认出是它（长脸 + 小耳 + 咬痕叶子 + 大鼻头）</li></ul>
+<div class="sec-head" id="sec-4"><span class="badge">8</span><h2>8 张静态表情（融合版动作，含之前两处待改）</h2></div>
+<p>透明底 PNG，240×240，单张 ≤500KB；同一个角色、同一个脸型、同一套配色，只改动作和表情。</p>
+<ol><li>收到：举爪敬礼——手举到耳边（第一版手贴额头像思考，已改），表情认真</li><li>OK：比个心、眨一只眼，不用点头，和第 1 张区分开</li><li>哈哈哈：仰头大笑，嘴张大、眼睛弯成弧线</li><li>委屈：抱膝坐着、泪汪汪，唯一一张负面情绪，要画出反差</li><li>抱抱：张开双臂，表情温暖</li><li>谢谢：双手捧一朵小花，只做这一个动作，不再加鞠躬（两动作挤在 240×240 里会糊）</li><li>加油：举起小旗跳跃——双脚离地跳起来（第一版站着举旗没跳起来，已改），懒洋洋的水豚突然跳起来要有反差感</li><li>晚安：盖着小被子躺平睡觉，突出水豚躺平的招牌动作</li></ol>
+<div class="sec-head" id="sec-5"><span class="badge">05</span><h2>发给 Codex 的提示词（融合版，直接复制）</h2></div>
+<pre><code>请按以下要求，重新设计我的原创水豚 IP 表情包“暖暖豚”，先做静态版，不要做动态。
+
+定位：暖暖的，但天塌下来也不急。温暖、淡定、情绪稳定，适合赶毕设、找工作的学生和年轻女性；核心是“累了还能稳住”的治愈感，不是单纯可爱。
+
+形象（融合版，缺一不可）：
+- 物种是水豚，不要画成仓鼠、熊、猫
+- 脸：长方形打底、边角揉圆，比圆脸拉长约五分之一；小耳朵
+- 鼻子：水豚长方形大鼻头，边角倒圆，暖棕色，不要粉色小鼻子
+- 嘴：小小的 w 形，微微上扬的小微笑
+- 眼睛：大圆亮晶晶，带睫毛和高光，上眼睑压下来一点点——大眼睛加半分淡定，不要全睁的惊讶眼，也不要半闭的困眼；眉毛抬高放平，不要斜着
+- 腮红：大大的粉色腮红，不要 // 两道线
+- 颜色：奶茶色身体、奶油肚子、中粗深棕描边，全套固定 2-3 个主色，不要每张换色
+- 比例：大头小身，头占整体 55%-60%
+- 记忆点：头顶一片带咬痕的小叶子，微微歪着；开心时竖起，累了就耷拉下来
+- 风格：粗描边加平涂色，干净简洁，去掉小图里看不清的细节，不要加黄色光线
+
+不要模仿水豚噜噜（头顶橘子的黄色水豚）、轻松熊、Chiikawa、Loopy、LINE Friends；不要用网上抠图、免费素材、他人字体；表情文字只用下面 8 句。
+
+8 张（透明底 PNG，240x240，单张 ≤500KB；同一角色、同一脸型、同一配色，只改动作和表情）：
+1. 收到：举爪敬礼，手举到耳边，表情认真
+2. OK：比个心、眨一只眼，不要点头
+3. 哈哈哈：仰头大笑，嘴张大、眼睛弯成弧线
+4. 委屈：抱膝坐着、泪汪汪
+5. 抱抱：张开双臂，表情温暖
+6. 谢谢：双手捧一朵小花，只做这一个动作，不要鞠躬
+7. 加油：举起小旗跳跃，双脚离地
+8. 晚安：盖着小被子躺平睡觉
+
+第一步：先出角色设定图（正面、侧面、背面 + 颜色色号），确认不撞款、剪影能认出来；第二步：再按上面 8 张出静态表情图；不要现在做动态。</code></pre>
+<div class="sec-head" id="sec-6"><span class="badge">06</span><h2>验收（设定图出来后按这 3 条看）</h2></div>
+<ol><li>一眼能认出是水豚，不是仓鼠或熊（鼻头 + 长脸是关键）</li><li>涂黑只看剪影也能认出是暖暖豚（咬痕叶子 + 长脸 + 大鼻头）</li><li>缩小到 50×50 聊天图标，脸和动作依然清楚；8 张情绪各不相同，没有两张动作重复</li></ol>
+<div class="sec-head" id="sec-7"><span class="badge">07</span><h2>备注</h2></div>
+<ul><li>本文件是文字设定，不是成图：本轮没出新图，设定图和 8 张仍需主 agent 或 Codex 按上面执行。</li><li>他如果改选路线 ①（可爱优先），这份作废：直接按可爱版出 8 张，不用再改鼻子和脸型。</li><li>和小红书店的关系：IP 以后可作店铺头像/封面/插图，但 19.9 元模板商品仍未上架、自动发货仍未自测——别把这份设定当成那篇笔记已可带转化发布。</li></ul>
+<pre><code>
+文件：`***</code></pre><nav class="pager"><span><a href="5.html">← 开题图文稿第 6 页：三行卡片做图版</a></span><span><a href="7.html">AX3600 代理链泄漏排查与 fail-closed 加固（定版） →</a></span></nav></main></div>
+<script>
+var bar=document.getElementById('progress');
+var links=Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+var secs=links.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
+function onScroll(){var st=window.scrollY||document.documentElement.scrollTop;var h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?(st/h*100):0)+'%';var cur=secs[0];secs.forEach(function(s){if(s.getBoundingClientRect().top<=120)cur=s;});links.forEach(function(a){var on=a.getAttribute('href')==='#'+(cur&&cur.id);a.classList.toggle('active',on);if(on)a.scrollIntoView({block:'nearest'});});}
+window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+document.getElementById('toTop').addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+</script>
+</body>
+</html>

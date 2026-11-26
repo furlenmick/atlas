@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harness 到底在干嘛：一句话讲清 · Atlas</title>
+<style>
+:root{--ink:#26221e;--muted:#6f6a63;--paper:#faf7f2;--surface:#fff;--line:#e8e0d5;
+--accent:#d94f30;--accent-soft:#fdeee9;--pine:#2e6b4f;--pine-soft:#e8f2ec}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;font-size:17px;line-height:1.85}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+h1,h2,h3,h4{font-family:"Noto Serif SC","Songti SC","STSong",serif;line-height:1.35}
+code{font-family:ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f1ece4;padding:1px 6px;border-radius:4px}
+pre{background:#26221e;color:#f5efe6;padding:16px 18px;border-radius:10px;overflow-x:auto}
+pre code{background:none;color:inherit;padding:0}
+blockquote{border-left:3px solid var(--accent);background:var(--accent-soft);margin:20px 0;padding:12px 18px;color:#5a4a44}
+blockquote p{margin:0}
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:15px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:8px 12px;text-align:left}
+th{background:#f1ece4}
+img{max-width:100%}
+figure{margin:20px 0;text-align:center}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px}
+hr{border:none;border-top:1px solid var(--line);margin:28px 0}
+.tag{display:inline-block;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:2px 10px;font-size:13px;margin:0 6px 6px 0;color:var(--muted);font-family:ui-monospace,"JetBrains Mono",Menlo,monospace}
+/* --- homepage --- */
+.topbar{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--line);padding:14px 0}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 64px}
+.search{width:100%;font-size:16px;padding:12px 16px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-family:inherit}
+.search:focus{outline:2px solid var(--accent);outline-offset:1px}
+.overview{color:var(--muted);font-size:14px;margin:20px 0 4px}
+.catgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:18px 0 8px}
+@media(min-width:900px){.catgrid{grid-template-columns:repeat(3,1fr)}}
+.catcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:0 1px 4px rgba(38,34,30,.06)}
+.catcard h3{margin:0 0 4px;font-size:19px}
+.catcard p{margin:4px 0;color:var(--muted);font-size:14px}
+.pinned-sec{margin:28px 0}
+.pinned-sec h2,.sechead{font-size:22px;font-weight:900;margin:0 0 12px;padding-bottom:6px}
+.pinned-sec h2::before{content:"";display:block;width:32px;height:4px;background:var(--accent);border-radius:2px;margin-bottom:10px}
+.chips{margin:18px 0;display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 14px;font-size:14px;cursor:pointer}
+.chip.active{background:var(--pine);color:#fff;border-color:var(--pine)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0;box-shadow:0 1px 4px rgba(38,34,30,.06)}
+.card h3{margin:0 0 6px;font-size:19px}
+.card h3 a{color:var(--ink)}
+.card p{margin:6px 0;color:var(--muted);font-size:15px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .catline{color:var(--pine);font-size:13px;font-weight:700}
+.pinned{display:inline-block;background:var(--accent);color:#fff;border-radius:4px;font-size:12px;padding:2px 8px;margin-left:8px;vertical-align:middle}
+.date{color:var(--muted);font-size:13px}
+/* --- detail --- */
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:50}
+.layout{display:grid;grid-template-columns:240px 1fr;gap:32px;max-width:1080px;margin:0 auto;padding:24px}
+@media(max-width:860px){.layout{grid-template-columns:1fr}}
+.toc{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto;scrollbar-width:thin;align-self:start}
+.toc h4{margin:0 0 8px;font-size:14px}
+.toc ol{margin:0;padding-left:0;list-style:none}
+.toc li{margin:2px 0}
+.toc a{display:block;padding:5px 10px;border-radius:8px;color:var(--ink);font-size:14px;line-height:1.5}
+.toc a.active{background:var(--accent-soft);color:var(--accent);font-weight:700}
+.toc-mobile{display:none}
+@media(max-width:860px){.toc{display:none}.toc-mobile{display:block;position:sticky;top:0;z-index:15;background:var(--paper);padding:10px 0;border-bottom:1px solid var(--line)}}
+.kicker{color:var(--accent);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.article h1{font-size:32px;font-weight:900;margin:8px 0}
+.lead{color:var(--muted);font-size:15px}
+.meta{color:var(--muted);font-size:14px;margin:10px 0}
+.sec-head{display:flex;gap:12px;align-items:baseline;margin:36px 0 12px}
+.sec-head h2{margin:0;font-size:24px;font-weight:900}
+.badge{flex:0 0 auto;border:2px solid var(--accent);color:var(--accent);border-radius:8px;font-family:ui-monospace,"JetBrains Mono",monospace;font-weight:700;font-size:14px;padding:1px 8px}
+.img-note{border:1px dashed var(--line);border-radius:10px;padding:14px;color:var(--muted);font-size:14px;text-align:center;margin:20px 0}
+nav.back{margin-bottom:16px;font-size:15px}
+nav.pager{display:flex;justify-content:space-between;gap:16px;margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-size:15px}
+#toTop{position:fixed;right:20px;bottom:20px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);opacity:.75;font-size:18px;cursor:pointer;z-index:40}
+footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid var(--line);padding-top:16px}
+@media(max-width:640px){body{font-size:16px}.article h1{font-size:26px}.layout{padding:16px}}
+</style>
+</head>
+<body>
+<div id="progress"></div><button id="toTop" title="回到顶部">↑</button><div class="layout"><aside><nav class="toc"><h4>目录（4 节）</h4><ol><li style=""><a href="#sec-1"> 流程（以“修登录闪退”为例）</a></li><li style=""><a href="#sec-2"> Harness 顺手还管这些（防失控）</a></li><li style=""><a href="#sec-3"> 分清四个词</a></li><li style=""><a href="#sec-4"> 关键纠正</a></li></ol></nav></aside><main class="article"><nav class="back"><a href="../index.html">← 返回 Atlas</a></nav><div class="kicker">AI 与 Agent</div><h1>Harness 到底在干嘛：一句话讲清</h1><p class="lead">一句话：大模型只动嘴，Harness 负责动手、传话、兜底。以“修登录闪退”为例走一遍完整流程。</p><div><span class="tag">Harness</span><span class="tag">Agent</span><span class="tag">概念图</span></div><p class="meta">约 714 字 · 阅读约 1 分钟 · 更新 2026-11-26</p><div class="toc-mobile"><details><summary>目录（4 节）</summary><ol><li style=""><a href="#sec-1"> 流程（以“修登录闪退”为例）</a></li><li style=""><a href="#sec-2"> Harness 顺手还管这些（防失控）</a></li><li style=""><a href="#sec-3"> 分清四个词</a></li><li style=""><a href="#sec-4"> 关键纠正</a></li></ol></details></div>
+<p>一句话：大模型只动嘴，Harness 负责动手 + 传话 + 兜底</p>
+<div class="img-note">🖼 Harness 流程图：大模型只动嘴，Harness 负责动手、传话、兜底（配图 kbimg:harness-diagram.png，未包含在导出中）</div>
+<div class="sec-head" id="sec-1"><span class="badge">01</span><h2>流程（以“修登录闪退”为例）</h2></div>
+<pre><code>① 你：说一句话 “修登录闪退”
+        ↓
+② HARNESS · 准备材料
+   把你的话 + 相关文件 + 能用的工具清单，打包好喂给大模型
+   它不思考，只负责“拼材料、递话”
+        ↓
+③ 大模型 · 只动脑、只动嘴
+   决定下一步：“先读登录代码”
+   它自己不会读文件、改代码、跑测试
+        ↓
+④ HARNESS · 动手干活
+   读文件、改一行代码、跑测试
+   再把真实结果贴回去：文件内容 / 测试报错
+        ↓
+   ↺ 循环 ③ → ④，直到大模型说“修好了”
+        ↓
+⑤ 收尾：Harness 停下来，向你汇报改了什么</code></pre>
+<div class="sec-head" id="sec-2"><span class="badge">02</span><h2>Harness 顺手还管这些（防失控）</h2></div>
+<ul><li>工具清单：能调哪些工具</li><li>上下文：一次喂多少文件</li><li>权限：哪些文件能改 / 不能改</li><li>上限：试几次就停，不死循环</li><li>留记录：每步都记下来给你检查</li><li>目标：盯着你的任务不跑偏</li></ul>
+<div class="sec-head" id="sec-3"><span class="badge">03</span><h2>分清四个词</h2></div>
+<ul><li>大模型 = 大脑，只会说话</li><li>Harness = 身体 + 管家，动手 + 传话</li><li>Agent = 大脑 + 身体 + 一个目标</li><li>Codex = 打包好的 Agent：GPT + 自家 Harness + 命令行外壳</li></ul>
+<div class="sec-head" id="sec-4"><span class="badge">04</span><h2>关键纠正</h2></div>
+<p>拆解不是 Codex 在外面先拆，是大模型自己拆； 循环也不只是“再问一次”，关键是中间 Harness 真的动手改了、跑了。</p><nav class="pager"><span><a href="1.html">← Grok 机器人为什么烧钱：Harness 学习笔记</a></span><span><a href="3.html">小米 AX3600 刷 OpenWrt 做旁路由完整教程（定版） →</a></span></nav></main></div>
+<script>
+var bar=document.getElementById('progress');
+var links=Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+var secs=links.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
+function onScroll(){var st=window.scrollY||document.documentElement.scrollTop;var h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?(st/h*100):0)+'%';var cur=secs[0];secs.forEach(function(s){if(s.getBoundingClientRect().top<=120)cur=s;});links.forEach(function(a){var on=a.getAttribute('href')==='#'+(cur&&cur.id);a.classList.toggle('active',on);if(on)a.scrollIntoView({block:'nearest'});});}
+window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+document.getElementById('toTop').addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+</script>
+</body>
+</html>

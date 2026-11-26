@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude 账号防封与付款完整流程（定版） · Atlas</title>
+<style>
+:root{--ink:#26221e;--muted:#6f6a63;--paper:#faf7f2;--surface:#fff;--line:#e8e0d5;
+--accent:#d94f30;--accent-soft:#fdeee9;--pine:#2e6b4f;--pine-soft:#e8f2ec}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;font-size:17px;line-height:1.85}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+h1,h2,h3,h4{font-family:"Noto Serif SC","Songti SC","STSong",serif;line-height:1.35}
+code{font-family:ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f1ece4;padding:1px 6px;border-radius:4px}
+pre{background:#26221e;color:#f5efe6;padding:16px 18px;border-radius:10px;overflow-x:auto}
+pre code{background:none;color:inherit;padding:0}
+blockquote{border-left:3px solid var(--accent);background:var(--accent-soft);margin:20px 0;padding:12px 18px;color:#5a4a44}
+blockquote p{margin:0}
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:15px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:8px 12px;text-align:left}
+th{background:#f1ece4}
+img{max-width:100%}
+figure{margin:20px 0;text-align:center}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px}
+hr{border:none;border-top:1px solid var(--line);margin:28px 0}
+.tag{display:inline-block;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:2px 10px;font-size:13px;margin:0 6px 6px 0;color:var(--muted);font-family:ui-monospace,"JetBrains Mono",Menlo,monospace}
+/* --- homepage --- */
+.topbar{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--line);padding:14px 0}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 64px}
+.search{width:100%;font-size:16px;padding:12px 16px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-family:inherit}
+.search:focus{outline:2px solid var(--accent);outline-offset:1px}
+.overview{color:var(--muted);font-size:14px;margin:20px 0 4px}
+.catgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:18px 0 8px}
+@media(min-width:900px){.catgrid{grid-template-columns:repeat(3,1fr)}}
+.catcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:0 1px 4px rgba(38,34,30,.06)}
+.catcard h3{margin:0 0 4px;font-size:19px}
+.catcard p{margin:4px 0;color:var(--muted);font-size:14px}
+.pinned-sec{margin:28px 0}
+.pinned-sec h2,.sechead{font-size:22px;font-weight:900;margin:0 0 12px;padding-bottom:6px}
+.pinned-sec h2::before{content:"";display:block;width:32px;height:4px;background:var(--accent);border-radius:2px;margin-bottom:10px}
+.chips{margin:18px 0;display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 14px;font-size:14px;cursor:pointer}
+.chip.active{background:var(--pine);color:#fff;border-color:var(--pine)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0;box-shadow:0 1px 4px rgba(38,34,30,.06)}
+.card h3{margin:0 0 6px;font-size:19px}
+.card h3 a{color:var(--ink)}
+.card p{margin:6px 0;color:var(--muted);font-size:15px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .catline{color:var(--pine);font-size:13px;font-weight:700}
+.pinned{display:inline-block;background:var(--accent);color:#fff;border-radius:4px;font-size:12px;padding:2px 8px;margin-left:8px;vertical-align:middle}
+.date{color:var(--muted);font-size:13px}
+/* --- detail --- */
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:50}
+.layout{display:grid;grid-template-columns:240px 1fr;gap:32px;max-width:1080px;margin:0 auto;padding:24px}
+@media(max-width:860px){.layout{grid-template-columns:1fr}}
+.toc{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto;scrollbar-width:thin;align-self:start}
+.toc h4{margin:0 0 8px;font-size:14px}
+.toc ol{margin:0;padding-left:0;list-style:none}
+.toc li{margin:2px 0}
+.toc a{display:block;padding:5px 10px;border-radius:8px;color:var(--ink);font-size:14px;line-height:1.5}
+.toc a.active{background:var(--accent-soft);color:var(--accent);font-weight:700}
+.toc-mobile{display:none}
+@media(max-width:860px){.toc{display:none}.toc-mobile{display:block;position:sticky;top:0;z-index:15;background:var(--paper);padding:10px 0;border-bottom:1px solid var(--line)}}
+.kicker{color:var(--accent);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.article h1{font-size:32px;font-weight:900;margin:8px 0}
+.lead{color:var(--muted);font-size:15px}
+.meta{color:var(--muted);font-size:14px;margin:10px 0}
+.sec-head{display:flex;gap:12px;align-items:baseline;margin:36px 0 12px}
+.sec-head h2{margin:0;font-size:24px;font-weight:900}
+.badge{flex:0 0 auto;border:2px solid var(--accent);color:var(--accent);border-radius:8px;font-family:ui-monospace,"JetBrains Mono",monospace;font-weight:700;font-size:14px;padding:1px 8px}
+.img-note{border:1px dashed var(--line);border-radius:10px;padding:14px;color:var(--muted);font-size:14px;text-align:center;margin:20px 0}
+nav.back{margin-bottom:16px;font-size:15px}
+nav.pager{display:flex;justify-content:space-between;gap:16px;margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-size:15px}
+#toTop{position:fixed;right:20px;bottom:20px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);opacity:.75;font-size:18px;cursor:pointer;z-index:40}
+footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid var(--line);padding-top:16px}
+@media(max-width:640px){body{font-size:16px}.article h1{font-size:26px}.layout{padding:16px}}
+</style>
+</head>
+<body>
+<div id="progress"></div><button id="toTop" title="回到顶部">↑</button><div class="layout"><aside><nav class="toc"><h4>目录（6 节）</h4><ol><li style=""><a href="#sec-1"> 背景结论（先认清，再动手）</a></li><li style=""><a href="#sec-2"> 步骤一：账号——保留旧号，不开新号</a></li><li style=""><a href="#sec-3"> 步骤二：环境——本地 Win11 + 链式出口</a></li><li style=""><a href="#sec-4"> 步骤三：付款——顺序和铁律</a></li><li style=""><a href="#sec-5"> 步骤四：KYC 弹窗出现时怎么办</a></li><li style=""><a href="#sec-6"> 踩坑记录</a></li></ol></nav></aside><main class="article"><nav class="back"><a href="../index.html">← 返回 Atlas</a></nav><div class="kicker">账号与服务</div><h1>Claude 账号防封与付款完整流程（定版）</h1><p class="lead">从出口、账号、时区到付款与 KYC 的整套定级流程：保留旧号、住宅链式出口、iOS 礼品卡优先、月付 Pro 起步、KYC 弹窗先截图不交材料。</p><div><span class="tag">Claude</span><span class="tag">防封</span><span class="tag">付款</span><span class="tag">KYC</span><span class="tag">住宅IP</span></div><p class="meta">约 1979 字 · 阅读约 4 分钟 · 更新 2026-11-26</p><div class="toc-mobile"><details><summary>目录（6 节）</summary><ol><li style=""><a href="#sec-1"> 背景结论（先认清，再动手）</a></li><li style=""><a href="#sec-2"> 步骤一：账号——保留旧号，不开新号</a></li><li style=""><a href="#sec-3"> 步骤二：环境——本地 Win11 + 链式出口</a></li><li style=""><a href="#sec-4"> 步骤三：付款——顺序和铁律</a></li><li style=""><a href="#sec-5"> 步骤四：KYC 弹窗出现时怎么办</a></li><li style=""><a href="#sec-6"> 踩坑记录</a></li></ol></details></div>
+<blockquote><p>定版：2026-10-20 定级，2026-10-23 补时区与 KYC 执行细则。<br>一句话原则：先在最终出口上把环境养稳，再付费；全程低频、一致、不折腾。</p></blockquote>
+<div class="sec-head" id="sec-1"><span class="badge">01</span><h2>背景结论（先认清，再动手）</h2></div>
+<ul><li>大陆 / 香港 / 澳门都是 Claude 不支持的地区，使用本身就带封号风险，违规终止不退款；其他原因退款按比例。</li><li>最好的资产是干净的住宅出口：Verizon Business 静态住宅 IP，经 RackNerd 前置链式转发。机场共享节点和机房 IP 直连风险最高；VPS 直装已出局——唯一可接受的变体是 VPS 出站全部走 Verizon socks5 并带 kill-switch。</li><li>付费 Pro 极可能触发 Stripe + Anthropic 全量复审，大陆卡是最大的风险因子。</li></ul>
+<div class="sec-head" id="sec-2"><span class="badge">02</span><h2>步骤一：账号——保留旧号，不开新号</h2></div>
+<ul><li>此前已用一条美区 ISP IP 注册过一个账号（非 Verizon 静态 IP，那条线路与账号详情未知）。默认保留旧账号，不另开新号：多开账号本身就是封号触发器，存活的老注册是资产。</li><li>那条 ISP 线路若仍干净，就别迁移；若已脏，单向迁移到 Verizon 出口，轻度养号几天再付费。绝不在两个 IP 之间来回跳。</li><li>只有四种情况才弃号重开：老账号已被封 / 被标、注册在脏 IP 上、账号不完全在自己控制下、登录历史已污染。</li></ul>
+<div class="sec-head" id="sec-3"><span class="badge">03</span><h2>步骤二：环境——本地 Win11 + 链式出口</h2></div>
+<ul><li>本地 Win11，桌面端 / CLI 为主力，配 v2rayN TUN 模式。主力工具定为 Claude Code + Design。</li><li>时区跟随最终出口一次钉死，永不反复。兼职路线②的钉法：</li><li>系统时区留北京，Claude 进程单独用 <code>TZ=America/New_York</code> 从脚本启动；桌面版关掉自启，只从脚本启动。</li><li>Claude 专用 Chrome Profile 把 en-US 置顶。注意：Chrome 在 Windows 上不吃 TZ 变量，网页版时区仍报北京，所以网页版只作登录 / OAuth 与少量使用，主力放 CLI + 桌面版。</li><li>验收标准：脚本启动的 CLI 显示美东时间（EST）。</li><li>配套：Windows 区域设 United States、浏览器语言 en-US 优先、自动校时打开、关掉自动设置时区与定位，不用 JS 时区伪装。</li></ul>
+<div class="sec-head" id="sec-4"><span class="badge">04</span><h2>步骤三：付款——顺序和铁律</h2></div>
+<p>付款方式优先级（从优到次）：</p>
+<ol><li><strong>iOS + 礼品卡</strong>：已有美区 Apple ID；只在官方店购买、留好小票、分批兑换。灰卡有风险，不碰。</li><li><strong>Starryblu</strong>：SG BIN 万事达借记卡，大陆护照 + 手机号可开；作备用卡，只走官方渠道。</li><li><strong>Bybit</strong>：已有账户可用；不要为了这件事新开 Bybit 卡。</li><li>大陆卡（风险因子最大，尽量不用）。</li><li>US PayPal（网页端只收卡，排最后）。</li></ol>
+<p>价格参考（iOS 价）：Pro 年付 $214.99；Max 5x $124.99/月、20x $249.99/月（网页价 $100 / $200）。</p>
+<p>铁律：</p>
+<ul><li>先月付 Pro $20 验证稳定性和用量，频繁撞限额再升 Max 5x；未验证稳定前不上 $100–200 的档。</li><li>拒卡不要反复重试。</li><li>出问题先申诉，绝不 chargeback。</li><li>退款只走 Apple，且须单独取消订阅；退款退回美区 USD 余额，约 48 小时，退不回人民币。不要重复薅退款。</li></ul>
+<div class="sec-head" id="sec-5"><span class="badge">05</span><h2>步骤四：KYC 弹窗出现时怎么办</h2></div>
+<p>背景：Anthropic 自 2026-04 起经 Persona 做选择性验证，要实体证件原件 + 活体自拍，不接受复印件 / 扫描 / 数字 ID。典型触发点：升 Max、高频使用、被风控标记；VPN / 位置与声明地址不符是典型情形。Persona 接受中国护照（查人证一致，不查居住地），但验证通过后仍可因在不支持地区使用被封；且提交真实身份是单向门——被封后换邮箱重开的空间大减。</p>
+<p>执行细则：</p>
+<ol><li>维持 Pro、不跳 Max，低频起步，尽量不触发。</li><li>真弹出来时先截图，别当场交材料，回来商量后再决定。</li><li>注册名必须与证件拼音一致（这一步在注册时就要对齐）。</li><li>验证时用链式出口的浏览器、关定位；手机扫码要在同一出口的 WiFi 下、关蜂窝、拒绝定位授权。</li><li>始终保持一致：IP、时区、语言、账单国家、声明地址，五样对得上。</li></ol>
+<div class="sec-head" id="sec-6"><span class="badge">06</span><h2>踩坑记录</h2></div>
+<ul><li><strong>多开账号 = 自找封号</strong>：新号没有历史积累，还多一个触发器；老号活着就是资产。</li><li><strong>付款方式比金额更重要</strong>：大陆卡是全量复审里最大的风险因子，宁可用礼品卡绕开。</li><li><strong>时区反复横跳是大忌</strong>：钉死一次就不要再改；网页版时区报北京是 Chrome 的固有限制，不是配置错误，别为它反复折腾。</li><li><strong>KYC 是单向门</strong>：交了真实身份就回不去了，所以策略是&quot;不触发&quot;而不是&quot;准备好材料随时交&quot;。</li></ul><nav class="pager"><span><a href="7.html">← AX3600 代理链泄漏排查与 fail-closed 加固（定版）</a></span><span><a href="9.html">住宅出口与链式代理选型定版 →</a></span></nav></main></div>
+<script>
+var bar=document.getElementById('progress');
+var links=Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+var secs=links.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
+function onScroll(){var st=window.scrollY||document.documentElement.scrollTop;var h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?(st/h*100):0)+'%';var cur=secs[0];secs.forEach(function(s){if(s.getBoundingClientRect().top<=120)cur=s;});links.forEach(function(a){var on=a.getAttribute('href')==='#'+(cur&&cur.id);a.classList.toggle('active',on);if(on)a.scrollIntoView({block:'nearest'});});}
+window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+document.getElementById('toTop').addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+</script>
+</body>
+</html>

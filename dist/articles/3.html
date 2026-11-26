@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>小米 AX3600 刷 OpenWrt 做旁路由完整教程（定版） · Atlas</title>
+<style>
+:root{--ink:#26221e;--muted:#6f6a63;--paper:#faf7f2;--surface:#fff;--line:#e8e0d5;
+--accent:#d94f30;--accent-soft:#fdeee9;--pine:#2e6b4f;--pine-soft:#e8f2ec}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;font-size:17px;line-height:1.85}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+h1,h2,h3,h4{font-family:"Noto Serif SC","Songti SC","STSong",serif;line-height:1.35}
+code{font-family:ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f1ece4;padding:1px 6px;border-radius:4px}
+pre{background:#26221e;color:#f5efe6;padding:16px 18px;border-radius:10px;overflow-x:auto}
+pre code{background:none;color:inherit;padding:0}
+blockquote{border-left:3px solid var(--accent);background:var(--accent-soft);margin:20px 0;padding:12px 18px;color:#5a4a44}
+blockquote p{margin:0}
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:15px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:8px 12px;text-align:left}
+th{background:#f1ece4}
+img{max-width:100%}
+figure{margin:20px 0;text-align:center}
+figcaption{color:var(--muted);font-size:14px;margin-top:8px}
+hr{border:none;border-top:1px solid var(--line);margin:28px 0}
+.tag{display:inline-block;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:2px 10px;font-size:13px;margin:0 6px 6px 0;color:var(--muted);font-family:ui-monospace,"JetBrains Mono",Menlo,monospace}
+/* --- homepage --- */
+.topbar{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--line);padding:14px 0}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 64px}
+.search{width:100%;font-size:16px;padding:12px 16px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-family:inherit}
+.search:focus{outline:2px solid var(--accent);outline-offset:1px}
+.overview{color:var(--muted);font-size:14px;margin:20px 0 4px}
+.catgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:18px 0 8px}
+@media(min-width:900px){.catgrid{grid-template-columns:repeat(3,1fr)}}
+.catcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:0 1px 4px rgba(38,34,30,.06)}
+.catcard h3{margin:0 0 4px;font-size:19px}
+.catcard p{margin:4px 0;color:var(--muted);font-size:14px}
+.pinned-sec{margin:28px 0}
+.pinned-sec h2,.sechead{font-size:22px;font-weight:900;margin:0 0 12px;padding-bottom:6px}
+.pinned-sec h2::before{content:"";display:block;width:32px;height:4px;background:var(--accent);border-radius:2px;margin-bottom:10px}
+.chips{margin:18px 0;display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 14px;font-size:14px;cursor:pointer}
+.chip.active{background:var(--pine);color:#fff;border-color:var(--pine)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0;box-shadow:0 1px 4px rgba(38,34,30,.06)}
+.card h3{margin:0 0 6px;font-size:19px}
+.card h3 a{color:var(--ink)}
+.card p{margin:6px 0;color:var(--muted);font-size:15px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .catline{color:var(--pine);font-size:13px;font-weight:700}
+.pinned{display:inline-block;background:var(--accent);color:#fff;border-radius:4px;font-size:12px;padding:2px 8px;margin-left:8px;vertical-align:middle}
+.date{color:var(--muted);font-size:13px}
+/* --- detail --- */
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:50}
+.layout{display:grid;grid-template-columns:240px 1fr;gap:32px;max-width:1080px;margin:0 auto;padding:24px}
+@media(max-width:860px){.layout{grid-template-columns:1fr}}
+.toc{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto;scrollbar-width:thin;align-self:start}
+.toc h4{margin:0 0 8px;font-size:14px}
+.toc ol{margin:0;padding-left:0;list-style:none}
+.toc li{margin:2px 0}
+.toc a{display:block;padding:5px 10px;border-radius:8px;color:var(--ink);font-size:14px;line-height:1.5}
+.toc a.active{background:var(--accent-soft);color:var(--accent);font-weight:700}
+.toc-mobile{display:none}
+@media(max-width:860px){.toc{display:none}.toc-mobile{display:block;position:sticky;top:0;z-index:15;background:var(--paper);padding:10px 0;border-bottom:1px solid var(--line)}}
+.kicker{color:var(--accent);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.article h1{font-size:32px;font-weight:900;margin:8px 0}
+.lead{color:var(--muted);font-size:15px}
+.meta{color:var(--muted);font-size:14px;margin:10px 0}
+.sec-head{display:flex;gap:12px;align-items:baseline;margin:36px 0 12px}
+.sec-head h2{margin:0;font-size:24px;font-weight:900}
+.badge{flex:0 0 auto;border:2px solid var(--accent);color:var(--accent);border-radius:8px;font-family:ui-monospace,"JetBrains Mono",monospace;font-weight:700;font-size:14px;padding:1px 8px}
+.img-note{border:1px dashed var(--line);border-radius:10px;padding:14px;color:var(--muted);font-size:14px;text-align:center;margin:20px 0}
+nav.back{margin-bottom:16px;font-size:15px}
+nav.pager{display:flex;justify-content:space-between;gap:16px;margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-size:15px}
+#toTop{position:fixed;right:20px;bottom:20px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);opacity:.75;font-size:18px;cursor:pointer;z-index:40}
+footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid var(--line);padding-top:16px}
+@media(max-width:640px){body{font-size:16px}.article h1{font-size:26px}.layout{padding:16px}}
+</style>
+</head>
+<body>
+<div id="progress"></div><button id="toTop" title="回到顶部">↑</button><div class="layout"><aside><nav class="toc"><h4>目录（22 节）</h4><ol><li style=""><a href="#sec-1"> 先看懂拓扑（动手前花 2 分钟）</a></li><li style=""><a href="#sec-2"> 恢复出厂，确认固件版本</a></li><li style=""><a href="#sec-3"> （仅高版本需要）降级到 1.0.17</a></li><li style=""><a href="#sec-4"> 一键开启 SSH</a></li><li style=""><a href="#sec-5"> 备份重要分区（5 分钟，变砖保险）</a></li><li style=""><a href="#sec-6"> 下载 OpenWrt 固件</a></li><li style=""><a href="#sec-7"> 刷入 OpenWrt（分两步，约 10 分钟）</a></li><li style="padding-left:14px;"><a href="#sec-8"> 6.1 把过渡镜像传进路由器并改短文件名</a></li><li style="padding-left:14px;"><a href="#sec-9"> 6.2 查当前启动分区，刷入非当前分区</a></li><li style="padding-left:14px;"><a href="#sec-10"> 6.3 进内存中的 OpenWrt，正式安装</a></li><li style=""><a href="#sec-11"> 设为旁路由（基础网络配置）</a></li><li style=""><a href="#sec-12"> 安装 AdGuardHome（去广告 DNS）</a></li><li style=""><a href="#sec-13"> 安装 OpenClash（代理分流）</a></li><li style="padding-left:14px;"><a href="#sec-14"> 9.1 下载安装包</a></li><li style="padding-left:14px;"><a href="#sec-15"> 9.2 安装依赖和主程序</a></li><li style="padding-left:14px;"><a href="#sec-16"> 9.3 下载 Clash 内核</a></li><li style="padding-left:14px;"><a href="#sec-17"> 9.4 导入订阅并启动</a></li><li style="padding-left:14px;"><a href="#sec-18"> 9.5 把 AdGuardHome 的上游接到 Clash</a></li><li style="padding-left:14px;"><a href="#sec-19"> 9.6 让路由器自身也走这条 DNS</a></li><li style=""><a href="#sec-20"> 设备接入 &amp; 验证</a></li><li style=""><a href="#sec-21"> 回滚与救砖</a></li><li style=""><a href="#sec-22"> 日常维护 &amp; 常见问题</a></li></ol></nav></aside><main class="article"><nav class="back"><a href="../index.html">← 返回 Atlas</a></nav><div class="kicker">网络与路由</div><h1>小米 AX3600 刷 OpenWrt 做旁路由完整教程（定版）</h1><p class="lead">BE7200 Pro 当主路由、AX3600 刷 OpenWrt 做旁路由的完整定版教程：降级开 SSH、刷机、OpenClash 分流与 AdGuardHome 去广告，全程可照着走通。</p><div><span class="tag">AX3600</span><span class="tag">OpenWrt</span><span class="tag">OpenClash</span><span class="tag">AdGuardHome</span><span class="tag">旁路由</span></div><p class="meta">约 8786 字 · 阅读约 21 分钟 · 更新 2026-11-26</p><div class="toc-mobile"><details><summary>目录（22 节）</summary><ol><li style=""><a href="#sec-1"> 先看懂拓扑（动手前花 2 分钟）</a></li><li style=""><a href="#sec-2"> 恢复出厂，确认固件版本</a></li><li style=""><a href="#sec-3"> （仅高版本需要）降级到 1.0.17</a></li><li style=""><a href="#sec-4"> 一键开启 SSH</a></li><li style=""><a href="#sec-5"> 备份重要分区（5 分钟，变砖保险）</a></li><li style=""><a href="#sec-6"> 下载 OpenWrt 固件</a></li><li style=""><a href="#sec-7"> 刷入 OpenWrt（分两步，约 10 分钟）</a></li><li style="padding-left:14px;"><a href="#sec-8"> 6.1 把过渡镜像传进路由器并改短文件名</a></li><li style="padding-left:14px;"><a href="#sec-9"> 6.2 查当前启动分区，刷入非当前分区</a></li><li style="padding-left:14px;"><a href="#sec-10"> 6.3 进内存中的 OpenWrt，正式安装</a></li><li style=""><a href="#sec-11"> 设为旁路由（基础网络配置）</a></li><li style=""><a href="#sec-12"> 安装 AdGuardHome（去广告 DNS）</a></li><li style=""><a href="#sec-13"> 安装 OpenClash（代理分流）</a></li><li style="padding-left:14px;"><a href="#sec-14"> 9.1 下载安装包</a></li><li style="padding-left:14px;"><a href="#sec-15"> 9.2 安装依赖和主程序</a></li><li style="padding-left:14px;"><a href="#sec-16"> 9.3 下载 Clash 内核</a></li><li style="padding-left:14px;"><a href="#sec-17"> 9.4 导入订阅并启动</a></li><li style="padding-left:14px;"><a href="#sec-18"> 9.5 把 AdGuardHome 的上游接到 Clash</a></li><li style="padding-left:14px;"><a href="#sec-19"> 9.6 让路由器自身也走这条 DNS</a></li><li style=""><a href="#sec-20"> 设备接入 &amp; 验证</a></li><li style=""><a href="#sec-21"> 回滚与救砖</a></li><li style=""><a href="#sec-22"> 日常维护 &amp; 常见问题</a></li></ol></details></div>
+<blockquote><p>目标：BE7200 Pro 继续当主路由（拨号 + WiFi），闲置的 AX3600 刷 OpenWrt 后做<strong>旁路由</strong>，<br>承担代理分流（OpenClash）和去广告 DNS（AdGuardHome）。<br>想走软路由的设备把网关/DNS 指向它，不想走的设备完全不受影响。</p></blockquote>
+<div class="sec-head" id="sec-1"><span class="badge">0</span><h2>0. 先看懂拓扑（动手前花 2 分钟）</h2></div>
+<pre><code>光猫 ── BE7200 Pro（主路由，192.168.31.1，管拨号和 WiFi）
+          │
+          │ 网线（LAN 口对 LAN 口，AX3600 的 WAN 口空着不用）
+          │
+        AX3600（旁路由，192.168.31.2，WiFi 关闭）</code></pre>
+<ul><li>你的手机/电脑想走软路由时：手动把网关设为 192.168.31.2，DNS 设为 192.168.31.2。</li><li>数据流向：设备 → AX3600（Clash 分流 / AdGuardHome 过滤）→ BE7200 Pro → 光猫 → 外网。</li><li>全程用<strong>网线</strong>把电脑连 AX3600 操作，不要用 WiFi 刷机。</li></ul>
+<p><strong>需要准备</strong>：AX3600 及电源、一根网线、一台 Win11 电脑（自带 <code>ssh</code>/<code>scp</code> 命令）。</p>
+<hr>
+<div class="sec-head" id="sec-2"><span class="badge">1</span><h2>1. 恢复出厂，确认固件版本</h2></div>
+<ol><li>AX3600 通电，<strong>不接任何网线</strong>。长按机身 Reset 孔 5 秒以上，看到指示灯变橙色后松手，等待 2~3 分钟重启完成。</li><li>电脑用网线连 AX3600 的 <strong>LAN 口</strong>（4 个口随便一个，别插 WAN 口）。</li><li>浏览器打开 <code>http://192.168.31.1</code>，按初始化向导随便设个 WiFi 名和管理密码（管理密码记下来，后面降级登录要用）。</li><li>进后台看固件版本（一般在&quot;系统状态&quot;或&quot;路由设置→系统升级&quot;里）。</li></ol>
+<ul><li>如果版本是 <strong>1.0.17</strong>：直接跳到第 3 步。</li><li>如果版本<strong>高于</strong> 1.0.17：必须先降级，看第 2 步。（开 SSH 用的漏洞在新版里已经被堵上了）</li></ul>
+<hr>
+<div class="sec-head" id="sec-3"><span class="badge">2</span><h2>2.（仅高版本需要）降级到 1.0.17</h2></div>
+<ol><li>在电脑上下载降级固件（小米官方 CDN 直链，已验证可访问，纯文本长按复制）：</li></ol>
+<p>   <code>https://cdn.cnbj1.fds.api.mi-img.com/xiaoqiang/rom/r3600/miwifi_r3600_firmware_5da25_1.0.17.bin</code></p>
+<ul><li>文件名：<code>miwifi_r3600_firmware_5da25_1.0.17.bin</code></li><li>大小：<strong>28,312,508 字节</strong>（约 27.0 MiB）。下完对一下大小，差一位都别用。</li></ul>
+<ol><li>浏览器登录 <code>http://192.168.31.1</code>，登录后看地址栏，把 <code>stok=</code> 后面那一长串字符复制下来（后面也要用）。</li><li>在浏览器地址栏粘贴（把 <code>&lt;STOK&gt;</code> 换成你刚复制的那串）：</li></ol>
+<p>   <code>http://192.168.31.1/cgi-bin/luci/;stok=&lt;STOK&gt;/web/setting/upgrade</code>    这是&quot;手动升级&quot;页面。点&quot;选择文件&quot;，上传第 1 步下载的 bin，开始升级。 4. 等待 3~5 分钟，指示灯变蓝常亮表示完成。浏览器重新打开 <code>http://192.168.31.1</code> 登录。    （如果提示密码不对，用你第 1 步里设的管理密码；实在不行 Reset 重来一次。）</p>
+<hr>
+<div class="sec-head" id="sec-4"><span class="badge">3</span><h2>3. 一键开启 SSH</h2></div>
+<ol><li>登录 <code>http://192.168.31.1</code>，从地址栏复制新的 <code>stok=</code> 后面的字符串。</li><li>把下面这串地址里的 <code>&lt;STOK&gt;</code> 替换掉，在<strong>浏览器地址栏</strong>粘贴后回车（纯文本，长按复制）：</li></ol>
+<p>   <code>http://192.168.31.1/cgi-bin/luci/;stok=&lt;STOK&gt;/api/xqsystem/upgrade_rom?url=%3Bnvram%20set%20ssh_en%3D1%3Bnvram%20commit%3Bsed%20-i%20%27s%2Fchannel%3D.*%2Fchannel%3D%22debug%22%2Fg%27%20%2Fetc%2Finit.d%2Fdropbear%3B%2Fetc%2Finit.d%2Fdropbear%20start%3Becho%20-e%20***%7Cpasswd%20root%3B</code> 3. 页面返回 <code>{&quot;code&quot;:0}</code> 即成功。这串命令一次做完四件事：打开 SSH 开关并保存、启动 SSH 服务、把 root 密码设为 <code>admin</code>。 4. 在电脑上按 <code>Win+R</code> 输入 <code>cmd</code> 回车，输入：    <code>ssh root@192.168.31.1</code>    提示输入密码时输入 <code>admin</code>（输入时不显示，输完回车）。看到 <code>root@XiaoQiang:~#</code> 就表示进去了。 5. <strong>如果 root 登不上</strong>：说明密码没设成功。备选方案是去网上搜&quot;小米路由器 SSH 密码计算器&quot;，输入机身标签上的 SN 算出密码再登。算出来也登不上就回到第 1 步重来（多半是固件版本不对）。</p>
+<hr>
+<div class="sec-head" id="sec-5"><span class="badge">4</span><h2>4. 备份重要分区（5 分钟，变砖保险）</h2></div>
+<p>在刚才的 SSH 窗口里逐行执行：</p>
+<pre><code>cd /tmp
+nanddump -f mtd8-art.bin /dev/mtd8
+nanddump -f mtd9-bdata.bin /dev/mtd9
+nanddump -f mtd10-crash.bin /dev/mtd10
+ls -lh mtd*.bin</code></pre>
+<ul><li>mtd8 是 ART（WiFi 射频校准数据，丢了 WiFi 就残了），mtd9 是 bdata（设备身份信息），mtd10 是 crash。</li><li>然后在<strong>电脑的 cmd</strong> 里（不是 SSH 里）执行，把备份拉回电脑妥善保存：</li></ul>
+<p>  <code>scp root@192.168.31.1:/tmp/mtd*.bin D:\backup\ax3600\</code>   （先在 D 盘建好 <code>D:\backup\ax3600</code> 文件夹；密码还是 <code>admin</code>；第一次会问 <code>yes/no</code>，输 <code>yes</code>。）</p>
+<hr>
+<div class="sec-head" id="sec-6"><span class="badge">5</span><h2>5. 下载 OpenWrt 固件</h2></div>
+<p>打开 <code>https://firmware-selector.openwrt.org/</code>，搜索框输入 <code>ax3600</code>，版本选 <strong>25.12.6</strong>（当前稳定版；24.10 系列已于 2026-09-30 停止安全更新，不建议再用），下载下面两个文件：</p>
+<table><thead><tr><th>文件</th><th>大小</th><th>SHA256（下载后可校验）</th></tr></thead><tbody><tr><td><code>openwrt-25.12.6-qualcommax-ipq807x-xiaomi_ax3600-initramfs-factory.ubi</code></td><td>14,942,208 字节（约 14.25 MiB）</td><td><code>994f415609a058ee44ab4fa92712c0cdb4e754aabb0abb0a70a0d0d9652ec357</code></td></tr><tr><td><code>openwrt-25.12.6-qualcommax-ipq807x-xiaomi_ax3600-squashfs-sysupgrade.bin</code></td><td>13,568,307 字节（约 12.94 MiB）</td><td><code>b4d26d71e913a12e9f35a362cc360d8de9e513563b8bbe1e7c8dc43796726729</code></td></tr></tbody></table>
+<blockquote><p>注意：24.10 开始 AX3600 的 target 从 <code>ipq807x/generic</code> 改成了 <code>qualcommax/ipq807x</code>，<br>老教程里的旧版文件名对不上是正常的，认准 <code>qualcommax-ipq807x-xiaomi_ax3600</code> 就行。</p></blockquote>
+<hr>
+<div class="sec-head" id="sec-7"><span class="badge">6</span><h2>6. 刷入 OpenWrt（分两步，约 10 分钟）</h2></div>
+<div class="sec-head" id="sec-8"><span class="badge">6.1</span><h3>6.1 把过渡镜像传进路由器并改短文件名</h3></div>
+<p>在电脑 cmd 里：</p>
+<pre><code>scp D:\openwrt\openwrt-25.12.6-qualcommax-ipq807x-xiaomi_ax3600-initramfs-factory.ubi root@192.168.31.1:/tmp/factory.ubi</code></pre>
+<p>（把 <code>D:\openwrt\</code> 换成你实际存放固件的文件夹。）</p>
+<div class="sec-head" id="sec-9"><span class="badge">6.2</span><h3>6.2 查当前启动分区，刷入非当前分区</h3></div>
+<p>SSH 登录路由器，执行：</p>
+<pre><code>fw_printenv flag_boot_rootfs</code></pre>
+<p>看返回结果，二选一执行（<strong>不要两组都执行</strong>）：</p>
+<ul><li>如果返回 <code>flag_boot_rootfs=1</code>，执行：</li></ul>
+<pre><code>ubiformat /dev/mtd12 -y -f /tmp/factory.ubi -s 2048 -O 2048
+fw_setenv flag_boot_rootfs 0
+fw_setenv flag_last_success 0
+reboot</code></pre>
+<ul><li>如果返回 <code>flag_boot_rootfs=0</code>，执行：</li></ul>
+<pre><code>ubiformat /dev/mtd13 -y -f /tmp/factory.ubi -s 2048 -O 2048
+fw_setenv flag_boot_rootfs 1
+fw_setenv flag_last_success 1
+reboot</code></pre>
+<p>原理：AX3600 有双系统分区，这一步只写<strong>当前没在用的那个分区</strong>，先让 OpenWrt 从内存里跑起来验证一遍。 这一步如果失败，原厂系统还完整躺在另一个分区里，有机会切回去。 注意：下一步 6.3 正式安装完成后，OpenWrt 会把两个分区合并成一个大分区使用， 原厂就不再保留在机器里了——届时恢复原厂走第 11 步的官方修复工具，别指望双分区兜底。</p>
+<div class="sec-head" id="sec-10"><span class="badge">6.3</span><h3>6.3 进内存中的 OpenWrt，正式安装</h3></div>
+<ol><li>等待 2~3 分钟（指示灯变蓝）。<strong>电脑网线仍然直连 AX3600</strong>，浏览器打开 <code>http://192.168.1.1</code></li></ol>
+<p>   （注意：这时 IP 变成了 192.168.1.1，不是 192.168.31.1）。 2. 第一次进会让你设 root 密码，设一个自己记得住的。 3. 在电脑 cmd 里把正式固件传进去并改短名：    <code>scp D:\openwrt\openwrt-25.12.6-qualcommax-ipq807x-xiaomi_ax3600-squashfs-sysupgrade.bin root@192.168.1.1:/tmp/sysupgrade.bin</code> 4. SSH 登录（<code>ssh root@192.168.1.1</code>，用刚设的密码），执行：    <code>sysupgrade -n /tmp/sysupgrade.bin</code> 5. 等待 3 分钟左右，OpenWrt 正式装好。至此刷机完成。</p>
+<hr>
+<div class="sec-head" id="sec-11"><span class="badge">7</span><h2>7. 设为旁路由（基础网络配置）</h2></div>
+<ol><li>电脑<strong>仍然网线直连 AX3600</strong>，浏览器打开 <code>http://192.168.1.1</code> 登录。</li><li>网络 → 接口 → LAN → 修改 → 基本设置，改成：</li></ol>
+<ul><li>IPv4 地址：<code>192.168.31.2</code></li><li>IPv4 子网掩码：<code>255.255.255.0</code></li><li>IPv4 网关：<code>192.168.31.1</code>（你的 BE7200 Pro）</li><li>使用自定义的 DNS 服务器：<code>192.168.31.1</code>（先这样，第 9 步会改成 127.0.0.1）</li></ul>
+<ol><li>同一页面下方&quot;DHCP 服务器&quot; → 基本设置 → <strong>勾选&quot;忽略此接口&quot;</strong>（DHCP 继续由 BE7200 Pro 负责）。</li><li>点&quot;保存&quot;，再点&quot;保存并应用&quot;。页面会转圈然后断开——<strong>这是正常的</strong>，因为 IP 已经变了。</li><li>现在接线：<strong>AX3600 的 LAN 口</strong> 用网线连到 <strong>BE7200 Pro 的 LAN 口</strong>（AX3600 的 WAN 口永远空着）。</li></ol>
+<p>   电脑的网线也改插到 BE7200 Pro 上（或连 BE7200 Pro 的 WiFi）。 6. 浏览器打开 <code>http://192.168.31.2</code>，能登录就说明旁路由网络通了。 7. 关 WiFi：网络 → 无线，把 2.4G 和 5G 的两个无线网络都点&quot;禁用&quot;（WiFi 交给 BE7200 Pro，AX3600 只当网关）。 8. 换国内软件源（官方源在国内很慢），SSH 里执行：</p>
+<pre><code>cat /etc/apk/repositories
+sed -i &#x27;s|downloads.openwrt.org|mirrors.ustc.edu.cn/openwrt|g&#x27; /etc/apk/repositories
+cat /etc/apk/repositories
+apk update</code></pre>
+<p>   第二次 <code>cat</code> 确认地址已经变成 <code>mirrors.ustc.edu.cn/openwrt</code> 开头，<code>apk update</code> 不报错即可。</p>
+<hr>
+<div class="sec-head" id="sec-12"><span class="badge">8</span><h2>8. 安装 AdGuardHome（去广告 DNS）</h2></div>
+<ol><li>SSH 里执行：</li></ol>
+<p>   <code>apk add adguardhome luci-app-adguardhome</code></p>
+<ul><li>如果提示找不到这两个包，停下来告诉我，我给你手动安装官方二进制包的步骤（不需要重来）。</li></ul>
+<ol><li>把 53 端口让给 AdGuardHome（OpenWrt 自带的 dnsmasq 默认占着 53）：</li></ol>
+<pre><code>uci set dhcp.@dnsmasq[0].port=&#x27;0&#x27;
+uci commit dhcp
+/etc/init.d/dnsmasq restart
+/etc/init.d/adguardhome restart
+ss -lntp | grep &#x27;:53 &#x27;</code></pre>
+<p>   最后一条命令应该能看到 <code>adguardhome</code> 在监听 53 端口。 3. 浏览器打开 <code>http://192.168.31.2:3000</code> 按向导走：</p>
+<ul><li>网页管理界面端口：3000（默认）</li><li>DNS 服务器端口：53（默认）</li><li>设置管理用户名和密码（自己记好）</li><li>上游 DNS 服务器：<strong>先填 <code>223.5.5.5</code></strong>（装完 OpenClash 后再改成 Clash 的 7874 端口，先填个能用的）</li></ul>
+<ol><li>进 AdGuardHome 的&quot;设置 → DNS 设置&quot;：Bootstrap DNS 填 <code>223.5.5.5</code>，保存。</li></ol>
+<hr>
+<div class="sec-head" id="sec-13"><span class="badge">9</span><h2>9. 安装 OpenClash（代理分流）</h2></div>
+<div class="sec-head" id="sec-14"><span class="badge">9.1</span><h3>9.1 下载安装包</h3></div>
+<p>OpenClash 的 GitHub Releases 页（仓库 <code>vernesong/OpenClash</code>），下载当前最新版 <strong>v0.48.002</strong> 的 apk 包： <code>luci-app-openclash-0.48.002.apk</code>，大小 <strong>10,702,048 字节</strong>（约 10.21 MiB）。 （25.12 用 apk 包管理器，<code>.apk</code> 和 <code>.ipk</code> 别下混。）</p>
+<div class="sec-head" id="sec-15"><span class="badge">9.2</span><h3>9.2 安装依赖和主程序</h3></div>
+<p>把 apk 传到路由器 <code>/tmp</code>（用 scp 或 WinSCP 拖进去），SSH 里执行：</p>
+<pre><code>apk add dnsmasq-full
+apk add bash curl ca-bundle kmod-tun kmod-nft-tproxy
+apk add --allow-untrusted /tmp/luci-app-openclash-0.48.002.apk</code></pre>
+<p>说明：</p>
+<ul><li><code>dnsmasq-full</code> 是 OpenClash 安装检查要的完整版 dnsmasq，会替换掉精简版（我们已经把它的 DNS 关了、DHCP 也没开，替换很安全）。</li><li><code>--allow-untrusted</code> 是因为这个包不是官方源签名的，只对你确认过的文件用。</li><li>装完刷新 LuCI，左侧菜单出现&quot;服务 → OpenClash&quot;即成功。</li></ul>
+<div class="sec-head" id="sec-16"><span class="badge">9.3</span><h3>9.3 下载 Clash 内核</h3></div>
+<p>服务 → OpenClash → 全局设置 → 版本更新 → 内核下载：</p>
+<ul><li>内核选 <strong>Meta（mihomo）</strong>，架构选 <strong>linux-arm64</strong>（AX3600 是 ARM64），点下载，等待完成。</li><li>如果路由器上下载 GitHub 很慢/失败：用电脑从 OpenClash 的 Releases 页下好对应内核文件，</li></ul>
+<p>  通过&quot;全局设置 → 版本更新 → 上传内核&quot;传上去也行。</p>
+<div class="sec-head" id="sec-17"><span class="badge">9.4</span><h3>9.4 导入订阅并启动</h3></div>
+<ol><li>全局设置 → 配置文件订阅 → 新增：粘贴你的机场订阅链接（或你自己的 vless 订阅），保存。</li><li>点&quot;更新订阅&quot;，等节点列表出来。</li><li>回到&quot;运行状态&quot;/&quot;配置文件管理&quot;，选中刚更新的配置文件。</li><li><strong>DNS 设置（关键，决定会不会断网）</strong>：</li></ol>
+<ul><li>本地 DNS 劫持：启用</li><li>Fake-IP：启用</li><li>NameServer：填 <code>223.5.5.5</code>（多个用英文逗号隔开；<strong>千万不要填 127.0.0.1</strong>，否则和 AdGuardHome 互相指形成死循环）</li></ul>
+<ol><li>模式设置：运行模式保持&quot;规则&quot;即可，先别开 TUN。</li><li>点&quot;启动&quot;。状态页显示运行中即成功。</li></ol>
+<div class="sec-head" id="sec-18"><span class="badge">9.5</span><h3>9.5 把 AdGuardHome 的上游接到 Clash</h3></div>
+<p>回到 <code>http://192.168.31.2:3000</code> → 设置 → DNS 设置：</p>
+<ul><li>上游 DNS 服务器改成：<code>127.0.0.1:7874</code>（这就是 OpenClash 的 Fake-IP DNS 端口）</li><li>保存。</li></ul>
+<p>最终 DNS 链路：<strong>设备 → AdGuardHome(:53，去广告) → OpenClash(:7874，按规则分流) → 真实 DNS</strong>。 代理节点的域名由 Clash 用你填的 223.5.5.5 直接解析，不经过 AdGuardHome，没有循环。</p>
+<div class="sec-head" id="sec-19"><span class="badge">9.6</span><h3>9.6 让路由器自身也走这条 DNS</h3></div>
+<p>网络 → 接口 → LAN → 修改 → 基本设置 → 自定义 DNS 服务器改成 <code>127.0.0.1</code>，保存并应用。</p>
+<hr>
+<div class="sec-head" id="sec-20"><span class="badge">10</span><h2>10. 设备接入 &amp; 验证</h2></div>
+<ol><li>在想走软路由的设备上手动设置（以电脑为例）：</li></ol>
+<ul><li>IP：192.168.31.x（x 取 100~200 之间没被占用的）</li><li>子网掩码：255.255.255.0</li><li>网关：<strong>192.168.31.2</strong></li><li>DNS：<strong>192.168.31.2</strong></li></ul>
+<ol><li>验证三件套：</li></ol>
+<ul><li>能正常打开网页 → 旁路由转发通了。</li><li>打开 AdGuardHome 首页（<code>http://192.168.31.2:3000</code>），&quot;查询日志&quot;里有这台设备的记录，且拦截计数在涨 → 去广告生效。</li><li>在 Clash 里切到&quot;全局&quot;模式后访问 <code>ip.sb</code>，显示的 IP 变成节点 IP → 代理生效；切回&quot;规则&quot;模式，国内网站直连速度正常。</li></ul>
+<ol><li>不想走的设备：什么都不用改，网关/DNS 保持自动（走 BE7200 Pro），完全不受影响。</li></ol>
+<hr>
+<div class="sec-head" id="sec-21"><span class="badge">11</span><h2>11. 回滚与救砖</h2></div>
+<ul><li><strong>升级 OpenWrt</strong>：去固件选择器下新版 <code>squashfs-sysupgrade.bin</code>，LuCI 里系统 → 备份/升级 → 刷写即可（可保留配置）。</li><li><strong>过渡阶段起不来（6.2 之后、6.3 之前）</strong>：原厂还完整躺在另一个分区里，</li></ul>
+<p>  断电重启多试几次，bootloader 会按 <code>flag_last_success</code> 机制切回原厂分区。</p>
+<ul><li><strong>正式装完后回原厂</strong>：用小米官方 <strong>MIWIFIRepairTool</strong> 修复工具——电脑网线直连 AX3600 的 LAN 口，</li></ul>
+<p>  运行工具、选择原厂固件包，工具会通过 TFTP 把官方固件刷回去，恢复出厂状态（小米固件、米家管理都回来）。   这是小米官方给的救砖通道，成功率很高，不需要动第 4 步的备份。   工具官方直链（979,690 字节的 zip）：<code>https://cdn.cnbj1.fds.api.mi-img.com/xiaoqiang/tools/MIWIFIRepairTool.x86.zip</code>   注意：小米路由器会劫持 <code>miwifi.com</code> 域名到本地后台，在家里网络打开小米官网下载页会跳到路由器管理页，   属正常现象；上面的 CDN 直链不受劫持影响，可直接下载（或用手机流量打开官网）。</p>
+<ul><li><strong>手动 TFTP 救砖</strong>：修复工具不行时，OpenWrt 官方 wiki 有 AX3600 的 debrick 步骤，原理相同、手动操作。</li><li>第 4 步备份的 <code>mtd8-art.bin</code> 等文件是最后保险，留着别删。</li></ul>
+<div class="sec-head" id="sec-22"><span class="badge">12</span><h2>12. 日常维护 &amp; 常见问题</h2></div>
+<ul><li><strong>订阅自动更新</strong>：OpenClash → 全局设置 → 计划任务，打开&quot;配置文件自动更新&quot;（每天凌晨一次）。</li><li><strong>过滤器更新</strong>：AdGuardHome → 过滤器 → 拦截列表，定期点&quot;检查更新&quot;。</li><li><strong>装完 Clash 上不了网</strong>：先去 OpenClash 里点&quot;停止运行&quot;，看是否恢复；</li></ul>
+<p>  九成是 DNS 环路——检查 NameServer 里有没有 127.0.0.1，有就删掉。</p>
+<ul><li><strong>AdGuardHome 的 :3000 打不开</strong>：SSH 里看 <code>logread | grep -i adguard</code> 找报错。</li><li><strong>53 端口被占</strong>：<code>ss -lntp | grep &#x27;:53 &#x27;</code> 看是谁在监听，应该只有 adguardhome。</li><li><strong>部分 UDP 应用（如游戏语音）异常</strong>：试试 OpenClash 里切换到 TUN 模式，或把这台设备网关改回 192.168.31.1 绕开。</li></ul><nav class="pager"><span><a href="2.html">← Harness 到底在干嘛：一句话讲清</a></span><span><a href="4.html">小红书图文稿：毕设开题“问题、目标、方法”三段怎么写 →</a></span></nav></main></div>
+<script>
+var bar=document.getElementById('progress');
+var links=Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+var secs=links.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
+function onScroll(){var st=window.scrollY||document.documentElement.scrollTop;var h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?(st/h*100):0)+'%';var cur=secs[0];secs.forEach(function(s){if(s.getBoundingClientRect().top<=120)cur=s;});links.forEach(function(a){var on=a.getAttribute('href')==='#'+(cur&&cur.id);a.classList.toggle('active',on);if(on)a.scrollIntoView({block:'nearest'});});}
+window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+document.getElementById('toTop').addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+</script>
+</body>
+</html>
