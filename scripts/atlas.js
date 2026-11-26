@@ -172,11 +172,15 @@
   /* ---------- homepage search / filter (used by inline handlers) ---------- */
   window.filterCards = function (q) {
     q = (q || "").trim().toLowerCase();
+    var title = document.getElementById("siteTitle");
+    if (title) title.hidden = !!q;
     document.querySelectorAll("[data-search]").forEach(function (el) {
       el.style.display = (!q || el.dataset.search.toLowerCase().indexOf(q) !== -1) ? "" : "none";
     });
   };
   window.setChip = function (btn, cat) {
+    var title = document.getElementById("siteTitle");
+    if (title) title.hidden = cat !== "全部";
     document.querySelectorAll(".chip").forEach(function (c) { c.classList.remove("active"); });
     btn.classList.add("active");
     document.querySelectorAll("[data-cat]").forEach(function (el) {
@@ -357,6 +361,12 @@
     var o = loadOverrides();
     if (!document.querySelector(".card[data-article-id]")) return;
     var all = getAllArticles();
+    var pinnedSec = document.querySelector(".pinned-sec");
+    var sections = {};
+    document.querySelectorAll("section").forEach(function (sec) {
+      var h = sec.querySelector("h2.sechead");
+      if (h) sections[h.textContent.replace(/（\d+ 篇）$/, "")] = sec;
+    });
     // hide deleted / patch edited cards in place
     document.querySelectorAll(".card[data-article-id]").forEach(function (card) {
       var id = parseInt(card.getAttribute("data-article-id"), 10);
