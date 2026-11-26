@@ -97,6 +97,10 @@ nav.back{margin-bottom:16px;font-size:15px}
 nav.pager{display:flex;justify-content:space-between;gap:16px;margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-size:15px}
 #toTop{position:fixed;right:20px;bottom:20px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);opacity:.75;font-size:18px;cursor:pointer;z-index:40}
 footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid var(--line);padding-top:16px}
+footer.site-footer{text-align:center;line-height:1.9}
+footer.site-footer p{margin:4px 0}
+footer.site-footer a{color:var(--pine);font-weight:700}
+footer.site-footer a:hover{color:var(--accent)}
 @media(max-width:640px){body{font-size:16px}.article h1{font-size:26px}.layout{padding:16px}}
 </style>
 </head>
@@ -106,7 +110,7 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
 <ol><li><strong>抓原文</strong>：在浏览器里打开原帖，抓全文和全部配图，记下原文链接、作者、页面时间（页面时间前后不一致时按原样记录，不替作者选一个）。</li><li><strong>定形式：写学习笔记，不做全文翻译</strong>（原因见踩坑）。用自己的话重写：讲清结构、核心机制、关键数字和账、例子想说明什么、检查清单要点；想法和数字归原文，表达是自己的。</li><li><strong>配图本地化</strong>：配图全部下载到本地 <code>images/</code> 文件夹，正文按原文顺序引用本地文件，不放远程图片链接——解压后断网也能打开。</li><li><strong>交付形态</strong>：</li></ol>
 <ul><li>Markdown 离线包：<code>.md</code> + <code>images/</code> 一起打包，打开 md 即可读。</li><li>要预览效果时再做 HTML 版：衬线标题、侧边目录、阅读进度条；关键数字做对比卡片（如 $0.0049 对 $0.000084、58 倍）；手机上表格自动堆叠；支持深色模式。</li></ul>
 <div class="sec-head" id="sec-2"><span class="badge">02</span><h2>踩坑记录（这篇的重点）</h2></div>
-<ul><li><strong>&quot;公开能看&quot; ≠ &quot;可以全文复制&quot;</strong>：作者发在 X 上免费公开，版权仍归作者。把整篇长文逐句翻译、排版成文档，本质是把整部作品换种语言复制一份——不管署不署名、不管是否商用，这一步都不能做。能做的是：链接 + 概要，或用自己的话重写成学习文档；直接引用不能超过 50 个词。</li><li><strong>不要先承诺再改口</strong>：这次最初答应了&quot;抓全文、翻译成中文&quot;，后来才改口只给概要，前后不一致——教训是动手前先把形式定死（第 2 步），再开工。</li><li><strong>&quot;离线&quot;就要真离线</strong>：第一版把图片链接放进文档，那不叫离线版。图片必须下载到本地并用相对路径引用，交付前断网自检一遍。</li><li><strong>概要太薄也不行</strong>：只有几段的概要不够用，定版的学习笔记要把结构、数字、例子、清单都写全，读完笔记应能复述原文的完整思路。</li></ul></div><nav class="pager"><span><a href="15.html">← Codex CLI 在 Windows 上的安装流程（进行中）</a></span><span></span></nav></main></div>
+<ul><li><strong>&quot;公开能看&quot; ≠ &quot;可以全文复制&quot;</strong>：作者发在 X 上免费公开，版权仍归作者。把整篇长文逐句翻译、排版成文档，本质是把整部作品换种语言复制一份——不管署不署名、不管是否商用，这一步都不能做。能做的是：链接 + 概要，或用自己的话重写成学习文档；直接引用不能超过 50 个词。</li><li><strong>不要先承诺再改口</strong>：这次最初答应了&quot;抓全文、翻译成中文&quot;，后来才改口只给概要，前后不一致——教训是动手前先把形式定死（第 2 步），再开工。</li><li><strong>&quot;离线&quot;就要真离线</strong>：第一版把图片链接放进文档，那不叫离线版。图片必须下载到本地并用相对路径引用，交付前断网自检一遍。</li><li><strong>概要太薄也不行</strong>：只有几段的概要不够用，定版的学习笔记要把结构、数字、例子、清单都写全，读完笔记应能复述原文的完整思路。</li></ul></div><nav class="pager"><span><a href="15.html">← Codex CLI 在 Windows 上的安装流程（进行中）</a></span><span></span></nav><footer class="site-footer"><p>© 2026 Atlas · Paul Mack</p><p><a href="https://github.com/furlenmick/atlas">GitHub</a> · <a href="https://yanchs.com">Lather &amp; Lore</a></p><p>共 16 篇 · 6 个分类</p></footer></main></div>
 <script>/* Atlas client runtime — Add / Edit / Delete (no backend).
  *
  * Built-in articles are baked into each page as JSON (#atlas-data).

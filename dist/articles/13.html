@@ -97,6 +97,10 @@ nav.back{margin-bottom:16px;font-size:15px}
 nav.pager{display:flex;justify-content:space-between;gap:16px;margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-size:15px}
 #toTop{position:fixed;right:20px;bottom:20px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);opacity:.75;font-size:18px;cursor:pointer;z-index:40}
 footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid var(--line);padding-top:16px}
+footer.site-footer{text-align:center;line-height:1.9}
+footer.site-footer p{margin:4px 0}
+footer.site-footer a{color:var(--pine);font-weight:700}
+footer.site-footer a:hover{color:var(--accent)}
 @media(max-width:640px){body{font-size:16px}.article h1{font-size:26px}.layout{padding:16px}}
 </style>
 </head>
@@ -114,7 +118,7 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
 <div class="sec-head" id="sec-5"><span class="badge">05</span><h2>WiFi Calling 在中国的限制（重点）</h2></div>
 <ul><li>AT&amp;T 官网明确：WiFi Calling 在中国不可用，中国 IP 直连会被拒签。</li><li>拉起条件：必须走美国 IP——用支持 UDP 的美区节点做热点 / 旁路由，让手机流量从美国出口走。</li><li>佐证：此前唯一一次状态栏出现 &quot;RedPocket Wi-Fi&quot; 时，手机正开着 VPN（美国 IP）。</li></ul>
 <div class="sec-head" id="sec-6"><span class="badge">06</span><h2>踩坑记录</h2></div>
-<ul><li><strong>611 / 800 免费电话在境外常打不通</strong>，不要拿它当&quot;线路是否正常&quot;的测试标准，会误判。</li><li><strong>套餐日期出过错</strong>：初激活时日期不对，是客服 Sean 重新应用套餐才修正的——激活后第一件事核对数据余额和日期，不对立刻找客服。</li><li><strong>登录要关 VPN</strong>：开着 VPN 登不上 RedPocket 账户，关掉并换一条连接再登。</li></ul></div><nav class="pager"><span><a href="12.html">← Railway 部署 Xray 四节点（定版）</a></span><span><a href="14.html">Lather &amp; Lore 手工皂站：发布流程与待办 →</a></span></nav></main></div>
+<ul><li><strong>611 / 800 免费电话在境外常打不通</strong>，不要拿它当&quot;线路是否正常&quot;的测试标准，会误判。</li><li><strong>套餐日期出过错</strong>：初激活时日期不对，是客服 Sean 重新应用套餐才修正的——激活后第一件事核对数据余额和日期，不对立刻找客服。</li><li><strong>登录要关 VPN</strong>：开着 VPN 登不上 RedPocket 账户，关掉并换一条连接再登。</li></ul></div><nav class="pager"><span><a href="12.html">← Railway 部署 Xray 四节点（定版）</a></span><span><a href="14.html">Lather &amp; Lore 手工皂站：发布流程与待办 →</a></span></nav><footer class="site-footer"><p>© 2026 Atlas · Paul Mack</p><p><a href="https://github.com/furlenmick/atlas">GitHub</a> · <a href="https://yanchs.com">Lather &amp; Lore</a></p><p>共 16 篇 · 6 个分类</p></footer></main></div>
 <script>/* Atlas client runtime — Add / Edit / Delete (no backend).
  *
  * Built-in articles are baked into each page as JSON (#atlas-data).

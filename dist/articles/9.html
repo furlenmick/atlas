@@ -97,6 +97,10 @@ nav.back{margin-bottom:16px;font-size:15px}
 nav.pager{display:flex;justify-content:space-between;gap:16px;margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-size:15px}
 #toTop{position:fixed;right:20px;bottom:20px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);opacity:.75;font-size:18px;cursor:pointer;z-index:40}
 footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid var(--line);padding-top:16px}
+footer.site-footer{text-align:center;line-height:1.9}
+footer.site-footer p{margin:4px 0}
+footer.site-footer a{color:var(--pine);font-weight:700}
+footer.site-footer a:hover{color:var(--accent)}
 @media(max-width:640px){body{font-size:16px}.article h1{font-size:26px}.layout{padding:16px}}
 </style>
 </head>
@@ -110,7 +114,7 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
 <div class="sec-head" id="sec-3"><span class="badge">03</span><h2>选型规则（踩出来的）</h2></div>
 <ul><li><strong>机场大多做不了链式前置</strong>：买前必须核实是否支持中转 / UDP / ToS；TikTok 等场景必须 UDP 通，不通直接排除。</li><li><strong>Proxy-Seller 不支持选地区</strong>：ISP 静态线只有美 / 英 / 德 / 法 / 日 5 国；要城市级定位只能找客服。</li><li><strong>住宅静态 &gt; 动态住宅 &gt; 机房 IP</strong>：敏感账号只认第一档；动态住宅只配做重试和非敏感业务；机房 IP 只能当节点中转，绝不直接登敏感账号（与《Claude 账号防封与付款完整流程》的定级一致）。</li></ul>
 <div class="sec-head" id="sec-4"><span class="badge">04</span><h2>踩坑记录</h2></div>
-<ul><li><strong>链式能不能搭，先问再买</strong>：前置链需要中转支持，很多机场套餐买完才发现不支持——核实顺序要在付款之前。</li><li><strong>粘性会话不是固定 IP</strong>：Cliproxy 的&quot;粘性&quot;只有约 120 分钟，拿它当固定出口用会在换 IP 时翻车；每次用前重测出口 IP 和归属。</li></ul></div><nav class="pager"><span><a href="8.html">← Claude 账号防封与付款完整流程（定版）</a></span><span><a href="10.html">Cloady 免费档部署 Xray 链式节点（定版） →</a></span></nav></main></div>
+<ul><li><strong>链式能不能搭，先问再买</strong>：前置链需要中转支持，很多机场套餐买完才发现不支持——核实顺序要在付款之前。</li><li><strong>粘性会话不是固定 IP</strong>：Cliproxy 的&quot;粘性&quot;只有约 120 分钟，拿它当固定出口用会在换 IP 时翻车；每次用前重测出口 IP 和归属。</li></ul></div><nav class="pager"><span><a href="8.html">← Claude 账号防封与付款完整流程（定版）</a></span><span><a href="10.html">Cloady 免费档部署 Xray 链式节点（定版） →</a></span></nav><footer class="site-footer"><p>© 2026 Atlas · Paul Mack</p><p><a href="https://github.com/furlenmick/atlas">GitHub</a> · <a href="https://yanchs.com">Lather &amp; Lore</a></p><p>共 16 篇 · 6 个分类</p></footer></main></div>
 <script>/* Atlas client runtime — Add / Edit / Delete (no backend).
  *
  * Built-in articles are baked into each page as JSON (#atlas-data).

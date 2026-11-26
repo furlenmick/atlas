@@ -97,6 +97,10 @@ nav.back{margin-bottom:16px;font-size:15px}
 nav.pager{display:flex;justify-content:space-between;gap:16px;margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-size:15px}
 #toTop{position:fixed;right:20px;bottom:20px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);opacity:.75;font-size:18px;cursor:pointer;z-index:40}
 footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid var(--line);padding-top:16px}
+footer.site-footer{text-align:center;line-height:1.9}
+footer.site-footer p{margin:4px 0}
+footer.site-footer a{color:var(--pine);font-weight:700}
+footer.site-footer a:hover{color:var(--accent)}
 @media(max-width:640px){body{font-size:16px}.article h1{font-size:26px}.layout{padding:16px}}
 </style>
 </head>
@@ -232,7 +236,7 @@ apk add --allow-untrusted /tmp/luci-app-openclash-0.48.002.apk</code></pre>
 <div class="sec-head" id="sec-22"><span class="badge">12</span><h2>12. 日常维护 &amp; 常见问题</h2></div>
 <ul><li><strong>订阅自动更新</strong>：OpenClash → 全局设置 → 计划任务，打开&quot;配置文件自动更新&quot;（每天凌晨一次）。</li><li><strong>过滤器更新</strong>：AdGuardHome → 过滤器 → 拦截列表，定期点&quot;检查更新&quot;。</li><li><strong>装完 Clash 上不了网</strong>：先去 OpenClash 里点&quot;停止运行&quot;，看是否恢复；</li></ul>
 <p>  九成是 DNS 环路——检查 NameServer 里有没有 127.0.0.1，有就删掉。</p>
-<ul><li><strong>AdGuardHome 的 :3000 打不开</strong>：SSH 里看 <code>logread | grep -i adguard</code> 找报错。</li><li><strong>53 端口被占</strong>：<code>ss -lntp | grep &#x27;:53 &#x27;</code> 看是谁在监听，应该只有 adguardhome。</li><li><strong>部分 UDP 应用（如游戏语音）异常</strong>：试试 OpenClash 里切换到 TUN 模式，或把这台设备网关改回 192.168.31.1 绕开。</li></ul></div><nav class="pager"><span><a href="2.html">← Harness 到底在干嘛：一句话讲清</a></span><span><a href="4.html">小红书图文稿：毕设开题“问题、目标、方法”三段怎么写 →</a></span></nav></main></div>
+<ul><li><strong>AdGuardHome 的 :3000 打不开</strong>：SSH 里看 <code>logread | grep -i adguard</code> 找报错。</li><li><strong>53 端口被占</strong>：<code>ss -lntp | grep &#x27;:53 &#x27;</code> 看是谁在监听，应该只有 adguardhome。</li><li><strong>部分 UDP 应用（如游戏语音）异常</strong>：试试 OpenClash 里切换到 TUN 模式，或把这台设备网关改回 192.168.31.1 绕开。</li></ul></div><nav class="pager"><span><a href="2.html">← Harness 到底在干嘛：一句话讲清</a></span><span><a href="4.html">小红书图文稿：毕设开题“问题、目标、方法”三段怎么写 →</a></span></nav><footer class="site-footer"><p>© 2026 Atlas · Paul Mack</p><p><a href="https://github.com/furlenmick/atlas">GitHub</a> · <a href="https://yanchs.com">Lather &amp; Lore</a></p><p>共 16 篇 · 6 个分类</p></footer></main></div>
 <script>/* Atlas client runtime — Add / Edit / Delete (no backend).
  *
  * Built-in articles are baked into each page as JSON (#atlas-data).

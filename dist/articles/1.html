@@ -97,6 +97,10 @@ nav.back{margin-bottom:16px;font-size:15px}
 nav.pager{display:flex;justify-content:space-between;gap:16px;margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-size:15px}
 #toTop{position:fixed;right:20px;bottom:20px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);opacity:.75;font-size:18px;cursor:pointer;z-index:40}
 footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid var(--line);padding-top:16px}
+footer.site-footer{text-align:center;line-height:1.9}
+footer.site-footer p{margin:4px 0}
+footer.site-footer a{color:var(--pine);font-weight:700}
+footer.site-footer a:hover{color:var(--accent)}
 @media(max-width:640px){body{font-size:16px}.article h1{font-size:26px}.layout{padding:16px}}
 </style>
 </head>
@@ -171,7 +175,7 @@ Jev|$0.000084|输入 $0.042 / 百万 · 输出免费
 <p>主管 → 职责说明 → 工作区 → 三道检查 → Jev → 再加第二个机器人</p>
 <p>不要一上来就搭十个机器人。先让主管加一个专家跑通一个小闭环，比如邮箱分流，跑顺了再加内容或代码。</p>
 <p>这和我们之前定下来的 Agent 结构完全对得上：模型只负责动嘴和拆解，Harness 负责准备材料、动手执行、传结果、管循环和权限，MCP 是 Harness 对外借本事的一种插口。Jev 在这里就是 Harness 里一个便宜的决策插口，Grok 是贵的写作插口，两个插口分工不同，Harness 负责在中间选对插口、用对价格。</p>
-<blockquote><p>这套东西省的是重复决策的钱，不是让你把所有决定都外包出去。不可逆的事，永远要留一个人工确认的口子。</p></blockquote></div><nav class="pager"><span></span><span><a href="2.html">Harness 到底在干嘛：一句话讲清 →</a></span></nav></main></div>
+<blockquote><p>这套东西省的是重复决策的钱，不是让你把所有决定都外包出去。不可逆的事，永远要留一个人工确认的口子。</p></blockquote></div><nav class="pager"><span></span><span><a href="2.html">Harness 到底在干嘛：一句话讲清 →</a></span></nav><footer class="site-footer"><p>© 2026 Atlas · Paul Mack</p><p><a href="https://github.com/furlenmick/atlas">GitHub</a> · <a href="https://yanchs.com">Lather &amp; Lore</a></p><p>共 16 篇 · 6 个分类</p></footer></main></div>
 <script>/* Atlas client runtime — Add / Edit / Delete (no backend).
  *
  * Built-in articles are baked into each page as JSON (#atlas-data).

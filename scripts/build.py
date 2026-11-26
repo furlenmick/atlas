@@ -116,6 +116,10 @@ nav.back{margin-bottom:16px;font-size:15px}
 nav.pager{display:flex;justify-content:space-between;gap:16px;margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-size:15px}
 #toTop{position:fixed;right:20px;bottom:20px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);opacity:.75;font-size:18px;cursor:pointer;z-index:40}
 footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid var(--line);padding-top:16px}
+footer.site-footer{text-align:center;line-height:1.9}
+footer.site-footer p{margin:4px 0}
+footer.site-footer a{color:var(--pine);font-weight:700}
+footer.site-footer a:hover{color:var(--accent)}
 @media(max-width:640px){body{font-size:16px}.article h1{font-size:26px}.layout{padding:16px}}
 """
 
@@ -304,6 +308,13 @@ def load_articles():
     return arts
 
 
+def footer_html(n_articles, n_cats):
+    return ('<footer class="site-footer"><p>© 2026 Atlas · Paul Mack</p>'
+            '<p><a href="https://github.com/furlenmick/atlas">GitHub</a> · '
+            '<a href="https://yanchs.com">Lather &amp; Lore</a></p>'
+            '<p>共 %d 篇 · %d 个分类</p></footer>' % (n_articles, n_cats))
+
+
 def page(title, body_html, extra_js=""):
     return ("<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"utf-8\">\n"
             "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
@@ -369,8 +380,9 @@ def build_home(arts):
         '<div class="catgrid">%s</div>'
         '<section class="pinned-sec"><h2>置顶推荐</h2>%s</section>'
         '<div class="chips">%s</div>%s'
-        '<footer>Atlas · 个人知识库 · %d 篇文章，内容以仓库 articles/ 的 Markdown 为准。</footer></div>'
-        % (len(arts), len(cats), "".join(cat_cards), pinned_html, "".join(chips), "".join(grouped), len(arts)))
+        '%s</div>'
+        % (len(arts), len(cats), "".join(cat_cards), pinned_html, "".join(chips), "".join(grouped),
+           footer_html(len(arts), len(cats))))
     data = {"articles": [article_data(a) for a in arts],
             "categories": sorted({a["category"] for a in arts})}
     return page("Atlas", data_script(data) + body, ATLAS_JS)
@@ -402,12 +414,13 @@ def build_detail(a, arts):
         '<div class="art-progress"><div id="artProgressFill"></div></div></header>'
         '<div class="kicker">%s</div><h1>%s</h1><p class="lead">%s</p>'
         '<div id="article-tags">%s</div><p class="meta">约 %d 字 · 阅读约 %d 分钟 · 更新 %s</p>'
-        '%s<div id="article-body">%s</div>%s</main></div>'
+        '%s<div id="article-body">%s</div>%s%s</main></div>'
         % (toc_html, esc(a["category"]), esc(a["title"]), esc(a["summary"]),
            "".join('<span class="tag">%s</span>' % esc(t) for t in a["tags_list"]),
            words, minutes, esc(a.get("updated_at", "")[:10]),
            ('<div class="toc-mobile"><details><summary>目录（%d 节）</summary><ol>%s</ol></details></div>' % (len(toc), toc_items)) if toc else "",
-           body_html, pager))
+           body_html, pager,
+           footer_html(len(arts), len({x["category"] for x in arts}))))
     data = {"articles": [article_data(a)], "categories": sorted({x["category"] for x in arts})}
     return page(a["title"],
                 '<script>window.ATLAS_CURRENT_ID=%d;</script>' % a["id_int"] + data_script(data) + body,
@@ -419,7 +432,8 @@ def build_view(arts):
     body = (
         '<div id="progress"></div><button id="toTop" title="回到顶部">↑</button>'
         '<div class="layout"><aside><nav class="toc" id="view-toc"></nav></aside>'
-        '<main class="article" id="artRoot"><div id="view-main"><p>加载中…</p></div></main></div>')
+        '<main class="article" id="artRoot"><div id="view-main"><p>加载中…</p></div>'
+        + footer_html(len(arts), len({a["category"] for a in arts})) + '</main></div>')
     data = {"articles": [article_data(a) for a in arts],
             "categories": sorted({a["category"] for a in arts})}
     return page("Atlas", data_script(data) + body, ATLAS_JS)

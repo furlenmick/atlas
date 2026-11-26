@@ -97,6 +97,10 @@ nav.back{margin-bottom:16px;font-size:15px}
 nav.pager{display:flex;justify-content:space-between;gap:16px;margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-size:15px}
 #toTop{position:fixed;right:20px;bottom:20px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);opacity:.75;font-size:18px;cursor:pointer;z-index:40}
 footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid var(--line);padding-top:16px}
+footer.site-footer{text-align:center;line-height:1.9}
+footer.site-footer p{margin:4px 0}
+footer.site-footer a{color:var(--pine);font-weight:700}
+footer.site-footer a:hover{color:var(--accent)}
 @media(max-width:640px){body{font-size:16px}.article h1{font-size:26px}.layout{padding:16px}}
 </style>
 </head>
@@ -121,7 +125,7 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
 <p>操作纪律：</p>
 <ul><li>这套加固防的是核心故障，防不了人主动把模式切成直连。所以维护网络之前，先彻底退出 Claude 三端（桌面版、CLI、网页版）。</li><li>待办：保存应用后做一次冒烟测试，再停掉核心做一次断网验收，确认 2.x 网段确实出不了包。</li></ul>
 <div class="sec-head" id="sec-5"><span class="badge">05</span><h2>踩坑记录</h2></div>
-<ul><li><strong>检测口径不一致</strong>：2026-10-29 同一天，browserleaks 重测已经干净，但 Claude 的检测工具仍报 DNS / WebRTC 可能泄漏。此条未最终确认——以后复测时以两个工具交叉验证为准，不要只信一边。</li><li><strong>STUN 端口 REJECT 是一把双刃剑</strong>：堵住了泄漏，也堵掉了网页版视频会议的 P2P 通话。先想清楚哪台设备要开会，再决定规则加在哪个 Profile / 网段上。</li><li><strong>真正的风险不是节点挂掉，是核心死掉</strong>：节点故障 = 连不上（安全）；核心崩溃 + NAT 还在 = 真实 IP 裸奔（危险）。加固要针对后者。</li></ul></div><nav class="pager"><span><a href="6.html">← 暖暖豚融合版角色设定（路线 ② 可执行版）</a></span><span><a href="8.html">Claude 账号防封与付款完整流程（定版） →</a></span></nav></main></div>
+<ul><li><strong>检测口径不一致</strong>：2026-10-29 同一天，browserleaks 重测已经干净，但 Claude 的检测工具仍报 DNS / WebRTC 可能泄漏。此条未最终确认——以后复测时以两个工具交叉验证为准，不要只信一边。</li><li><strong>STUN 端口 REJECT 是一把双刃剑</strong>：堵住了泄漏，也堵掉了网页版视频会议的 P2P 通话。先想清楚哪台设备要开会，再决定规则加在哪个 Profile / 网段上。</li><li><strong>真正的风险不是节点挂掉，是核心死掉</strong>：节点故障 = 连不上（安全）；核心崩溃 + NAT 还在 = 真实 IP 裸奔（危险）。加固要针对后者。</li></ul></div><nav class="pager"><span><a href="6.html">← 暖暖豚融合版角色设定（路线 ② 可执行版）</a></span><span><a href="8.html">Claude 账号防封与付款完整流程（定版） →</a></span></nav><footer class="site-footer"><p>© 2026 Atlas · Paul Mack</p><p><a href="https://github.com/furlenmick/atlas">GitHub</a> · <a href="https://yanchs.com">Lather &amp; Lore</a></p><p>共 16 篇 · 6 个分类</p></footer></main></div>
 <script>/* Atlas client runtime — Add / Edit / Delete (no backend).
  *
  * Built-in articles are baked into each page as JSON (#atlas-data).

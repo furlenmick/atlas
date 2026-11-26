@@ -97,6 +97,10 @@ nav.back{margin-bottom:16px;font-size:15px}
 nav.pager{display:flex;justify-content:space-between;gap:16px;margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-size:15px}
 #toTop{position:fixed;right:20px;bottom:20px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);opacity:.75;font-size:18px;cursor:pointer;z-index:40}
 footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid var(--line);padding-top:16px}
+footer.site-footer{text-align:center;line-height:1.9}
+footer.site-footer p{margin:4px 0}
+footer.site-footer a{color:var(--pine);font-weight:700}
+footer.site-footer a:hover{color:var(--accent)}
 @media(max-width:640px){body{font-size:16px}.article h1{font-size:26px}.layout{padding:16px}}
 </style>
 </head>
@@ -109,7 +113,7 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
 <ol><li>在 Cloady 建应用，规格选免费档，区域 usw1。</li><li>上传带 Dockerfile 的 Xray 配置：监听 :3000，入站 VLESS + WS。</li><li>配置出站只保留一条：Cliproxy SOCKS5（粘性会话 ***，t-120）。删掉直连出站，保证 fail-closed。</li><li>部署前逐项核对配置：<strong>特别是密码栏不能为空</strong>（见踩坑）。</li><li>部署完成后验收两件事：</li></ol>
 <ul><li>用第二个 Xray 实例经该出站取 example.com，应成功返回。</li><li>WS 握手应返回 101。</li></ul>
 <div class="sec-head" id="sec-3"><span class="badge">03</span><h2>踩坑记录（这篇的重点）</h2></div>
-<ul><li><strong>旧应用删了，域名就失效</strong>：旧应用 <code>xray</code>（域名 ***）已于 2026-11-24 按决定删除，旧链接不要再用。</li><li><strong>上传类应用没有&quot;替换源码&quot;入口</strong>：想换代码只能新建应用；&quot;Deploy now&quot; 只是用旧文件重建，点了没变化不要奇怪。</li><li><strong>免费额度被第一个应用占满</strong>：第二个应用即使选最小规格也要 $4.25/月且必须绑卡。先删旧应用再建新的，才走得通免费路线。</li><li><strong>改配置把密码栏写空 → 部署报错</strong>：换 sid 改配置时曾把密码栏清空导致报错，重建才通。教训：改完配置先核对密码栏非空，再点部署。</li><li><strong>&quot;总是超时&quot;不在服务器端</strong>：用户报超时后做过服务器端诊断——无异常，手机的真实流量一直在走 Cliproxy 出站。结论：超时既不在 Cloady 也不在 Cliproxy 会话，要在手机端按具体目标复现，不要在服务器上瞎改。</li><li><strong>测速地址的 403 不代表代理坏了</strong>：直连测试里 SOCKS5 / HTTP 测速地址经此出口分别回 HTTP / 403，那是测速地址自身的表现，不等于代理不可用。验收要用真实目标（如 example.com）和 WS 握手，不要只看测速站。</li></ul></div><nav class="pager"><span><a href="9.html">← 住宅出口与链式代理选型定版</a></span><span><a href="11.html">CT8.PL 免费主机部署 Xray 节点（定版） →</a></span></nav></main></div>
+<ul><li><strong>旧应用删了，域名就失效</strong>：旧应用 <code>xray</code>（域名 ***）已于 2026-11-24 按决定删除，旧链接不要再用。</li><li><strong>上传类应用没有&quot;替换源码&quot;入口</strong>：想换代码只能新建应用；&quot;Deploy now&quot; 只是用旧文件重建，点了没变化不要奇怪。</li><li><strong>免费额度被第一个应用占满</strong>：第二个应用即使选最小规格也要 $4.25/月且必须绑卡。先删旧应用再建新的，才走得通免费路线。</li><li><strong>改配置把密码栏写空 → 部署报错</strong>：换 sid 改配置时曾把密码栏清空导致报错，重建才通。教训：改完配置先核对密码栏非空，再点部署。</li><li><strong>&quot;总是超时&quot;不在服务器端</strong>：用户报超时后做过服务器端诊断——无异常，手机的真实流量一直在走 Cliproxy 出站。结论：超时既不在 Cloady 也不在 Cliproxy 会话，要在手机端按具体目标复现，不要在服务器上瞎改。</li><li><strong>测速地址的 403 不代表代理坏了</strong>：直连测试里 SOCKS5 / HTTP 测速地址经此出口分别回 HTTP / 403，那是测速地址自身的表现，不等于代理不可用。验收要用真实目标（如 example.com）和 WS 握手，不要只看测速站。</li></ul></div><nav class="pager"><span><a href="9.html">← 住宅出口与链式代理选型定版</a></span><span><a href="11.html">CT8.PL 免费主机部署 Xray 节点（定版） →</a></span></nav><footer class="site-footer"><p>© 2026 Atlas · Paul Mack</p><p><a href="https://github.com/furlenmick/atlas">GitHub</a> · <a href="https://yanchs.com">Lather &amp; Lore</a></p><p>共 16 篇 · 6 个分类</p></footer></main></div>
 <script>/* Atlas client runtime — Add / Edit / Delete (no backend).
  *
  * Built-in articles are baked into each page as JSON (#atlas-data).
