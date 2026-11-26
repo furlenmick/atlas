@@ -10,6 +10,7 @@ No external requests, no network, no dependencies.
 Usage:  python3 scripts/build.py   (run from the repo root)
 """
 import html as htmllib
+import json
 import os
 import re
 import shutil
@@ -18,6 +19,9 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ARTICLES_DIR = os.path.join(ROOT, "articles")
 DIST_DIR = os.path.join(ROOT, "dist")
+
+with open(os.path.join(ROOT, "scripts", "atlas.js"), encoding="utf-8") as _f:
+    ATLAS_JS = _f.read()
 
 CSS = """
 :root{--ink:#26221e;--muted:#6f6a63;--paper:#faf7f2;--surface:#fff;--line:#e8e0d5;
@@ -43,6 +47,23 @@ hr{border:none;border-top:1px solid var(--line);margin:28px 0}
 .tag{display:inline-block;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:2px 10px;font-size:13px;margin:0 6px 6px 0;color:var(--muted);font-family:ui-monospace,"JetBrains Mono",Menlo,monospace}
 /* --- homepage --- */
 .topbar{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--line);padding:14px 0}
+.top-actions{display:flex;gap:10px;align-items:center;margin:16px 0 4px;flex-wrap:wrap}
+.btn{display:inline-block;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 16px;font-size:14px;cursor:pointer;color:var(--ink);font-family:inherit}
+.btn:hover{border-color:var(--accent)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-danger{color:#b3261e;border-color:#e5b6b0}
+#atlas-pending{color:var(--accent);font-size:13px}
+.modal{position:fixed;inset:0;background:rgba(38,34,30,.45);z-index:100;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:32px 16px}
+.modal[hidden]{display:none}
+.modal-card{background:var(--surface);border-radius:14px;padding:22px 24px;max-width:640px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.25)}
+.modal-card h3{margin:0 0 12px;font-size:22px}
+.field{display:block;margin:12px 0;font-size:14px;color:var(--muted)}
+.field input[type=text],.field textarea,.field select{width:100%;margin-top:4px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-size:15px;font-family:inherit;background:#fff;color:var(--ink)}
+.field textarea{font-family:ui-monospace,"JetBrains Mono",Menlo,monospace}
+.modal-actions{display:flex;gap:10px;margin-top:16px}
+.modal-note{color:var(--muted);font-size:13px;line-height:1.7}
+.modal-card ul,.modal-card ol{font-size:14px;line-height:1.8}
+
 .wrap{max-width:1080px;margin:0 auto;padding:0 24px 64px}
 .search{width:100%;font-size:16px;padding:12px 16px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-family:inherit}
 .search:focus{outline:2px solid var(--accent);outline-offset:1px}
@@ -284,6 +305,19 @@ def page(title, body_html, extra_js=""):
             % (esc(title), CSS, body_html, extra_js))
 
 
+def article_data(a):
+    return {"id": a["id_int"], "title": a["title"], "category": a["category"],
+            "tags": a["tags_list"], "summary": a["summary"], "pinned": a["pinned_bool"],
+            "updated_at": a.get("updated_at", ""), "cover_key": a.get("cover_key", ""),
+            "source_note": a.get("source_note", ""), "file": a.get("file", ""), "body": a["body"]}
+
+
+def data_script(obj):
+    # "</" is escaped so article bodies can never break out of the script tag
+    return ('<script id="atlas-data" type="application/json">%s</script>'
+            % json.dumps(obj, ensure_ascii=False).replace("</", "<\\/"))
+
+
 def build_home(arts):
     cats = {}
     for a in arts:
@@ -299,18 +333,18 @@ def build_home(arts):
     for cat in sorted(cats):
         chips.append('<button class="chip" onclick="setChip(this,\'%s\')">%s</button>' % (esc(cat), esc(cat)))
     pinned_html = "".join(
-        '<article class="card" data-cat="%s" data-search="%s"><h3><a href="articles/%d.html">%s</a><span class="pinned">置顶</span></h3>'
+        '<article class="card" data-article-id="%d" data-cat="%s" data-search="%s"><h3><a href="articles/%d.html">%s</a><span class="pinned">置顶</span></h3>'
         '<p>%s</p><div>%s</div></article>'
-        % (esc(a["category"]), esc(a["title"] + " " + a["summary"] + " " + " ".join(a["tags_list"])),
+        % (a["id_int"], esc(a["category"]), esc(a["title"] + " " + a["summary"] + " " + " ".join(a["tags_list"])),
            a["id_int"], esc(a["title"]), esc(a["summary"]),
            "".join('<span class="tag">%s</span>' % esc(t) for t in a["tags_list"]))
         for a in pinned)
     grouped = []
     for cat in sorted(cats, key=lambda c: -len(cats[c])):
         items = "".join(
-            '<article class="card" data-cat="%s" data-search="%s"><h3><a href="articles/%d.html">%s</a>%s</h3>'
+            '<article class="card" data-article-id="%d" data-cat="%s" data-search="%s"><h3><a href="articles/%d.html">%s</a>%s</h3>'
             '<p>%s</p><div><span class="date">%s</span> %s</div></article>'
-            % (esc(a["category"]), esc(a["title"] + " " + a["summary"] + " " + " ".join(a["tags_list"])),
+            % (a["id_int"], esc(a["category"]), esc(a["title"] + " " + a["summary"] + " " + " ".join(a["tags_list"])),
                a["id_int"], esc(a["title"]),
                '<span class="pinned">置顶</span>' if a["pinned_bool"] else "",
                esc(a["summary"]), esc(a.get("updated_at", "")[:10]),
@@ -321,13 +355,19 @@ def build_home(arts):
         '<div class="topbar"><div class="wrap" style="padding-bottom:0">'
         '<input class="search" placeholder="搜索文章、标签、摘要…" oninput="filterCards(this.value)">'
         '</div></div>'
-        '<div class="wrap"><p class="overview">共 %d 篇 · %d 个分类</p>'
+        '<div class="wrap"><div class="top-actions">'
+        '<button class="btn btn-primary" type="button" onclick="atlasNewArticle()">＋ 新增文章</button>'
+        '<button class="btn" type="button" onclick="atlasExportChanges()">导出改动</button>'
+        '<span id="atlas-pending" style="display:none"></span></div>'
+        '<p class="overview">共 %d 篇 · %d 个分类</p>'
         '<div class="catgrid">%s</div>'
         '<section class="pinned-sec"><h2>置顶推荐</h2>%s</section>'
         '<div class="chips">%s</div>%s'
         '<footer>Atlas · 个人知识库 · %d 篇文章，内容以仓库 articles/ 的 Markdown 为准。</footer></div>'
         % (len(arts), len(cats), "".join(cat_cards), pinned_html, "".join(chips), "".join(grouped), len(arts)))
-    return page("Atlas", body, JS_HOME)
+    data = {"articles": [article_data(a) for a in arts],
+            "categories": sorted({a["category"] for a in arts})}
+    return page("Atlas", data_script(data) + body, ATLAS_JS)
 
 
 def build_detail(a, arts):
@@ -350,16 +390,32 @@ def build_detail(a, arts):
     body = (
         '<div id="progress"></div><button id="toTop" title="回到顶部">↑</button>'
         '<div class="layout"><aside>%s</aside><main class="article">'
-        '<nav class="back"><a href="../index.html">← 返回 Atlas</a></nav>'
+        '<nav class="back"><a href="../index.html">← 返回 Atlas</a> '
+        '<button class="btn" type="button" onclick="atlasEditCurrent()">编辑</button> '
+        '<button class="btn btn-danger" type="button" onclick="atlasDeleteCurrent()">删除</button></nav>'
         '<div class="kicker">%s</div><h1>%s</h1><p class="lead">%s</p>'
-        '<div>%s</div><p class="meta">约 %d 字 · 阅读约 %d 分钟 · 更新 %s</p>'
-        '%s%s%s</main></div>'
+        '<div id="article-tags">%s</div><p class="meta">约 %d 字 · 阅读约 %d 分钟 · 更新 %s</p>'
+        '%s<div id="article-body">%s</div>%s</main></div>'
         % (toc_html, esc(a["category"]), esc(a["title"]), esc(a["summary"]),
            "".join('<span class="tag">%s</span>' % esc(t) for t in a["tags_list"]),
            words, minutes, esc(a.get("updated_at", "")[:10]),
            ('<div class="toc-mobile"><details><summary>目录（%d 节）</summary><ol>%s</ol></details></div>' % (len(toc), toc_items)) if toc else "",
            body_html, pager))
-    return page(a["title"], body, JS_DETAIL)
+    data = {"articles": [article_data(a)], "categories": sorted({x["category"] for x in arts})}
+    return page(a["title"],
+                '<script>window.ATLAS_CURRENT_ID=%d;</script>' % a["id_int"] + data_script(data) + body,
+                ATLAS_JS)
+
+
+def build_view(arts):
+    """Generic detail shell for articles added in the browser (no static file)."""
+    body = (
+        '<div id="progress"></div><button id="toTop" title="回到顶部">↑</button>'
+        '<div class="layout"><aside><nav class="toc" id="view-toc"></nav></aside>'
+        '<main class="article" id="view-main"><p>加载中…</p></main></div>')
+    data = {"articles": [article_data(a) for a in arts],
+            "categories": sorted({a["category"] for a in arts})}
+    return page("Atlas", data_script(data) + body, ATLAS_JS)
 
 
 def main():
@@ -372,6 +428,8 @@ def main():
     os.makedirs(os.path.join(DIST_DIR, "articles"))
     with open(os.path.join(DIST_DIR, "index.html"), "w", encoding="utf-8") as f:
         f.write(build_home(arts))
+    with open(os.path.join(DIST_DIR, "articles", "view.html"), "w", encoding="utf-8") as f:
+        f.write(build_view(arts))
     for a in arts:
         with open(os.path.join(DIST_DIR, "articles", "%d.html" % a["id_int"]), "w", encoding="utf-8") as f:
             f.write(build_detail(a, arts))

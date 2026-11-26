@@ -19,11 +19,13 @@ atlas/
 │   ├── 01-grok-harness.md
 │   └── …（共 16 篇）
 ├── scripts/
-│   └── build.py         构建脚本（Python 标准库，无依赖）
+│   ├── build.py         构建脚本（Python 标准库，无依赖）
+│   └── atlas.js         浏览器端运行代码：新增/编辑/删除、localStorage 改动、导出
 └── dist/                构建产物（已提交，拉下来就能看）
-    ├── index.html       首页
+    ├── index.html       首页（＋ 新增文章 / 导出改动）
     └── articles/
-        └── 1.html … 16.html   每篇详情页
+        ├── 1.html … 16.html   每篇详情页（编辑 / 删除按钮）
+        └── view.html          新增文章的详情页（按 id 渲染）
 ```
 
 ## 在其它主机上拉取并打开
@@ -49,13 +51,47 @@ python3 scripts/build.py
 构建脚本只读 `articles/*.md`，生成 `dist/index.html` 和
 `dist/articles/<id>.html`，不联网、不依赖任何包。
 
-## 新增 / 修改文章
+## 新增 / 修改 / 删除文章
+
+有两种办法，改完都要重新构建并推送，GitHub 才是可信来源。
+
+### 办法一：在浏览器里改（推荐，点按钮就行）
+
+Atlas 是纯前端、没有后端，所以浏览器里的改动先只存在本机浏览器的
+localStorage（键名 `atlas_overrides`）里，换浏览器、换电脑、清缓存就
+看不到了——必须走下面第 3 步导出，才能真正同步到 GitHub。
+
+1. 首页点「＋ 新增文章」新增；详情页点「编辑」改标题、分类、标签、摘要、
+   正文（Markdown），点「删除」会先弹确认框。新增的文章 id 从 1001 开始，
+   不会和仓库里已有的 id 冲突；分类下拉里有现成的 6 个分类，也可以选
+   「＋ 新分类…」自己填一个。
+2. 改完马上就能在页面上看到：首页列表、分类篇数、搜索、置顶都会跟着变；
+   被删的文章从列表和搜索里消失；新增的文章点进去是详情页（`view.html`）。
+3. 点首页「导出改动」：弹框里列出所有本地改动，每篇可单独下载对应的
+   Markdown 文件（新增/修改），也可以一键下载 `atlas-changes.json`；
+   被删的文章会注明要删掉 `articles/` 里的哪个文件。
+4. 把下载的文件放进仓库的 `articles/`（新增放新文件，修改覆盖同名文件，
+   删除的删掉对应文件），跑 `python3 scripts/build.py`，检查 `dist/`，
+   再提交推送：
+
+```bash
+git add -A
+git commit -m "更新文章：<标题>"
+git push origin main
+```
+
+5. 推完之后，在浏览器里做的那份本地改动就可以不用管了——下次打开页面
+   时如果还留着旧的 localStorage 改动，会和已同步的仓库内容重叠显示；
+   确认 GitHub 上已经有了之后，在浏览器控制台跑
+   `localStorage.removeItem('atlas_overrides')` 清掉即可。
+
+### 办法二：直接改文件
 
 1. 在 `articles/` 里新增或修改一个 Markdown 文件。新增时复制一篇已有的
    frontmatter 格式，改 `id`（用下一个未用的数字）、`title`、`category`、
    `tags`、`pinned`、`summary` 即可；正文用标准 Markdown 写，
    二级标题 `##` 会自动进目录，标题后的 `<!-- toc: 短标题 -->` 会用作目录
-   里的短标题。
+   里的短标题。删除就是删掉对应文件。
 2. 跑 `python3 scripts/build.py` 重新生成。
 3. 检查 `dist/` 里对应页面，确认无误后提交并推送：
 

@@ -28,6 +28,23 @@ hr{border:none;border-top:1px solid var(--line);margin:28px 0}
 .tag{display:inline-block;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:2px 10px;font-size:13px;margin:0 6px 6px 0;color:var(--muted);font-family:ui-monospace,"JetBrains Mono",Menlo,monospace}
 /* --- homepage --- */
 .topbar{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--line);padding:14px 0}
+.top-actions{display:flex;gap:10px;align-items:center;margin:16px 0 4px;flex-wrap:wrap}
+.btn{display:inline-block;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 16px;font-size:14px;cursor:pointer;color:var(--ink);font-family:inherit}
+.btn:hover{border-color:var(--accent)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-danger{color:#b3261e;border-color:#e5b6b0}
+#atlas-pending{color:var(--accent);font-size:13px}
+.modal{position:fixed;inset:0;background:rgba(38,34,30,.45);z-index:100;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:32px 16px}
+.modal[hidden]{display:none}
+.modal-card{background:var(--surface);border-radius:14px;padding:22px 24px;max-width:640px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.25)}
+.modal-card h3{margin:0 0 12px;font-size:22px}
+.field{display:block;margin:12px 0;font-size:14px;color:var(--muted)}
+.field input[type=text],.field textarea,.field select{width:100%;margin-top:4px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-size:15px;font-family:inherit;background:#fff;color:var(--ink)}
+.field textarea{font-family:ui-monospace,"JetBrains Mono",Menlo,monospace}
+.modal-actions{display:flex;gap:10px;margin-top:16px}
+.modal-note{color:var(--muted);font-size:13px;line-height:1.7}
+.modal-card ul,.modal-card ol{font-size:14px;line-height:1.8}
+
 .wrap{max-width:1080px;margin:0 auto;padding:0 24px 64px}
 .search{width:100%;font-size:16px;padding:12px 16px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-family:inherit}
 .search:focus{outline:2px solid var(--accent);outline-offset:1px}
@@ -78,7 +95,7 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
 </style>
 </head>
 <body>
-<div id="progress"></div><button id="toTop" title="回到顶部">↑</button><div class="layout"><aside><nav class="toc"><h4>目录（22 节）</h4><ol><li style=""><a href="#sec-1"> 先看懂拓扑（动手前花 2 分钟）</a></li><li style=""><a href="#sec-2"> 恢复出厂，确认固件版本</a></li><li style=""><a href="#sec-3"> （仅高版本需要）降级到 1.0.17</a></li><li style=""><a href="#sec-4"> 一键开启 SSH</a></li><li style=""><a href="#sec-5"> 备份重要分区（5 分钟，变砖保险）</a></li><li style=""><a href="#sec-6"> 下载 OpenWrt 固件</a></li><li style=""><a href="#sec-7"> 刷入 OpenWrt（分两步，约 10 分钟）</a></li><li style="padding-left:14px;"><a href="#sec-8"> 6.1 把过渡镜像传进路由器并改短文件名</a></li><li style="padding-left:14px;"><a href="#sec-9"> 6.2 查当前启动分区，刷入非当前分区</a></li><li style="padding-left:14px;"><a href="#sec-10"> 6.3 进内存中的 OpenWrt，正式安装</a></li><li style=""><a href="#sec-11"> 设为旁路由（基础网络配置）</a></li><li style=""><a href="#sec-12"> 安装 AdGuardHome（去广告 DNS）</a></li><li style=""><a href="#sec-13"> 安装 OpenClash（代理分流）</a></li><li style="padding-left:14px;"><a href="#sec-14"> 9.1 下载安装包</a></li><li style="padding-left:14px;"><a href="#sec-15"> 9.2 安装依赖和主程序</a></li><li style="padding-left:14px;"><a href="#sec-16"> 9.3 下载 Clash 内核</a></li><li style="padding-left:14px;"><a href="#sec-17"> 9.4 导入订阅并启动</a></li><li style="padding-left:14px;"><a href="#sec-18"> 9.5 把 AdGuardHome 的上游接到 Clash</a></li><li style="padding-left:14px;"><a href="#sec-19"> 9.6 让路由器自身也走这条 DNS</a></li><li style=""><a href="#sec-20"> 设备接入 &amp; 验证</a></li><li style=""><a href="#sec-21"> 回滚与救砖</a></li><li style=""><a href="#sec-22"> 日常维护 &amp; 常见问题</a></li></ol></nav></aside><main class="article"><nav class="back"><a href="../index.html">← 返回 Atlas</a></nav><div class="kicker">网络与路由</div><h1>小米 AX3600 刷 OpenWrt 做旁路由完整教程（定版）</h1><p class="lead">BE7200 Pro 当主路由、AX3600 刷 OpenWrt 做旁路由的完整定版教程：降级开 SSH、刷机、OpenClash 分流与 AdGuardHome 去广告，全程可照着走通。</p><div><span class="tag">AX3600</span><span class="tag">OpenWrt</span><span class="tag">OpenClash</span><span class="tag">AdGuardHome</span><span class="tag">旁路由</span></div><p class="meta">约 8786 字 · 阅读约 21 分钟 · 更新 2026-11-26</p><div class="toc-mobile"><details><summary>目录（22 节）</summary><ol><li style=""><a href="#sec-1"> 先看懂拓扑（动手前花 2 分钟）</a></li><li style=""><a href="#sec-2"> 恢复出厂，确认固件版本</a></li><li style=""><a href="#sec-3"> （仅高版本需要）降级到 1.0.17</a></li><li style=""><a href="#sec-4"> 一键开启 SSH</a></li><li style=""><a href="#sec-5"> 备份重要分区（5 分钟，变砖保险）</a></li><li style=""><a href="#sec-6"> 下载 OpenWrt 固件</a></li><li style=""><a href="#sec-7"> 刷入 OpenWrt（分两步，约 10 分钟）</a></li><li style="padding-left:14px;"><a href="#sec-8"> 6.1 把过渡镜像传进路由器并改短文件名</a></li><li style="padding-left:14px;"><a href="#sec-9"> 6.2 查当前启动分区，刷入非当前分区</a></li><li style="padding-left:14px;"><a href="#sec-10"> 6.3 进内存中的 OpenWrt，正式安装</a></li><li style=""><a href="#sec-11"> 设为旁路由（基础网络配置）</a></li><li style=""><a href="#sec-12"> 安装 AdGuardHome（去广告 DNS）</a></li><li style=""><a href="#sec-13"> 安装 OpenClash（代理分流）</a></li><li style="padding-left:14px;"><a href="#sec-14"> 9.1 下载安装包</a></li><li style="padding-left:14px;"><a href="#sec-15"> 9.2 安装依赖和主程序</a></li><li style="padding-left:14px;"><a href="#sec-16"> 9.3 下载 Clash 内核</a></li><li style="padding-left:14px;"><a href="#sec-17"> 9.4 导入订阅并启动</a></li><li style="padding-left:14px;"><a href="#sec-18"> 9.5 把 AdGuardHome 的上游接到 Clash</a></li><li style="padding-left:14px;"><a href="#sec-19"> 9.6 让路由器自身也走这条 DNS</a></li><li style=""><a href="#sec-20"> 设备接入 &amp; 验证</a></li><li style=""><a href="#sec-21"> 回滚与救砖</a></li><li style=""><a href="#sec-22"> 日常维护 &amp; 常见问题</a></li></ol></details></div>
+<script>window.ATLAS_CURRENT_ID=3;</script><script id="atlas-data" type="application/json">{"articles": [{"id": 3, "title": "小米 AX3600 刷 OpenWrt 做旁路由完整教程（定版）", "category": "网络与路由", "tags": ["AX3600", "OpenWrt", "OpenClash", "AdGuardHome", "旁路由"], "summary": "BE7200 Pro 当主路由、AX3600 刷 OpenWrt 做旁路由的完整定版教程：降级开 SSH、刷机、OpenClash 分流与 AdGuardHome 去广告，全程可照着走通。", "pinned": true, "updated_at": "2026-11-26T04:51:42.795Z", "cover_key": "ax3600-openwrt", "source_note": "来源：your_files/AX3600旁路由完整教程.md（294 行定版）。早期草稿《小米AX3600刷OpenWrt旁路由教程.md》内容已被定版覆盖，不单独收录。", "file": "03-ax3600-openwrt.md", "body": "\n# 小米 AX3600 刷 OpenWrt 做旁路由（OpenClash + AdGuardHome）完整教程\n\n> 目标：BE7200 Pro 继续当主路由（拨号 + WiFi），闲置的 AX3600 刷 OpenWrt 后做**旁路由**，\n> 承担代理分流（OpenClash）和去广告 DNS（AdGuardHome）。\n> 想走软路由的设备把网关/DNS 指向它，不想走的设备完全不受影响。\n\n## 0. 先看懂拓扑（动手前花 2 分钟）\n\n```\n光猫 ── BE7200 Pro（主路由，192.168.31.1，管拨号和 WiFi）\n          │\n          │ 网线（LAN 口对 LAN 口，AX3600 的 WAN 口空着不用）\n          │\n        AX3600（旁路由，192.168.31.2，WiFi 关闭）\n```\n\n- 你的手机/电脑想走软路由时：手动把网关设为 192.168.31.2，DNS 设为 192.168.31.2。\n- 数据流向：设备 → AX3600（Clash 分流 / AdGuardHome 过滤）→ BE7200 Pro → 光猫 → 外网。\n- 全程用**网线**把电脑连 AX3600 操作，不要用 WiFi 刷机。\n\n**需要准备**：AX3600 及电源、一根网线、一台 Win11 电脑（自带 `ssh`/`scp` 命令）。\n\n---\n\n## 1. 恢复出厂，确认固件版本\n\n1. AX3600 通电，**不接任何网线**。长按机身 Reset 孔 5 秒以上，看到指示灯变橙色后松手，等待 2~3 分钟重启完成。\n2. 电脑用网线连 AX3600 的 **LAN 口**（4 个口随便一个，别插 WAN 口）。\n3. 浏览器打开 `http://192.168.31.1`，按初始化向导随便设个 WiFi 名和管理密码（管理密码记下来，后面降级登录要用）。\n4. 进后台看固件版本（一般在\"系统状态\"或\"路由设置→系统升级\"里）。\n   - 如果版本是 **1.0.17**：直接跳到第 3 步。\n   - 如果版本**高于** 1.0.17：必须先降级，看第 2 步。（开 SSH 用的漏洞在新版里已经被堵上了）\n\n---\n\n## 2.（仅高版本需要）降级到 1.0.17\n\n1. 在电脑上下载降级固件（小米官方 CDN 直链，已验证可访问，纯文本长按复制）：\n   `https://cdn.cnbj1.fds.api.mi-img.com/xiaoqiang/rom/r3600/miwifi_r3600_firmware_5da25_1.0.17.bin`\n   - 文件名：`miwifi_r3600_firmware_5da25_1.0.17.bin`\n   - 大小：**28,312,508 字节**（约 27.0 MiB）。下完对一下大小，差一位都别用。\n2. 浏览器登录 `http://192.168.31.1`，登录后看地址栏，把 `stok=` 后面那一长串字符复制下来（后面也要用）。\n3. 在浏览器地址栏粘贴（把 `<STOK>` 换成你刚复制的那串）：\n   `http://192.168.31.1/cgi-bin/luci/;stok=<STOK>/web/setting/upgrade`\n   这是\"手动升级\"页面。点\"选择文件\"，上传第 1 步下载的 bin，开始升级。\n4. 等待 3~5 分钟，指示灯变蓝常亮表示完成。浏览器重新打开 `http://192.168.31.1` 登录。\n   （如果提示密码不对，用你第 1 步里设的管理密码；实在不行 Reset 重来一次。）\n\n---\n\n## 3. 一键开启 SSH\n\n1. 登录 `http://192.168.31.1`，从地址栏复制新的 `stok=` 后面的字符串。\n2. 把下面这串地址里的 `<STOK>` 替换掉，在**浏览器地址栏**粘贴后回车（纯文本，长按复制）：\n   `http://192.168.31.1/cgi-bin/luci/;stok=<STOK>/api/xqsystem/upgrade_rom?url=%3Bnvram%20set%20ssh_en%3D1%3Bnvram%20commit%3Bsed%20-i%20%27s%2Fchannel%3D.*%2Fchannel%3D%22debug%22%2Fg%27%20%2Fetc%2Finit.d%2Fdropbear%3B%2Fetc%2Finit.d%2Fdropbear%20start%3Becho%20-e%20***%7Cpasswd%20root%3B`\n3. 页面返回 `{\"code\":0}` 即成功。这串命令一次做完四件事：打开 SSH 开关并保存、启动 SSH 服务、把 root 密码设为 ***。\n4. 在电脑上按 `Win+R` 输入 `cmd` 回车，输入：\n   `ssh root@192.168.31.1`\n   提示输入密码时输入 ***（输入时不显示，输完回车）。看到 `root@XiaoQiang:~#` 就表示进去了。\n5. **如果 root 登不上**：说明密码没设成功。备选方案是去网上搜\"小米路由器 SSH 密码计算器\"，输入机身标签上的 SN 算出密码再登。算出来也登不上就回到第 1 步重来（多半是固件版本不对）。\n\n---\n\n## 4. 备份重要分区（5 分钟，变砖保险）\n\n在刚才的 SSH 窗口里逐行执行：\n\n```\ncd /tmp\nnanddump -f mtd8-art.bin /dev/mtd8\nnanddump -f mtd9-bdata.bin /dev/mtd9\nnanddump -f mtd10-crash.bin /dev/mtd10\nls -lh mtd*.bin\n```\n\n- mtd8 是 ART（WiFi 射频校准数据，丢了 WiFi 就残了），mtd9 是 bdata（设备身份信息），mtd10 是 crash。\n- 然后在**电脑的 cmd** 里（不是 SSH 里）执行，把备份拉回电脑妥善保存：\n  `scp root@192.168.31.1:/tmp/mtd*.bin D:\\backup\\ax3600\\`\n  （先在 D 盘建好 `D:\\backup\\ax3600` 文件夹；密码还是 ***；第一次会问 `yes/no`，输 `yes`。）\n\n---\n\n## 5. 下载 OpenWrt 固件\n\n打开 `https://firmware-selector.openwrt.org/`，搜索框输入 `ax3600`，版本选 **25.12.6**（当前稳定版；24.10 系列已于 2026-09-30 停止安全更新，不建议再用），下载下面两个文件：\n\n| 文件 | 大小 | SHA256（下载后可校验） |\n|---|---|---|\n| `openwrt-25.12.6-qualcommax-ipq807x-xiaomi_ax3600-initramfs-factory.ubi` | 14,942,208 字节（约 14.25 MiB） | `994f415609a058ee44ab4fa92712c0cdb4e754aabb0abb0a70a0d0d9652ec357` |\n| `openwrt-25.12.6-qualcommax-ipq807x-xiaomi_ax3600-squashfs-sysupgrade.bin` | 13,568,307 字节（约 12.94 MiB） | `b4d26d71e913a12e9f35a362cc360d8de9e513563b8bbe1e7c8dc43796726729` |\n\n> 注意：24.10 开始 AX3600 的 target 从 `ipq807x/generic` 改成了 `qualcommax/ipq807x`，\n> 老教程里的旧版文件名对不上是正常的，认准 `qualcommax-ipq807x-xiaomi_ax3600` 就行。\n\n---\n\n## 6. 刷入 OpenWrt（分两步，约 10 分钟）\n\n### 6.1 把过渡镜像传进路由器并改短文件名\n\n在电脑 cmd 里：\n\n```\nscp D:\\openwrt\\openwrt-25.12.6-qualcommax-ipq807x-xiaomi_ax3600-initramfs-factory.ubi root@192.168.31.1:/tmp/factory.ubi\n```\n\n（把 `D:\\openwrt\\` 换成你实际存放固件的文件夹。）\n\n### 6.2 查当前启动分区，刷入非当前分区\n\nSSH 登录路由器，执行：\n\n```\nfw_printenv flag_boot_rootfs\n```\n\n看返回结果，二选一执行（**不要两组都执行**）：\n\n- 如果返回 `flag_boot_rootfs=1`，执行：\n```\nubiformat /dev/mtd12 -y -f /tmp/factory.ubi -s 2048 -O 2048\nfw_setenv flag_boot_rootfs 0\nfw_setenv flag_last_success 0\nreboot\n```\n- 如果返回 `flag_boot_rootfs=0`，执行：\n```\nubiformat /dev/mtd13 -y -f /tmp/factory.ubi -s 2048 -O 2048\nfw_setenv flag_boot_rootfs 1\nfw_setenv flag_last_success 1\nreboot\n```\n\n原理：AX3600 有双系统分区，这一步只写**当前没在用的那个分区**，先让 OpenWrt 从内存里跑起来验证一遍。\n这一步如果失败，原厂系统还完整躺在另一个分区里，有机会切回去。\n注意：下一步 6.3 正式安装完成后，OpenWrt 会把两个分区合并成一个大分区使用，\n原厂就不再保留在机器里了——届时恢复原厂走第 11 步的官方修复工具，别指望双分区兜底。\n\n### 6.3 进内存中的 OpenWrt，正式安装\n\n1. 等待 2~3 分钟（指示灯变蓝）。**电脑网线仍然直连 AX3600**，浏览器打开 `http://192.168.1.1`\n   （注意：这时 IP 变成了 192.168.1.1，不是 192.168.31.1）。\n2. 第一次进会让你设 root 密码，设一个自己记得住的。\n3. 在电脑 cmd 里把正式固件传进去并改短名：\n   `scp D:\\openwrt\\openwrt-25.12.6-qualcommax-ipq807x-xiaomi_ax3600-squashfs-sysupgrade.bin root@192.168.1.1:/tmp/sysupgrade.bin`\n4. SSH 登录（`ssh root@192.168.1.1`，用刚设的密码），执行：\n   `sysupgrade -n /tmp/sysupgrade.bin`\n5. 等待 3 分钟左右，OpenWrt 正式装好。至此刷机完成。\n\n---\n\n## 7. 设为旁路由（基础网络配置）\n\n1. 电脑**仍然网线直连 AX3600**，浏览器打开 `http://192.168.1.1` 登录。\n2. 网络 → 接口 → LAN → 修改 → 基本设置，改成：\n   - IPv4 地址：`192.168.31.2`\n   - IPv4 子网掩码：`255.255.255.0`\n   - IPv4 网关：`192.168.31.1`（你的 BE7200 Pro）\n   - 使用自定义的 DNS 服务器：`192.168.31.1`（先这样，第 9 步会改成 127.0.0.1）\n3. 同一页面下方\"DHCP 服务器\" → 基本设置 → **勾选\"忽略此接口\"**（DHCP 继续由 BE7200 Pro 负责）。\n4. 点\"保存\"，再点\"保存并应用\"。页面会转圈然后断开——**这是正常的**，因为 IP 已经变了。\n5. 现在接线：**AX3600 的 LAN 口** 用网线连到 **BE7200 Pro 的 LAN 口**（AX3600 的 WAN 口永远空着）。\n   电脑的网线也改插到 BE7200 Pro 上（或连 BE7200 Pro 的 WiFi）。\n6. 浏览器打开 `http://192.168.31.2`，能登录就说明旁路由网络通了。\n7. 关 WiFi：网络 → 无线，把 2.4G 和 5G 的两个无线网络都点\"禁用\"（WiFi 交给 BE7200 Pro，AX3600 只当网关）。\n8. 换国内软件源（官方源在国内很慢），SSH 里执行：\n```\ncat /etc/apk/repositories\nsed -i 's|downloads.openwrt.org|mirrors.ustc.edu.cn/openwrt|g' /etc/apk/repositories\ncat /etc/apk/repositories\napk update\n```\n   第二次 `cat` 确认地址已经变成 `mirrors.ustc.edu.cn/openwrt` 开头，`apk update` 不报错即可。\n\n---\n\n## 8. 安装 AdGuardHome（去广告 DNS）\n\n1. SSH 里执行：\n   `apk add adguardhome luci-app-adguardhome`\n   - 如果提示找不到这两个包，停下来告诉我，我给你手动安装官方二进制包的步骤（不需要重来）。\n2. 把 53 端口让给 AdGuardHome（OpenWrt 自带的 dnsmasq 默认占着 53）：\n```\nuci set dhcp.@dnsmasq[0].port='0'\nuci commit dhcp\n/etc/init.d/dnsmasq restart\n/etc/init.d/adguardhome restart\nss -lntp | grep ':53 '\n```\n   最后一条命令应该能看到 `adguardhome` 在监听 53 端口。\n3. 浏览器打开 `http://192.168.31.2:3000` 按向导走：\n   - 网页管理界面端口：3000（默认）\n   - DNS 服务器端口：53（默认）\n   - 设置管理用户名和密码（自己记好）\n   - 上游 DNS 服务器：**先填 `223.5.5.5`**（装完 OpenClash 后再改成 Clash 的 7874 端口，先填个能用的）\n4. 进 AdGuardHome 的\"设置 → DNS 设置\"：Bootstrap DNS 填 `223.5.5.5`，保存。\n\n---\n\n## 9. 安装 OpenClash（代理分流）\n\n### 9.1 下载安装包\n\nOpenClash 的 GitHub Releases 页（仓库 `vernesong/OpenClash`），下载当前最新版 **v0.48.002** 的 apk 包：\n`luci-app-openclash-0.48.002.apk`，大小 **10,702,048 字节**（约 10.21 MiB）。\n（25.12 用 apk 包管理器，`.apk` 和 `.ipk` 别下混。）\n\n### 9.2 安装依赖和主程序\n\n把 apk 传到路由器 `/tmp`（用 scp 或 WinSCP 拖进去），SSH 里执行：\n\n```\napk add dnsmasq-full\napk add bash curl ca-bundle kmod-tun kmod-nft-tproxy\napk add --allow-untrusted /tmp/luci-app-openclash-0.48.002.apk\n```\n\n说明：\n- `dnsmasq-full` 是 OpenClash 安装检查要的完整版 dnsmasq，会替换掉精简版（我们已经把它的 DNS 关了、DHCP 也没开，替换很安全）。\n- `--allow-untrusted` 是因为这个包不是官方源签名的，只对你确认过的文件用。\n- 装完刷新 LuCI，左侧菜单出现\"服务 → OpenClash\"即成功。\n\n### 9.3 下载 Clash 内核\n\n服务 → OpenClash → 全局设置 → 版本更新 → 内核下载：\n- 内核选 **Meta（mihomo）**，架构选 **linux-arm64**（AX3600 是 ARM64），点下载，等待完成。\n- 如果路由器上下载 GitHub 很慢/失败：用电脑从 OpenClash 的 Releases 页下好对应内核文件，\n  通过\"全局设置 → 版本更新 → 上传内核\"传上去也行。\n\n### 9.4 导入订阅并启动\n\n1. 全局设置 → 配置文件订阅 → 新增：粘贴你的机场订阅链接（或你自己的 vless 订阅），保存。\n2. 点\"更新订阅\"，等节点列表出来。\n3. 回到\"运行状态\"/\"配置文件管理\"，选中刚更新的配置文件。\n4. **DNS 设置（关键，决定会不会断网）**：\n   - 本地 DNS 劫持：启用\n   - Fake-IP：启用\n   - NameServer：填 `223.5.5.5`（多个用英文逗号隔开；**千万不要填 127.0.0.1**，否则和 AdGuardHome 互相指形成死循环）\n5. 模式设置：运行模式保持\"规则\"即可，先别开 TUN。\n6. 点\"启动\"。状态页显示运行中即成功。\n\n### 9.5 把 AdGuardHome 的上游接到 Clash\n\n回到 `http://192.168.31.2:3000` → 设置 → DNS 设置：\n- 上游 DNS 服务器改成：`127.0.0.1:7874`（这就是 OpenClash 的 Fake-IP DNS 端口）\n- 保存。\n\n最终 DNS 链路：**设备 → AdGuardHome(:53，去广告) → OpenClash(:7874，按规则分流) → 真实 DNS**。\n代理节点的域名由 Clash 用你填的 223.5.5.5 直接解析，不经过 AdGuardHome，没有循环。\n\n### 9.6 让路由器自身也走这条 DNS\n\n网络 → 接口 → LAN → 修改 → 基本设置 → 自定义 DNS 服务器改成 `127.0.0.1`，保存并应用。\n\n---\n\n## 10. 设备接入 & 验证\n\n1. 在想走软路由的设备上手动设置（以电脑为例）：\n   - IP：192.168.31.x（x 取 100~200 之间没被占用的）\n   - 子网掩码：255.255.255.0\n   - 网关：**192.168.31.2**\n   - DNS：**192.168.31.2**\n2. 验证三件套：\n   - 能正常打开网页 → 旁路由转发通了。\n   - 打开 AdGuardHome 首页（`http://192.168.31.2:3000`），\"查询日志\"里有这台设备的记录，且拦截计数在涨 → 去广告生效。\n   - 在 Clash 里切到\"全局\"模式后访问 `ip.sb`，显示的 IP 变成节点 IP → 代理生效；切回\"规则\"模式，国内网站直连速度正常。\n3. 不想走的设备：什么都不用改，网关/DNS 保持自动（走 BE7200 Pro），完全不受影响。\n\n---\n\n## 11. 回滚与救砖\n\n- **升级 OpenWrt**：去固件选择器下新版 `squashfs-sysupgrade.bin`，LuCI 里系统 → 备份/升级 → 刷写即可（可保留配置）。\n- **过渡阶段起不来（6.2 之后、6.3 之前）**：原厂还完整躺在另一个分区里，\n  断电重启多试几次，bootloader 会按 `flag_last_success` 机制切回原厂分区。\n- **正式装完后回原厂**：用小米官方 **MIWIFIRepairTool** 修复工具——电脑网线直连 AX3600 的 LAN 口，\n  运行工具、选择原厂固件包，工具会通过 TFTP 把官方固件刷回去，恢复出厂状态（小米固件、米家管理都回来）。\n  这是小米官方给的救砖通道，成功率很高，不需要动第 4 步的备份。\n  工具官方直链（979,690 字节的 zip）：`https://cdn.cnbj1.fds.api.mi-img.com/xiaoqiang/tools/MIWIFIRepairTool.x86.zip`\n  注意：小米路由器会劫持 `miwifi.com` 域名到本地后台，在家里网络打开小米官网下载页会跳到路由器管理页，\n  属正常现象；上面的 CDN 直链不受劫持影响，可直接下载（或用手机流量打开官网）。\n- **手动 TFTP 救砖**：修复工具不行时，OpenWrt 官方 wiki 有 AX3600 的 debrick 步骤，原理相同、手动操作。\n- 第 4 步备份的 `mtd8-art.bin` 等文件是最后保险，留着别删。\n\n## 12. 日常维护 & 常见问题\n\n- **订阅自动更新**：OpenClash → 全局设置 → 计划任务，打开\"配置文件自动更新\"（每天凌晨一次）。\n- **过滤器更新**：AdGuardHome → 过滤器 → 拦截列表，定期点\"检查更新\"。\n- **装完 Clash 上不了网**：先去 OpenClash 里点\"停止运行\"，看是否恢复；\n  九成是 DNS 环路——检查 NameServer 里有没有 127.0.0.1，有就删掉。\n- **AdGuardHome 的 :3000 打不开**：SSH 里看 `logread | grep -i adguard` 找报错。\n- **53 端口被占**：`ss -lntp | grep ':53 '` 看是谁在监听，应该只有 adguardhome。\n- **部分 UDP 应用（如游戏语音）异常**：试试 OpenClash 里切换到 TUN 模式，或把这台设备网关改回 192.168.31.1 绕开。\n"}], "categories": ["AI 与 Agent", "创作与内容", "网站与项目", "网络与路由", "节点与代理", "账号与服务"]}</script><div id="progress"></div><button id="toTop" title="回到顶部">↑</button><div class="layout"><aside><nav class="toc"><h4>目录（22 节）</h4><ol><li style=""><a href="#sec-1"> 先看懂拓扑（动手前花 2 分钟）</a></li><li style=""><a href="#sec-2"> 恢复出厂，确认固件版本</a></li><li style=""><a href="#sec-3"> （仅高版本需要）降级到 1.0.17</a></li><li style=""><a href="#sec-4"> 一键开启 SSH</a></li><li style=""><a href="#sec-5"> 备份重要分区（5 分钟，变砖保险）</a></li><li style=""><a href="#sec-6"> 下载 OpenWrt 固件</a></li><li style=""><a href="#sec-7"> 刷入 OpenWrt（分两步，约 10 分钟）</a></li><li style="padding-left:14px;"><a href="#sec-8"> 6.1 把过渡镜像传进路由器并改短文件名</a></li><li style="padding-left:14px;"><a href="#sec-9"> 6.2 查当前启动分区，刷入非当前分区</a></li><li style="padding-left:14px;"><a href="#sec-10"> 6.3 进内存中的 OpenWrt，正式安装</a></li><li style=""><a href="#sec-11"> 设为旁路由（基础网络配置）</a></li><li style=""><a href="#sec-12"> 安装 AdGuardHome（去广告 DNS）</a></li><li style=""><a href="#sec-13"> 安装 OpenClash（代理分流）</a></li><li style="padding-left:14px;"><a href="#sec-14"> 9.1 下载安装包</a></li><li style="padding-left:14px;"><a href="#sec-15"> 9.2 安装依赖和主程序</a></li><li style="padding-left:14px;"><a href="#sec-16"> 9.3 下载 Clash 内核</a></li><li style="padding-left:14px;"><a href="#sec-17"> 9.4 导入订阅并启动</a></li><li style="padding-left:14px;"><a href="#sec-18"> 9.5 把 AdGuardHome 的上游接到 Clash</a></li><li style="padding-left:14px;"><a href="#sec-19"> 9.6 让路由器自身也走这条 DNS</a></li><li style=""><a href="#sec-20"> 设备接入 &amp; 验证</a></li><li style=""><a href="#sec-21"> 回滚与救砖</a></li><li style=""><a href="#sec-22"> 日常维护 &amp; 常见问题</a></li></ol></nav></aside><main class="article"><nav class="back"><a href="../index.html">← 返回 Atlas</a> <button class="btn" type="button" onclick="atlasEditCurrent()">编辑</button> <button class="btn btn-danger" type="button" onclick="atlasDeleteCurrent()">删除</button></nav><div class="kicker">网络与路由</div><h1>小米 AX3600 刷 OpenWrt 做旁路由完整教程（定版）</h1><p class="lead">BE7200 Pro 当主路由、AX3600 刷 OpenWrt 做旁路由的完整定版教程：降级开 SSH、刷机、OpenClash 分流与 AdGuardHome 去广告，全程可照着走通。</p><div id="article-tags"><span class="tag">AX3600</span><span class="tag">OpenWrt</span><span class="tag">OpenClash</span><span class="tag">AdGuardHome</span><span class="tag">旁路由</span></div><p class="meta">约 8786 字 · 阅读约 21 分钟 · 更新 2026-11-26</p><div class="toc-mobile"><details><summary>目录（22 节）</summary><ol><li style=""><a href="#sec-1"> 先看懂拓扑（动手前花 2 分钟）</a></li><li style=""><a href="#sec-2"> 恢复出厂，确认固件版本</a></li><li style=""><a href="#sec-3"> （仅高版本需要）降级到 1.0.17</a></li><li style=""><a href="#sec-4"> 一键开启 SSH</a></li><li style=""><a href="#sec-5"> 备份重要分区（5 分钟，变砖保险）</a></li><li style=""><a href="#sec-6"> 下载 OpenWrt 固件</a></li><li style=""><a href="#sec-7"> 刷入 OpenWrt（分两步，约 10 分钟）</a></li><li style="padding-left:14px;"><a href="#sec-8"> 6.1 把过渡镜像传进路由器并改短文件名</a></li><li style="padding-left:14px;"><a href="#sec-9"> 6.2 查当前启动分区，刷入非当前分区</a></li><li style="padding-left:14px;"><a href="#sec-10"> 6.3 进内存中的 OpenWrt，正式安装</a></li><li style=""><a href="#sec-11"> 设为旁路由（基础网络配置）</a></li><li style=""><a href="#sec-12"> 安装 AdGuardHome（去广告 DNS）</a></li><li style=""><a href="#sec-13"> 安装 OpenClash（代理分流）</a></li><li style="padding-left:14px;"><a href="#sec-14"> 9.1 下载安装包</a></li><li style="padding-left:14px;"><a href="#sec-15"> 9.2 安装依赖和主程序</a></li><li style="padding-left:14px;"><a href="#sec-16"> 9.3 下载 Clash 内核</a></li><li style="padding-left:14px;"><a href="#sec-17"> 9.4 导入订阅并启动</a></li><li style="padding-left:14px;"><a href="#sec-18"> 9.5 把 AdGuardHome 的上游接到 Clash</a></li><li style="padding-left:14px;"><a href="#sec-19"> 9.6 让路由器自身也走这条 DNS</a></li><li style=""><a href="#sec-20"> 设备接入 &amp; 验证</a></li><li style=""><a href="#sec-21"> 回滚与救砖</a></li><li style=""><a href="#sec-22"> 日常维护 &amp; 常见问题</a></li></ol></details></div><div id="article-body">
 <blockquote><p>目标：BE7200 Pro 继续当主路由（拨号 + WiFi），闲置的 AX3600 刷 OpenWrt 后做<strong>旁路由</strong>，<br>承担代理分流（OpenClash）和去广告 DNS（AdGuardHome）。<br>想走软路由的设备把网关/DNS 指向它，不想走的设备完全不受影响。</p></blockquote>
 <div class="sec-head" id="sec-1"><span class="badge">0</span><h2>0. 先看懂拓扑（动手前花 2 分钟）</h2></div>
 <pre><code>光猫 ── BE7200 Pro（主路由，192.168.31.1，管拨号和 WiFi）
@@ -209,14 +226,559 @@ apk add --allow-untrusted /tmp/luci-app-openclash-0.48.002.apk</code></pre>
 <div class="sec-head" id="sec-22"><span class="badge">12</span><h2>12. 日常维护 &amp; 常见问题</h2></div>
 <ul><li><strong>订阅自动更新</strong>：OpenClash → 全局设置 → 计划任务，打开&quot;配置文件自动更新&quot;（每天凌晨一次）。</li><li><strong>过滤器更新</strong>：AdGuardHome → 过滤器 → 拦截列表，定期点&quot;检查更新&quot;。</li><li><strong>装完 Clash 上不了网</strong>：先去 OpenClash 里点&quot;停止运行&quot;，看是否恢复；</li></ul>
 <p>  九成是 DNS 环路——检查 NameServer 里有没有 127.0.0.1，有就删掉。</p>
-<ul><li><strong>AdGuardHome 的 :3000 打不开</strong>：SSH 里看 <code>logread | grep -i adguard</code> 找报错。</li><li><strong>53 端口被占</strong>：<code>ss -lntp | grep &#x27;:53 &#x27;</code> 看是谁在监听，应该只有 adguardhome。</li><li><strong>部分 UDP 应用（如游戏语音）异常</strong>：试试 OpenClash 里切换到 TUN 模式，或把这台设备网关改回 192.168.31.1 绕开。</li></ul><nav class="pager"><span><a href="2.html">← Harness 到底在干嘛：一句话讲清</a></span><span><a href="4.html">小红书图文稿：毕设开题“问题、目标、方法”三段怎么写 →</a></span></nav></main></div>
-<script>
-var bar=document.getElementById('progress');
-var links=Array.prototype.slice.call(document.querySelectorAll('.toc a'));
-var secs=links.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
-function onScroll(){var st=window.scrollY||document.documentElement.scrollTop;var h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?(st/h*100):0)+'%';var cur=secs[0];secs.forEach(function(s){if(s.getBoundingClientRect().top<=120)cur=s;});links.forEach(function(a){var on=a.getAttribute('href')==='#'+(cur&&cur.id);a.classList.toggle('active',on);if(on)a.scrollIntoView({block:'nearest'});});}
-window.addEventListener('scroll',onScroll,{passive:true});onScroll();
-document.getElementById('toTop').addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+<ul><li><strong>AdGuardHome 的 :3000 打不开</strong>：SSH 里看 <code>logread | grep -i adguard</code> 找报错。</li><li><strong>53 端口被占</strong>：<code>ss -lntp | grep &#x27;:53 &#x27;</code> 看是谁在监听，应该只有 adguardhome。</li><li><strong>部分 UDP 应用（如游戏语音）异常</strong>：试试 OpenClash 里切换到 TUN 模式，或把这台设备网关改回 192.168.31.1 绕开。</li></ul></div><nav class="pager"><span><a href="2.html">← Harness 到底在干嘛：一句话讲清</a></span><span><a href="4.html">小红书图文稿：毕设开题“问题、目标、方法”三段怎么写 →</a></span></nav></main></div>
+<script>/* Atlas client runtime — Add / Edit / Delete (no backend).
+ *
+ * Built-in articles are baked into each page as JSON (#atlas-data).
+ * All adds/edits/deletes are stored in localStorage under key
+ * "atlas_overrides" and applied on top of the built-in articles:
+ *   { v: 1, added: [article...], edited: {id: article}, deleted: [id...] }
+ * Nothing leaves the browser until the user clicks "导出改动" on the
+ * homepage, downloads the changed Markdown files, puts them into
+ * articles/, rebuilds and pushes to GitHub.
+ */
+(function () {
+  "use strict";
+  var KEY = "atlas_overrides";
+
+  /* ---------- data ---------- */
+  var DATA = null;
+  try {
+    var el = document.getElementById("atlas-data");
+    DATA = el ? JSON.parse(el.textContent) : { articles: [], categories: [] };
+  } catch (e) { DATA = { articles: [], categories: [] }; }
+  var BUILTIN = DATA.articles || [];
+  var CATEGORIES = DATA.categories || [];
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function loadOverrides() {
+    try {
+      var o = JSON.parse(localStorage.getItem(KEY) || "null");
+      if (o && Array.isArray(o.added) && o.edited && Array.isArray(o.deleted)) return o;
+    } catch (e) {}
+    return { v: 1, added: [], edited: {}, deleted: [] };
+  }
+  function saveOverrides(o) {
+    try { localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) { alert("保存失败：浏览器 localStorage 不可用。"); }
+  }
+  function builtinById(id) {
+    for (var i = 0; i < BUILTIN.length; i++) if (BUILTIN[i].id === id) return BUILTIN[i];
+    return null;
+  }
+  function getArticle(id) {
+    var o = loadOverrides();
+    if (o.deleted.indexOf(id) !== -1) return null;
+    if (o.edited[id]) return o.edited[id];
+    for (var i = 0; i < o.added.length; i++) if (o.added[i].id === id) return o.added[i];
+    return builtinById(id);
+  }
+  function getAllArticles() {
+    var o = loadOverrides();
+    var list = [];
+    BUILTIN.forEach(function (a) {
+      if (o.deleted.indexOf(a.id) !== -1) return;
+      list.push(o.edited[a.id] || a);
+    });
+    o.added.forEach(function (a) {
+      if (o.deleted.indexOf(a.id) !== -1) return;
+      list.push(a);
+    });
+    list.sort(function (x, y) { return x.id - y.id; });
+    return list;
+  }
+  function pendingCount() {
+    var o = loadOverrides();
+    return o.added.length + Object.keys(o.edited).length + o.deleted.length;
+  }
+  function nextAddedId() {
+    var o = loadOverrides();
+    var max = 1000;
+    o.added.forEach(function (a) { if (a.id > max) max = a.id; });
+    return max + 1;
+  }
+  function slugify(title) {
+    var s = String(title || "article").replace(/[^\w\u4e00-\u9fa5]+/g, "-").replace(/^-+|-+$/g, "");
+    return s ? s.slice(0, 40) : "article";
+  }
+  function articleFilename(a) {
+    if (a.file) return a.file;
+    return a.id + "-" + slugify(a.title) + ".md";
+  }
+  function toMarkdown(a) {
+    var tags = (a.tags || []).map(function (t) { return '"' + String(t).replace(/"/g, "") + '"'; }).join(", ");
+    var fm = ["---", "id: " + a.id, 'title: "' + String(a.title || "").replace(/"/g, "") + '"',
+      'category: "' + String(a.category || "").replace(/"/g, "") + '"',
+      "tags: [" + tags + "]", "pinned: " + (a.pinned ? "true" : "false")];
+    if (a.cover_key) fm.push('cover_key: "' + a.cover_key + '"');
+    fm.push('summary: "' + String(a.summary || "").replace(/"/g, "") + '"');
+    if (a.source_note) fm.push('source_note: "' + String(a.source_note).replace(/"/g, "") + '"');
+    fm.push("updated_at: " + JSON.stringify(a.updated_at || new Date().toISOString()));
+    fm.push("---", "");
+    return fm.join("\n") + "\n" + (a.body || "");
+  }
+
+  /* ---------- small Markdown -> HTML (mirrors scripts/build.py) ---------- */
+  function inlineMd(s) {
+    s = esc(s);
+    s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    s = s.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, "<em>$1</em>");
+    s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
+    s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+    return s;
+  }
+  function mdToHtml(body) {
+    var lines = String(body || "").split("\n"), out = [], toc = [], i = 0, secN = 0;
+    function isTableSep(l) { return /^\s*\|[\s:|-]+\|\s*$/.test(l); }
+    while (i < lines.length) {
+      var line = lines[i];
+      if (line.indexOf("```") === 0) {
+        var buf = []; i++;
+        while (i < lines.length && lines[i].indexOf("```") !== 0) { buf.push(lines[i]); i++; }
+        i++;
+        out.push("<pre><code>" + esc(buf.join("\n")) + "</code></pre>"); continue;
+      }
+      if (line.trim().indexOf("|") === 0 && i + 1 < lines.length && isTableSep(lines[i + 1])) {
+        var header = line.trim().replace(/^\||\|$/g, "").split("|").map(function (c) { return c.trim(); });
+        i += 2; var rows = [];
+        while (i < lines.length && lines[i].trim().indexOf("|") === 0) {
+          rows.push(lines[i].trim().replace(/^\||\|$/g, "").split("|").map(function (c) { return c.trim(); })); i++;
+        }
+        var t = "<table><thead><tr>" + header.map(function (c) { return "<th>" + inlineMd(c) + "</th>"; }).join("") + "</tr></thead><tbody>";
+        rows.forEach(function (r) { t += "<tr>" + r.map(function (c) { return "<td>" + inlineMd(c) + "</td>"; }).join("") + "</tr>"; });
+        out.push(t + "</tbody></table>"); continue;
+      }
+      var hm = line.match(/^(#{1,3})\s+(.*)$/);
+      if (hm) {
+        var level = hm[1].length, raw = hm[2], tm = raw.match(/<!--\s*toc:\s*(.*?)\s*-->/);
+        var tocLabel = tm ? tm[1] : null;
+        raw = raw.replace(/<!--.*?-->/g, "").trim();
+        if (level === 1) { out.push("<h1>" + inlineMd(raw) + "</h1>"); }
+        else if (level === 2) {
+          secN++; var hid = "sec-" + secN;
+          var label = tocLabel || raw.replace(/^\d+[\.\、\s]*/, "");
+          toc.push({ id: hid, label: label, level: 2 });
+          var b = raw.match(/^(\d+)/);
+          out.push('<div class="sec-head" id="' + hid + '"><span class="badge">' + esc(b ? b[1] : ("0" + toc.length).slice(-2)) + '</span><h2>' + inlineMd(raw) + "</h2></div>");
+        } else {
+          if (/^\d+\.\d+/.test(raw)) {
+            secN++; var hid3 = "sec-" + secN;
+            toc.push({ id: hid3, label: raw, level: 3 });
+            out.push('<div class="sec-head" id="' + hid3 + '"><span class="badge">' + esc(raw.split(" ")[0]) + "</span><h3>" + inlineMd(raw) + "</h3></div>");
+          } else { out.push("<h3>" + inlineMd(raw) + "</h3>"); }
+        }
+        i++; continue;
+      }
+      if (line.indexOf(">") === 0) {
+        var bq = [];
+        while (i < lines.length && lines[i].indexOf(">") === 0) { bq.push(lines[i].replace(/^>\s?/, "")); i++; }
+        out.push("<blockquote><p>" + bq.map(inlineMd).join("<br>") + "</p></blockquote>"); continue;
+      }
+      if (line.trim() === "---" || line.trim() === "***" || line.trim() === "___") { out.push("<hr>"); i++; continue; }
+      var im = line.match(/^!\[([^\]]*)\]\(([^)]+)\)\s*$/);
+      if (im) { out.push('<div class="img-note">🖼 ' + esc(im[1]) + "（配图 " + esc(im[2]) + "，未包含在导出中）</div>"); i++; continue; }
+      if (/^\s*[-*]\s+/.test(line)) {
+        var items = [];
+        while (i < lines.length && /^\s*[-*]\s+/.test(lines[i])) { items.push(lines[i].replace(/^\s*[-*]\s+/, "")); i++; }
+        out.push("<ul>" + items.map(function (x) { return "<li>" + inlineMd(x) + "</li>"; }).join("") + "</ul>"); continue;
+      }
+      if (/^\s*\d+[\.\)]\s+/.test(line)) {
+        var oitems = [];
+        while (i < lines.length && /^\s*\d+[\.\)]\s+/.test(lines[i])) { oitems.push(lines[i].replace(/^\s*\d+[\.\)]\s+/, "")); i++; }
+        out.push("<ol>" + oitems.map(function (x) { return "<li>" + inlineMd(x) + "</li>"; }).join("") + "</ol>"); continue;
+      }
+      if (!line.trim()) { i++; continue; }
+      var para = [line]; i++;
+      while (i < lines.length && lines[i].trim() && !/^(#{1,3}\s|```|\s*[-*]\s|\s*\d+[\.\)]\s+>|>|\|)/.test(lines[i])) { para.push(lines[i]); i++; }
+      out.push("<p>" + para.map(inlineMd).join(" ") + "</p>");
+    }
+    return { html: out.join("\n"), toc: toc };
+  }
+
+  /* ---------- homepage search / filter (used by inline handlers) ---------- */
+  window.filterCards = function (q) {
+    q = (q || "").trim().toLowerCase();
+    document.querySelectorAll("[data-search]").forEach(function (el) {
+      el.style.display = (!q || el.dataset.search.toLowerCase().indexOf(q) !== -1) ? "" : "none";
+    });
+  };
+  window.setChip = function (btn, cat) {
+    document.querySelectorAll(".chip").forEach(function (c) { c.classList.remove("active"); });
+    btn.classList.add("active");
+    document.querySelectorAll("[data-cat]").forEach(function (el) {
+      el.style.display = (cat === "全部" || el.dataset.cat === cat) ? "" : "none";
+    });
+  };
+
+  /* ---------- editor modal ---------- */
+  var currentEditId = null;
+  function ensureModal() {
+    if (document.getElementById("atlas-modal")) return;
+    var div = document.createElement("div");
+    div.id = "atlas-modal";
+    div.className = "modal";
+    div.hidden = true;
+    div.innerHTML =
+      '<div class="modal-card"><h3 id="atlas-modal-title">编辑文章</h3>' +
+      '<label class="field">标题<input id="ed-title" type="text"></label>' +
+      '<label class="field">分类<select id="ed-category"></select>' +
+      '<input id="ed-category-new" type="text" placeholder="新分类名称" hidden style="margin-top:6px"></label>' +
+      '<label class="field">标签（逗号分隔）<input id="ed-tags" type="text"></label>' +
+      '<label class="field">摘要<textarea id="ed-summary" rows="2"></textarea></label>' +
+      '<label class="field"><span><input id="ed-pinned" type="checkbox"> 置顶推荐</span></label>' +
+      '<label class="field">正文（Markdown）<textarea id="ed-body" rows="14"></textarea></label>' +
+      '<div class="modal-actions"><button class="btn btn-primary" id="ed-save">保存</button>' +
+      '<button class="btn" type="button" onclick="atlasCloseModal()">取消</button></div>' +
+      '<p class="modal-note">保存后只存在本浏览器（localStorage），需在首页点“导出改动”，把文件放回 articles/ 并重新构建、推送到 GitHub，才会同步到其它主机。</p></div>';
+    document.body.appendChild(div);
+    document.getElementById("ed-category").addEventListener("change", function () {
+      document.getElementById("ed-category-new").hidden = this.value !== "__new__";
+    });
+    document.getElementById("ed-save").addEventListener("click", saveEditor);
+  }
+  function fillCategories(selected) {
+    var sel = document.getElementById("ed-category");
+    var cats = CATEGORIES.slice();
+    getAllArticles().forEach(function (a) { if (cats.indexOf(a.category) === -1) cats.push(a.category); });
+    sel.innerHTML = cats.map(function (c) {
+      return '<option value="' + esc(c) + '"' + (c === selected ? " selected" : "") + ">" + esc(c) + "</option>";
+    }).join("") + '<option value="__new__">＋ 新分类…</option>';
+    document.getElementById("ed-category-new").hidden = true;
+  }
+  window.atlasCloseModal = function () {
+    var m = document.getElementById("atlas-modal");
+    if (m) m.hidden = true;
+    var e = document.getElementById("atlas-export-modal");
+    if (e) e.hidden = true;
+  };
+  window.atlasNewArticle = function () { openEditor(null); };
+  window.atlasEditCurrent = function () {
+    var id = window.ATLAS_CURRENT_ID;
+    if (id == null) return;
+    openEditor(getArticle(id));
+  };
+  function openEditor(article) {
+    ensureModal();
+    currentEditId = article ? article.id : null;
+    document.getElementById("atlas-modal-title").textContent = article ? "编辑文章" : "新增文章";
+    document.getElementById("ed-title").value = article ? article.title : "";
+    fillCategories(article ? article.category : CATEGORIES[0]);
+    document.getElementById("ed-tags").value = article ? (article.tags || []).join(", ") : "";
+    document.getElementById("ed-summary").value = article ? article.summary : "";
+    document.getElementById("ed-pinned").checked = !!(article && article.pinned);
+    document.getElementById("ed-body").value = article ? article.body : "";
+    document.getElementById("atlas-modal").hidden = false;
+  }
+  function saveEditor() {
+    var title = document.getElementById("ed-title").value.trim();
+    if (!title) { alert("请填写标题。"); return; }
+    var catSel = document.getElementById("ed-category");
+    var category = catSel.value === "__new__"
+      ? document.getElementById("ed-category-new").value.trim()
+      : catSel.value;
+    if (!category) { alert("请选择或填写分类。"); return; }
+    var tags = document.getElementById("ed-tags").value.split(/[,，、]/).map(function (t) { return t.trim(); }).filter(Boolean);
+    var o = loadOverrides();
+    if (currentEditId == null) {
+      var a = { id: nextAddedId(), title: title, category: category, tags: tags,
+        summary: document.getElementById("ed-summary").value.trim(), pinned: document.getElementById("ed-pinned").checked,
+        updated_at: new Date().toISOString(), body: document.getElementById("ed-body").value };
+      o.added.push(a);
+      saveOverrides(o);
+      atlasCloseModal();
+      location.href = atlasPath("articles/view.html?id=" + a.id);
+    } else {
+      var orig = getArticle(currentEditId);
+      var updated = { id: currentEditId, title: title, category: category, tags: tags,
+        summary: document.getElementById("ed-summary").value.trim(), pinned: document.getElementById("ed-pinned").checked,
+        updated_at: new Date().toISOString(), body: document.getElementById("ed-body").value,
+        cover_key: orig.cover_key, source_note: orig.source_note, file: orig.file };
+      if (orig.file) { o.edited[currentEditId] = updated; }
+      else {
+        for (var i = 0; i < o.added.length; i++) if (o.added[i].id === currentEditId) o.added[i] = updated;
+      }
+      saveOverrides(o);
+      atlasCloseModal();
+      location.reload();
+    }
+  }
+  function atlasPath(rel) {
+    return location.pathname.indexOf("/articles/") !== -1 ? "../" + rel : rel;
+  }
+  window.atlasDeleteCurrent = function () {
+    var id = window.ATLAS_CURRENT_ID;
+    if (id == null) return;
+    var a = getArticle(id);
+    if (!a) return;
+    if (!confirm("确定删除「" + a.title + "」吗？\n删除后只在本地生效，需导出改动并推送到 GitHub 才会同步。")) return;
+    var o = loadOverrides();
+    delete o.edited[id];
+    o.added = o.added.filter(function (x) { return x.id !== id; });
+    if (builtinById(id) && o.deleted.indexOf(id) === -1) o.deleted.push(id);
+    saveOverrides(o);
+    location.href = atlasPath("index.html");
+  };
+
+  /* ---------- export changes ---------- */
+  function downloadBlob(filename, text, type) {
+    var blob = new Blob([text], { type: type || "text/plain;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 500);
+  }
+  window.atlasExportChanges = function () {
+    var o = loadOverrides();
+    var changed = [];
+    o.added.forEach(function (a) { changed.push({ kind: "新增", article: a }); });
+    Object.keys(o.edited).forEach(function (id) { changed.push({ kind: "修改", article: o.edited[id] }); });
+    var deleted = o.deleted.map(function (id) { var b = builtinById(id); return { id: id, title: b ? b.title : ("id " + id), file: b ? b.file : null }; });
+    if (!changed.length && !deleted.length) { alert("本地没有改动（localStorage 里没有新增/修改/删除）。"); return; }
+    var div = document.getElementById("atlas-export-modal");
+    if (!div) {
+      div = document.createElement("div");
+      div.id = "atlas-export-modal"; div.className = "modal"; div.hidden = true;
+      document.body.appendChild(div);
+    }
+    var rows = changed.map(function (c, i) {
+      return '<li>' + esc(c.kind) + "：" + esc(c.article.title) + ' — <a href="#" data-exp="' + i + '">下载 ' + esc(articleFilename(c.article)) + "</a></li>";
+    }).join("");
+    var delRows = deleted.map(function (d) {
+      return "<li>删除：" + esc(d.title) + (d.file ? " — 在 articles/ 里删掉 " + esc(d.file) : "") + "</li>";
+    }).join("");
+    div.innerHTML = '<div class="modal-card"><h3>导出改动</h3>' +
+      "<p>以下改动只存在本浏览器（localStorage），还没有同步到 GitHub：</p><ul>" + rows + delRows + "</ul>" +
+      '<p><button class="btn btn-primary" id="exp-json">下载全部改动 (atlas-changes.json)</button> ' +
+      '<button class="btn" type="button" onclick="atlasCloseModal()">关闭</button></p>' +
+      "<ol class=\"modal-note\"><li>把上面下载的 Markdown 文件放进仓库的 articles/（新增放新文件，修改覆盖同名文件，删除的删掉对应文件）。</li>" +
+      "<li>在仓库根目录跑 <code>python3 scripts/build.py</code> 重新生成 dist/。</li>" +
+      "<li><code>git add -A && git commit -m \"更新文章\" && git push origin main</code>，其它主机 git pull 即可。</li></ol></div>";
+    div.hidden = false;
+    div.querySelectorAll("[data-exp]").forEach(function (a) {
+      a.addEventListener("click", function (ev) {
+        ev.preventDefault();
+        var c = changed[parseInt(a.getAttribute("data-exp"), 10)];
+        downloadBlob(articleFilename(c.article), toMarkdown(c.article), "text/markdown;charset=utf-8");
+      });
+    });
+    document.getElementById("exp-json").addEventListener("click", function () {
+      downloadBlob("atlas-changes.json", JSON.stringify({
+        exported_at: new Date().toISOString(),
+        added: o.added, edited: o.edited, deleted: o.deleted
+      }, null, 2), "application/json;charset=utf-8");
+    });
+  };
+
+  /* ---------- homepage overrides ---------- */
+  function cardHtml(a) {
+    var search = esc(a.title + " " + a.summary + " " + (a.tags || []).join(" "));
+    var tags = (a.tags || []).map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("");
+    var href = a.id >= 1001 ? "articles/view.html?id=" + a.id : "articles/" + a.id + ".html";
+    return '<article class="card" data-cat="' + esc(a.category) + '" data-search="' + search + '" data-article-id="' + a.id + '">' +
+      '<h3><a href="' + href + '">' + esc(a.title) + "</a>" + (a.pinned ? '<span class="pinned">置顶</span>' : "") + "</h3>" +
+      "<p>" + esc(a.summary) + "</p><div><span class=\"date\">" + esc((a.updated_at || "").slice(0, 10)) + "</span> " + tags + "</div></article>";
+  }
+  function applyHomepageOverrides() {
+    var o = loadOverrides();
+    if (!document.querySelector(".card[data-article-id]")) return;
+    var all = getAllArticles();
+    // hide deleted / patch edited cards in place
+    document.querySelectorAll(".card[data-article-id]").forEach(function (card) {
+      var id = parseInt(card.getAttribute("data-article-id"), 10);
+      var a = getArticle(id);
+      if (!a) { card.remove(); return; }
+      var h3a = card.querySelector("h3 a");
+      if (h3a) h3a.textContent = a.title;
+      var p = card.querySelector("p");
+      if (p) p.textContent = a.summary;
+      var tagsDiv = card.querySelector("h3").parentNode.querySelector("div");
+      var pin = card.querySelector(".pinned");
+      if (a.pinned && !pin) {
+        var s = document.createElement("span"); s.className = "pinned"; s.textContent = "置顶";
+        card.querySelector("h3").appendChild(s);
+      } else if (!a.pinned && pin) { pin.remove(); }
+      if (tagsDiv) {
+        tagsDiv.innerHTML = '<span class="date">' + esc((a.updated_at || "").slice(0, 10)) + "</span> " +
+          (a.tags || []).map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("");
+      }
+      card.setAttribute("data-cat", a.category);
+      card.setAttribute("data-search", a.title + " " + a.summary + " " + (a.tags || []).join(" "));
+    });
+    // pinned status / category: pinned articles appear in BOTH the pinned
+    // section and the grouped list, so toggle the pinned-section copy only
+    all.forEach(function (a) {
+      var pinnedCard = pinnedSec ? pinnedSec.querySelector('.card[data-article-id="' + a.id + '"]') : null;
+      var groupedCard = null;
+      document.querySelectorAll('.card[data-article-id="' + a.id + '"]').forEach(function (c) {
+        if (!pinnedSec || !pinnedSec.contains(c)) groupedCard = c;
+      });
+      if (a.pinned && !pinnedCard) {
+        var clone = groupedCard ? groupedCard.cloneNode(true) : null;
+        if (!clone) { var t0 = document.createElement("div"); t0.innerHTML = cardHtml(a); clone = t0.firstChild; }
+        if (pinnedSec) pinnedSec.appendChild(clone);
+      } else if (!a.pinned && pinnedCard) { pinnedCard.remove(); }
+      if (!groupedCard) {
+        var wrap = document.createElement("div"); wrap.innerHTML = cardHtml(a);
+        var newCard = wrap.firstChild;
+        var target = sections[a.category];
+        if (!target) {
+          target = document.createElement("section");
+          target.innerHTML = '<h2 class="sechead"></h2>';
+          var footer = document.querySelector("footer");
+          (footer ? footer.parentNode : document.body).insertBefore(target, footer);
+          sections[a.category] = target;
+          var chipRow = document.querySelector(".chips");
+          if (chipRow) {
+            var chip = document.createElement("button");
+            chip.className = "chip"; chip.textContent = a.category;
+            chip.setAttribute("onclick", "setChip(this,'" + a.category.replace(/'/g, "") + "')");
+            chipRow.appendChild(chip);
+          }
+        }
+        target.appendChild(newCard);
+      }
+    });
+    // recount: overview, category cards, section headings
+    var ov = document.querySelector(".overview");
+    if (ov) ov.textContent = "共 " + all.length + " 篇 · " + new Set(all.map(function (a) { return a.category; })).size + " 个分类";
+    document.querySelectorAll(".catcard").forEach(function (cc) {
+      var cat = cc.getAttribute("data-cat");
+      var list = all.filter(function (a) { return a.category === cat; });
+      if (!list.length) { cc.remove(); return; }
+      var p = cc.querySelector("p");
+      if (p) p.textContent = list.length + " 篇 · 最新：" + list[0].title;
+    });
+    document.querySelectorAll("section h2.sechead").forEach(function (h) {
+      var cat = h.textContent.replace(/（\d+ 篇）$/, "");
+      var n = all.filter(function (a) { return a.category === cat; }).length;
+      h.textContent = cat + "（" + n + " 篇）";
+    });
+    // pending-changes badge
+    var badge = document.getElementById("atlas-pending");
+    if (badge) {
+      var n = pendingCount();
+      badge.textContent = n ? ("本地有 " + n + " 处改动未导出") : "";
+      badge.style.display = n ? "" : "none";
+    }
+  }
+
+  /* ---------- detail overrides + generic view page ---------- */
+  function rebuildToc(toc) {
+    var items = toc.map(function (t) {
+      return '<li' + (t.level === 3 ? ' style="padding-left:14px;"' : "") + '><a href="#' + t.id + '">' + esc(t.label) + "</a></li>";
+    }).join("");
+    document.querySelectorAll(".toc ol").forEach(function (ol) { ol.innerHTML = items; });
+    document.querySelectorAll(".toc-mobile ol").forEach(function (ol) { ol.innerHTML = items; });
+    var h = document.querySelector(".toc h4");
+    if (h) h.textContent = "目录（" + toc.length + " 节）";
+    var s = document.querySelector(".toc-mobile summary");
+    if (s) s.textContent = "目录（" + toc.length + " 节）";
+  }
+  function applyDetailOverride() {
+    var id = window.ATLAS_CURRENT_ID;
+    if (id == null) return;
+    var o = loadOverrides();
+    if (!o.edited[id]) return;
+    var a = o.edited[id];
+    var main = document.querySelector("main.article");
+    if (!main) return;
+    var h1 = main.querySelector("h1");
+    if (h1) h1.textContent = a.title;
+    var lead = main.querySelector(".lead");
+    if (lead) lead.textContent = a.summary;
+    var tags = document.getElementById("article-tags");
+    if (tags) tags.innerHTML = (a.tags || []).map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("");
+    var meta = main.querySelector(".meta");
+    if (meta) meta.textContent = "约 " + a.body.length + " 字 · 阅读约 " + Math.max(1, Math.round(a.body.length / 400)) + " 分钟 · 更新 " + (a.updated_at || "").slice(0, 10) + "（本地修改，未导出）";
+    var bodyEl = document.getElementById("article-body");
+    if (bodyEl) {
+      var r = mdToHtml(a.body);
+      bodyEl.innerHTML = r.html;
+      rebuildToc(r.toc);
+      document.title = a.title + " · Atlas";
+    }
+    initScrollspy();
+  }
+  function renderViewPage() {
+    var main = document.getElementById("view-main");
+    if (!main) return;
+    var id = parseInt(new URLSearchParams(location.search).get("id") || "0", 10);
+    var a = getArticle(id);
+    if (!a) {
+      main.innerHTML = '<nav class="back"><a href="../index.html">← 返回 Atlas</a></nav><h1>文章不存在</h1><p class="lead">这篇文章可能已被删除，或链接不正确。</p>';
+      document.title = "文章不存在 · Atlas";
+      return;
+    }
+    window.ATLAS_CURRENT_ID = id;
+    var r = mdToHtml(a.body);
+    var words = a.body.length;
+    main.innerHTML =
+      '<nav class="back"><a href="../index.html">← 返回 Atlas</a> ' +
+      '<button class="btn" type="button" onclick="atlasEditCurrent()">编辑</button> ' +
+      '<button class="btn btn-danger" type="button" onclick="atlasDeleteCurrent()">删除</button></nav>' +
+      '<div class="kicker">' + esc(a.category) + "</div><h1>" + esc(a.title) + "</h1>" +
+      '<p class="lead">' + esc(a.summary) + "</p>" +
+      '<div id="article-tags">' + (a.tags || []).map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("") + "</div>" +
+      '<p class="meta">约 ' + words + " 字 · 阅读约 " + Math.max(1, Math.round(words / 400)) + " 分钟 · 更新 " + (a.updated_at || "").slice(0, 10) + "</p>" +
+      '<div id="article-body">' + r.html + "</div>";
+    document.title = a.title + " · Atlas";
+    var tocNav = document.getElementById("view-toc");
+    if (tocNav) {
+      tocNav.innerHTML = "<h4>目录（" + r.toc.length + " 节）</h4><ol>" +
+        r.toc.map(function (t) {
+          return '<li' + (t.level === 3 ? ' style="padding-left:14px;"' : "") + '><a href="#' + t.id + '">' + esc(t.label) + "</a></li>";
+        }).join("") + "</ol>";
+    }
+    initScrollspy();
+  }
+
+  /* ---------- scrollspy / progress (detail pages) ---------- */
+  var spyInit = false;
+  function initScrollspy() {
+    var bar = document.getElementById("progress");
+    if (!bar) return;
+    var links = Array.prototype.slice.call(document.querySelectorAll(".toc a"));
+    var secs = links.map(function (a) { return document.getElementById(a.getAttribute("href").slice(1)); }).filter(Boolean);
+    function onScroll() {
+      var st = window.scrollY || document.documentElement.scrollTop;
+      var h = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.width = (h > 0 ? (st / h * 100) : 0) + "%";
+      var cur = secs[0];
+      secs.forEach(function (s) { if (s.getBoundingClientRect().top <= 120) cur = s; });
+      links.forEach(function (a) {
+        var on = cur && a.getAttribute("href") === "#" + cur.id;
+        a.classList.toggle("active", !!on);
+        if (on) a.scrollIntoView({ block: "nearest" });
+      });
+    }
+    if (!spyInit) {
+      window.addEventListener("scroll", onScroll, { passive: true });
+      var top = document.getElementById("toTop");
+      if (top) top.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+      spyInit = true;
+    }
+    onScroll();
+  }
+
+  /* ---------- boot ---------- */
+  if (document.getElementById("view-main")) renderViewPage();
+  else { applyHomepageOverrides(); applyDetailOverride(); }
+  if (document.getElementById("progress")) initScrollspy();
+  var topBtn = document.getElementById("toTop");
+  if (topBtn && !spyInit) topBtn.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+
+  /* Test hook (no-op in browsers): lets `node --check`-style tests require
+     the pure functions without a DOM. */
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = { mdToHtml: mdToHtml, toMarkdown: toMarkdown,
+      loadOverrides: loadOverrides, saveOverrides: saveOverrides,
+      getAllArticles: getAllArticles, getArticle: getArticle };
+  }
+})();
 </script>
 </body>
 </html>
