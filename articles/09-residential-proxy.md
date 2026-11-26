@@ -24,7 +24,7 @@ updated_at: "2026-11-26T04:51:42.795Z"
 ## 备用与试用线
 
 - **1024proxy**：只留 $0.99 动态住宅试用，给谷歌重试当非美出口用，不作主力。
-- **Cliproxy 洛杉矶**（测试中）：us.cliproxy.io:3010，SOCKS5，粘性会话约 120 分钟。自测出口 ***，Charter/Spectrum AS20001 住宅 IP，时区 America/Los_Angeles。注意：非固定 IP，约 120 分钟后可能换 IP，用前必须重测；尚未决定是否用它替换 Verizon 作主力末跳。
+- **Cliproxy 洛杉矶**（测试中）：us.cliproxy.io:3010，SOCKS5，粘性会话约 120 分钟。自测出口 [出口 IP 已隐藏]，Charter/Spectrum AS20001 住宅 IP，时区 America/Los_Angeles。注意：非固定 IP，约 120 分钟后可能换 IP，用前必须重测；尚未决定是否用它替换 Verizon 作主力末跳。
 
 ## 选型规则（踩出来的）
 

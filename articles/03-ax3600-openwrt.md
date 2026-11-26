@@ -64,12 +64,12 @@ updated_at: "2026-11-26T04:51:42.795Z"
 
 1. 登录 `http://192.168.31.1`，从地址栏复制新的 `stok=` 后面的字符串。
 2. 把下面这串地址里的 `<STOK>` 替换掉，在**浏览器地址栏**粘贴后回车（纯文本，长按复制）：
-   `http://192.168.31.1/cgi-bin/luci/;stok=<STOK>/api/xqsystem/upgrade_rom?url=%3Bnvram%20set%20ssh_en%3D1%3Bnvram%20commit%3Bsed%20-i%20%27s%2Fchannel%3D.*%2Fchannel%3D%22debug%22%2Fg%27%20%2Fetc%2Finit.d%2Fdropbear%3B%2Fetc%2Finit.d%2Fdropbear%20start%3Becho%20-e%20***%7Cpasswd%20root%3B`
-3. 页面返回 `{"code":0}` 即成功。这串命令一次做完四件事：打开 SSH 开关并保存、启动 SSH 服务、把 root 密码设为 ***。
+   `http://192.168.31.1/cgi-bin/luci/;stok=<STOK>/api/xqsystem/upgrade_rom?url=%3Bnvram%20set%20ssh_en%3D1%3Bnvram%20commit%3Bsed%20-i%20%27s%2Fchannel%3D.*%2Fchannel%3D%22debug%22%2Fg%27%20%2Fetc%2Finit.d%2Fdropbear%3B%2Fetc%2Finit.d%2Fdropbear%20start%3Becho%20-e%20[密码已隐藏]%7Cpasswd%20root%3B`
+3. 页面返回 `{"code":0}` 即成功。这串命令一次做完四件事：打开 SSH 开关并保存、启动 SSH 服务、把 root 密码设为你自己设定的密码（[密码已隐藏]）。
 4. 在电脑上按 `Win+R` 输入 `cmd` 回车，输入：
    `ssh root@192.168.31.1`
-   提示输入密码时输入 ***（输入时不显示，输完回车）。看到 `root@XiaoQiang:~#` 就表示进去了。
-5. **如果 root 登不上**：说明密码没设成功。备选方案是去网上搜"小米路由器 SSH 密码计算器"，输入机身标签上的 SN 算出密码再登。算出来也登不上就回到第 1 步重来（多半是固件版本不对）。
+   提示输入密码时输入你设置的密码（输入时不显示，输完回车）。看到 `root@XiaoQiang:~#` 就表示进去了。
+5. **如果 root 密码登不上**：说明密码没设成功。备选方案是去网上搜"小米路由器 SSH 密码计算器"，输入机身标签上的 SN 算出密码再登。算出来也登不上就回到第 1 步重来（多半是固件版本不对）。
 
 ---
 
@@ -88,7 +88,7 @@ ls -lh mtd*.bin
 - mtd8 是 ART（WiFi 射频校准数据，丢了 WiFi 就残了），mtd9 是 bdata（设备身份信息），mtd10 是 crash。
 - 然后在**电脑的 cmd** 里（不是 SSH 里）执行，把备份拉回电脑妥善保存：
   `scp root@192.168.31.1:/tmp/mtd*.bin D:\backup\ax3600\`
-  （先在 D 盘建好 `D:\backup\ax3600` 文件夹；密码还是 ***；第一次会问 `yes/no`，输 `yes`。）
+  （先在 D 盘建好 `D:\backup\ax3600` 文件夹；密码还是你设置的那个；第一次会问 `yes/no`，输 `yes`。）
 
 ---
 

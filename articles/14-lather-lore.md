@@ -27,7 +27,7 @@ updated_at: "2026-11-26T04:51:42.795Z"
 ## 发布流程（已走通）
 
 1. 改内容（文案、商品、图片）。
-2. 用部署 Token `***`（已接入 Cloudflare 连接器）自动发布到 Workers。
+2. 用部署 Token [Token 名称已隐藏]（已接入 Cloudflare 连接器）自动发布到 Workers。
 3. 发布后打开 yanchs.com 与 www 两个地址各验一遍，确认新内容生效。
 
 ## 待办：Google Search Console（需本人手动）
