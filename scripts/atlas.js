@@ -74,6 +74,8 @@
   }
   function renderHome() {
     scrollCtx = null;
+    // Homepage has no scroll progress bar (detail pages keep theirs).
+    if (progressEl) progressEl.style.display = 'none';
     var html = '<div class="home-top"><div class="home-hero" id="homeHero"><h1>Atlas</h1><p class="tagline">我的个人知识库 — 流程、工具和踩过的坑，都沉淀在这里。</p><div class="rule" aria-hidden="true"></div></div></div>'
       + '<header class="home-head"><div class="home-head-in"><div class="search-row">'
       + '<div class="search-wrap"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>'
@@ -156,22 +158,22 @@
           + (a.tags.length ? '<p class="tags">' + a.tags.map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('') + '</p>' : '')
           + '</button></li>';
       }).join('') + '</ul>';
-      if (totalPages > 1) {
-        var pageNums = [];
-        for (var pi = 1; pi <= totalPages; pi++) {
-          if (pi === 1 || pi === totalPages || Math.abs(pi - homeState.page) <= 1) pageNums.push(pi);
-          else if (pageNums[pageNums.length - 1] !== 0) pageNums.push(0);
-        }
-        html += '<nav class="pager" aria-label="文章分页">'
-          + '<button type="button" class="pg-btn" data-page="' + (homeState.page - 1) + '"' + (homeState.page <= 1 ? ' disabled' : '') + '>上一页</button>'
-          + pageNums.map(function (n) {
-            if (n === 0) return '<span class="pg-info" aria-hidden="true">…</span>';
-            return '<button type="button" class="pg-btn' + (n === homeState.page ? ' on' : '') + '" data-page="' + n + '"' + (n === homeState.page ? ' aria-current="page"' : '') + '>' + n + '</button>';
-          }).join('')
-          + '<button type="button" class="pg-btn" data-page="' + (homeState.page + 1) + '"' + (homeState.page >= totalPages ? ' disabled' : '') + '>下一页</button>'
-          + '<span class="pg-info">第 ' + homeState.page + ' / ' + totalPages + ' 页</span>'
-          + '</nav>';
+      // Pager always renders while the list is non-empty, even on a single
+      // page (prev/next disabled there), so pagination never looks absent.
+      var pageNums = [];
+      for (var pi = 1; pi <= totalPages; pi++) {
+        if (pi === 1 || pi === totalPages || Math.abs(pi - homeState.page) <= 1) pageNums.push(pi);
+        else if (pageNums[pageNums.length - 1] !== 0) pageNums.push(0);
       }
+      html += '<nav class="pager" aria-label="文章分页">'
+        + '<button type="button" class="pg-btn" data-page="' + (homeState.page - 1) + '"' + (homeState.page <= 1 ? ' disabled' : '') + '>上一页</button>'
+        + pageNums.map(function (n) {
+          if (n === 0) return '<span class="pg-info" aria-hidden="true">…</span>';
+          return '<button type="button" class="pg-btn' + (n === homeState.page ? ' on' : '') + '" data-page="' + n + '"' + (n === homeState.page ? ' aria-current="page"' : '') + '>' + n + '</button>';
+        }).join('')
+        + '<button type="button" class="pg-btn" data-page="' + (homeState.page + 1) + '"' + (homeState.page >= totalPages ? ' disabled' : '') + '>下一页</button>'
+        + '<span class="pg-info">第 ' + homeState.page + ' / ' + totalPages + ' 页</span>'
+        + '</nav>';
     }
     html += '</div>';
     main.innerHTML = html;
@@ -391,6 +393,8 @@
   function renderArticle(id) {
     var a = byId(id);
     if (!a) { goHome(); return; }
+    // Detail pages show the top scroll progress bar again.
+    if (progressEl) progressEl.style.display = '';
     var idx = ARTICLES.indexOf(a);
     var prev = ARTICLES[idx - 1], next = ARTICLES[idx + 1];
     var chars = stripHtml(a.html).replace(/\s/g, '').length;

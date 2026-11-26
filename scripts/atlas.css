@@ -41,7 +41,7 @@ button,[role="button"],select,summary,input:not([type="checkbox"],[type="radio"]
 .cat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
 @media (max-width:480px){.cat-grid{grid-template-columns:minmax(0,1fr)}}
 @media (min-width:1024px){.cat-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-.cat-card{border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);padding:16px;text-align:left;cursor:pointer;font-family:var(--sans);color:var(--text);width:100%;min-width:0}
+.cat-card{border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);padding:16px;text-align:left;cursor:pointer;font-family:var(--sans);color:var(--text);width:100%;min-width:0;display:flex;flex-direction:column;justify-content:flex-start}
 .cat-card .row{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
 .cat-card .name{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.45;min-width:0;overflow-wrap:anywhere}
 .cat-card .cnt{flex:none;font-size:12px;color:var(--dim)}
@@ -51,7 +51,7 @@ button,[role="button"],select,summary,input:not([type="checkbox"],[type="radio"]
 .sec-h .dash{display:inline-block;height:3px;width:24px;background:var(--accent);flex:none}
 .pin-grid{margin-top:12px;display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
 @media (min-width:768px){.pin-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.pin-card{border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);padding:20px;text-align:left;cursor:pointer;font-family:var(--sans);color:var(--text);display:block;width:100%;min-width:0}
+.pin-card{border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);padding:20px;text-align:left;cursor:pointer;font-family:var(--sans);color:var(--text);display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;width:100%;min-width:0}
 .pin-card .cat{font-size:12px;font-weight:500;color:var(--pine)}
 .pin-card .ttl{display:block;margin-top:6px;font-family:var(--serif);font-size:20px;font-weight:700;line-height:1.45;overflow-wrap:break-word}
 .pin-card .sum{display:block;margin-top:8px;font-size:14px;line-height:1.625;color:var(--dim);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
@@ -66,7 +66,7 @@ button,[role="button"],select,summary,input:not([type="checkbox"],[type="radio"]
 .chip.on{border-color:var(--pine);background:var(--pine);color:#fff}
 .alist{margin:16px 0 0;padding:0;list-style:none}
 .alist li+li{margin-top:12px}
-.acard{display:block;width:100%;min-width:0;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);padding:16px;text-align:left;cursor:pointer;font-family:var(--sans);color:var(--text)}
+.acard{display:flex;flex-direction:column;justify-content:flex-start;width:100%;min-width:0;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);padding:16px;text-align:left;cursor:pointer;font-family:var(--sans);color:var(--text)}
 .acard .top{display:flex;align-items:center;gap:8px;font-size:12px}
 .acard .cat{font-weight:500;color:var(--pine)}
 .acard .pin{border-radius:4px;background:var(--accent-soft);padding:2px 6px;font-weight:500;color:var(--accent)}
