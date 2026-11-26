@@ -393,6 +393,7 @@ button,[role="button"],select,summary,input:not([type="checkbox"],[type="radio"]
   function renderHome() {
     scrollCtx = null;
     // Homepage has no scroll progress bar (detail pages keep theirs).
+    stopProgressLoop();
     if (progressEl) progressEl.style.display = 'none';
     var html = '<div class="home-top"><div class="home-hero" id="homeHero"><h1>Atlas</h1><p class="tagline">我的个人知识库 — 流程、工具和踩过的坑，都沉淀在这里。</p><div class="rule" aria-hidden="true"></div></div></div>'
       + '<header class="home-head"><div class="home-head-in"><div class="search-row">'
@@ -781,6 +782,7 @@ button,[role="button"],select,summary,input:not([type="checkbox"],[type="radio"]
     };
     resetScroll();
     onScroll(null);
+    startProgressLoop();
   }
   function resetScroll() {
     pageScroller(null).scrollTo({ top: 0 });
@@ -806,6 +808,50 @@ button,[role="button"],select,summary,input:not([type="checkbox"],[type="radio"]
       }
     }
   }
+  /* Progress bar: the width is derived from where the article sits in the
+     viewport (rect-based), so it stays correct whichever element (window,
+     shell wrapper, nested scroller) is doing the scrolling — and it is
+     refreshed on every animation frame while an article is open, not only
+     when a scroll event reaches us. Some shells move content without ever
+     dispatching a scroll event into the document; in that case the old
+     scroll-event-only update left the bar stuck at 0% and looking gone. */
+  var lastProgressW = null;
+  function computeProgress(scrollerP) {
+    var p = scrollerP || 0;
+    if (scrollCtx && scrollCtx.root) {
+      var rect = scrollCtx.root.getBoundingClientRect();
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+      var total = scrollCtx.root.offsetHeight - vh;
+      if (total > 0) {
+        var rp = Math.min(1, Math.max(0, -rect.top / total));
+        if (rp > p) p = rp;
+      }
+    }
+    return p;
+  }
+  function setProgress(p) {
+    var w = (p * 100) + '%';
+    if (w === lastProgressW) return;
+    lastProgressW = w;
+    progressEl.style.width = w;
+    var fill = document.getElementById('artProgressFill');
+    if (fill) fill.style.width = w;
+  }
+  var progressRaf = 0;
+  function progressTick() {
+    progressRaf = 0;
+    if (!scrollCtx) return;
+    setProgress(computeProgress(0));
+    progressRaf = requestAnimationFrame(progressTick);
+  }
+  function startProgressLoop() {
+    if (progressRaf) return;
+    lastProgressW = null;
+    progressRaf = requestAnimationFrame(progressTick);
+  }
+  function stopProgressLoop() {
+    if (progressRaf) { cancelAnimationFrame(progressRaf); progressRaf = 0; }
+  }
   function onScroll(e) {
     var el = null;
     if (scrollCtx) {
@@ -821,23 +867,10 @@ button,[role="button"],select,summary,input:not([type="checkbox"],[type="radio"]
     var p = max > 0 ? Math.min(1, el.scrollTop / max) : 0;
     var scrolledPx = el.scrollTop;
     if (scrollCtx && scrollCtx.root) {
-      // Rect-based progress: derived from where the article actually sits in
-      // the viewport, so it stays correct whichever element (window, shell
-      // wrapper, nested scroller) is doing the scrolling — the scroller guess
-      // above can silently stay at 0 in shells whose scroller is not the
-      // document, which made the bar look gone.
-      var rect = scrollCtx.root.getBoundingClientRect();
-      var vh = window.innerHeight || document.documentElement.clientHeight;
-      var total = scrollCtx.root.offsetHeight - vh;
-      if (total > 0) {
-        var rp = Math.min(1, Math.max(0, -rect.top / total));
-        if (rp > p) p = rp;
-      }
-      if (-rect.top > scrolledPx) scrolledPx = -rect.top;
+      var rootTop = -scrollCtx.root.getBoundingClientRect().top;
+      if (rootTop > scrolledPx) scrolledPx = rootTop;
     }
-    progressEl.style.width = (p * 100) + '%';
-    var fill = document.getElementById('artProgressFill');
-    if (fill) fill.style.width = (p * 100) + '%';
+    setProgress(computeProgress(p));
     toTop.classList.toggle('show', scrolledPx > 600);
     if (scrollCtx && scrollCtx.heads.length) {
       var cur = -1;
