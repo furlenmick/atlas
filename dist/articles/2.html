@@ -68,7 +68,13 @@ hr{border:none;border-top:1px solid var(--line);margin:28px 0}
 .pinned{display:inline-block;background:var(--accent);color:#fff;border-radius:4px;font-size:12px;padding:2px 8px;margin-left:8px;vertical-align:middle}
 .date{color:var(--muted);font-size:13px}
 /* --- detail --- */
-#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:50}
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:200;display:block;pointer-events:none}
+/* sticky article header carrying a second progress bar, so the bar stays
+   pinned at the top with the header even when the fixed #progress bar is
+   covered / stays at 0 in an app shell */
+.art-head{position:sticky;top:0;z-index:30;background:var(--paper);padding:10px 0 0}
+.art-progress{height:3px;background:transparent;margin-top:8px}
+#artProgressFill{display:block;height:3px;background:var(--accent);width:0}
 .layout{display:grid;grid-template-columns:240px 1fr;gap:32px;max-width:1080px;margin:0 auto;padding:24px}
 @media(max-width:860px){.layout{grid-template-columns:1fr}}
 .toc{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto;scrollbar-width:thin;align-self:start}
@@ -95,7 +101,7 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
 </style>
 </head>
 <body>
-<script>window.ATLAS_CURRENT_ID=2;</script><script id="atlas-data" type="application/json">{"articles": [{"id": 2, "title": "Harness 到底在干嘛：一句话讲清", "category": "AI 与 Agent", "tags": ["Harness", "Agent", "概念图"], "summary": "一句话：大模型只动嘴，Harness 负责动手、传话、兜底。以“修登录闪退”为例走一遍完整流程。", "pinned": false, "updated_at": "2026-11-26T04:51:42.795Z", "cover_key": "harness-explainer", "source_note": "来源：your_files/harness-diagram.md（配套有同名 HTML / PDF / PNG 图）。", "file": "02-harness-explainer.md", "body": "\n# Harness 到底在干嘛？\n\n一句话：大模型只动嘴，Harness 负责动手 + 传话 + 兜底\n\n![Harness 流程图：大模型只动嘴，Harness 负责动手、传话、兜底](kbimg:harness-diagram.png)\n\n## 流程（以“修登录闪退”为例）\n\n```\n① 你：说一句话 “修登录闪退”\n        ↓\n② HARNESS · 准备材料\n   把你的话 + 相关文件 + 能用的工具清单，打包好喂给大模型\n   它不思考，只负责“拼材料、递话”\n        ↓\n③ 大模型 · 只动脑、只动嘴\n   决定下一步：“先读登录代码”\n   它自己不会读文件、改代码、跑测试\n        ↓\n④ HARNESS · 动手干活\n   读文件、改一行代码、跑测试\n   再把真实结果贴回去：文件内容 / 测试报错\n        ↓\n   ↺ 循环 ③ → ④，直到大模型说“修好了”\n        ↓\n⑤ 收尾：Harness 停下来，向你汇报改了什么\n```\n\n## Harness 顺手还管这些（防失控）\n\n- 工具清单：能调哪些工具\n- 上下文：一次喂多少文件\n- 权限：哪些文件能改 / 不能改\n- 上限：试几次就停，不死循环\n- 留记录：每步都记下来给你检查\n- 目标：盯着你的任务不跑偏\n\n## 分清四个词\n\n- 大模型 = 大脑，只会说话\n- Harness = 身体 + 管家，动手 + 传话\n- Agent = 大脑 + 身体 + 一个目标\n- Codex = 打包好的 Agent：GPT + 自家 Harness + 命令行外壳\n\n## 关键纠正\n\n拆解不是 Codex 在外面先拆，是大模型自己拆；\n循环也不只是“再问一次”，关键是中间 Harness 真的动手改了、跑了。\n"}], "categories": ["AI 与 Agent", "创作与内容", "网站与项目", "网络与路由", "节点与代理", "账号与服务"]}</script><div id="progress"></div><button id="toTop" title="回到顶部">↑</button><div class="layout"><aside><nav class="toc"><h4>目录（4 节）</h4><ol><li style=""><a href="#sec-1"> 流程（以“修登录闪退”为例）</a></li><li style=""><a href="#sec-2"> Harness 顺手还管这些（防失控）</a></li><li style=""><a href="#sec-3"> 分清四个词</a></li><li style=""><a href="#sec-4"> 关键纠正</a></li></ol></nav></aside><main class="article"><nav class="back"><a href="../index.html">← 返回 Atlas</a> <button class="btn" type="button" onclick="atlasEditCurrent()">编辑</button> <button class="btn btn-danger" type="button" onclick="atlasDeleteCurrent()">删除</button></nav><div class="kicker">AI 与 Agent</div><h1>Harness 到底在干嘛：一句话讲清</h1><p class="lead">一句话：大模型只动嘴，Harness 负责动手、传话、兜底。以“修登录闪退”为例走一遍完整流程。</p><div id="article-tags"><span class="tag">Harness</span><span class="tag">Agent</span><span class="tag">概念图</span></div><p class="meta">约 714 字 · 阅读约 1 分钟 · 更新 2026-11-26</p><div class="toc-mobile"><details><summary>目录（4 节）</summary><ol><li style=""><a href="#sec-1"> 流程（以“修登录闪退”为例）</a></li><li style=""><a href="#sec-2"> Harness 顺手还管这些（防失控）</a></li><li style=""><a href="#sec-3"> 分清四个词</a></li><li style=""><a href="#sec-4"> 关键纠正</a></li></ol></details></div><div id="article-body">
+<script>window.ATLAS_CURRENT_ID=2;</script><script id="atlas-data" type="application/json">{"articles": [{"id": 2, "title": "Harness 到底在干嘛：一句话讲清", "category": "AI 与 Agent", "tags": ["Harness", "Agent", "概念图"], "summary": "一句话：大模型只动嘴，Harness 负责动手、传话、兜底。以“修登录闪退”为例走一遍完整流程。", "pinned": false, "updated_at": "2026-11-26T04:51:42.795Z", "cover_key": "harness-explainer", "source_note": "来源：your_files/harness-diagram.md（配套有同名 HTML / PDF / PNG 图）。", "file": "02-harness-explainer.md", "body": "\n# Harness 到底在干嘛？\n\n一句话：大模型只动嘴，Harness 负责动手 + 传话 + 兜底\n\n![Harness 流程图：大模型只动嘴，Harness 负责动手、传话、兜底](kbimg:harness-diagram.png)\n\n## 流程（以“修登录闪退”为例）\n\n```\n① 你：说一句话 “修登录闪退”\n        ↓\n② HARNESS · 准备材料\n   把你的话 + 相关文件 + 能用的工具清单，打包好喂给大模型\n   它不思考，只负责“拼材料、递话”\n        ↓\n③ 大模型 · 只动脑、只动嘴\n   决定下一步：“先读登录代码”\n   它自己不会读文件、改代码、跑测试\n        ↓\n④ HARNESS · 动手干活\n   读文件、改一行代码、跑测试\n   再把真实结果贴回去：文件内容 / 测试报错\n        ↓\n   ↺ 循环 ③ → ④，直到大模型说“修好了”\n        ↓\n⑤ 收尾：Harness 停下来，向你汇报改了什么\n```\n\n## Harness 顺手还管这些（防失控）\n\n- 工具清单：能调哪些工具\n- 上下文：一次喂多少文件\n- 权限：哪些文件能改 / 不能改\n- 上限：试几次就停，不死循环\n- 留记录：每步都记下来给你检查\n- 目标：盯着你的任务不跑偏\n\n## 分清四个词\n\n- 大模型 = 大脑，只会说话\n- Harness = 身体 + 管家，动手 + 传话\n- Agent = 大脑 + 身体 + 一个目标\n- Codex = 打包好的 Agent：GPT + 自家 Harness + 命令行外壳\n\n## 关键纠正\n\n拆解不是 Codex 在外面先拆，是大模型自己拆；\n循环也不只是“再问一次”，关键是中间 Harness 真的动手改了、跑了。\n"}], "categories": ["AI 与 Agent", "创作与内容", "网站与项目", "网络与路由", "节点与代理", "账号与服务"]}</script><div id="progress"></div><button id="toTop" title="回到顶部">↑</button><div class="layout"><aside><nav class="toc"><h4>目录（4 节）</h4><ol><li style=""><a href="#sec-1"> 流程（以“修登录闪退”为例）</a></li><li style=""><a href="#sec-2"> Harness 顺手还管这些（防失控）</a></li><li style=""><a href="#sec-3"> 分清四个词</a></li><li style=""><a href="#sec-4"> 关键纠正</a></li></ol></nav></aside><main class="article" id="artRoot"><header class="art-head"><nav class="back"><a href="../index.html">← 返回 Atlas</a> <button class="btn" type="button" onclick="atlasEditCurrent()">编辑</button> <button class="btn btn-danger" type="button" onclick="atlasDeleteCurrent()">删除</button></nav><div class="art-progress"><div id="artProgressFill"></div></div></header><div class="kicker">AI 与 Agent</div><h1>Harness 到底在干嘛：一句话讲清</h1><p class="lead">一句话：大模型只动嘴，Harness 负责动手、传话、兜底。以“修登录闪退”为例走一遍完整流程。</p><div id="article-tags"><span class="tag">Harness</span><span class="tag">Agent</span><span class="tag">概念图</span></div><p class="meta">约 714 字 · 阅读约 1 分钟 · 更新 2026-11-26</p><div class="toc-mobile"><details><summary>目录（4 节）</summary><ol><li style=""><a href="#sec-1"> 流程（以“修登录闪退”为例）</a></li><li style=""><a href="#sec-2"> Harness 顺手还管这些（防失控）</a></li><li style=""><a href="#sec-3"> 分清四个词</a></li><li style=""><a href="#sec-4"> 关键纠正</a></li></ol></details></div><div id="article-body">
 <p>一句话：大模型只动嘴，Harness 负责动手 + 传话 + 兜底</p>
 <div class="img-note">🖼 Harness 流程图：大模型只动嘴，Harness 负责动手、传话、兜底（配图 kbimg:harness-diagram.png，未包含在导出中）</div>
 <div class="sec-head" id="sec-1"><span class="badge">01</span><h2>流程（以“修登录闪退”为例）</h2></div>
@@ -612,9 +618,10 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
     var r = mdToHtml(a.body);
     var words = a.body.length;
     main.innerHTML =
-      '<nav class="back"><a href="../index.html">← 返回 Atlas</a> ' +
+      '<header class="art-head"><nav class="back"><a href="../index.html">← 返回 Atlas</a> ' +
       '<button class="btn" type="button" onclick="atlasEditCurrent()">编辑</button> ' +
       '<button class="btn btn-danger" type="button" onclick="atlasDeleteCurrent()">删除</button></nav>' +
+      '<div class="art-progress"><div id="artProgressFill"></div></div></header>' +
       '<div class="kicker">' + esc(a.category) + "</div><h1>" + esc(a.title) + "</h1>" +
       '<p class="lead">' + esc(a.summary) + "</p>" +
       '<div id="article-tags">' + (a.tags || []).map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("") + "</div>" +
@@ -641,7 +648,21 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
     function onScroll() {
       var st = window.scrollY || document.documentElement.scrollTop;
       var h = document.documentElement.scrollHeight - window.innerHeight;
-      bar.style.width = (h > 0 ? (st / h * 100) : 0) + "%";
+      var pct = h > 0 ? (st / h) : 0;
+      /* Progress from the article's actual position in the viewport: the
+         old window-only calculation stays at 0 / is covered in an app
+         shell, so take the max of the two. */
+      var root = document.getElementById("artRoot");
+      if (root) {
+        var r = root.getBoundingClientRect();
+        var total = r.height - window.innerHeight;
+        var artPct = total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : (r.top <= 0 ? 1 : 0);
+        pct = Math.max(pct, artPct);
+      }
+      var w = (pct * 100) + "%";
+      bar.style.width = w;
+      var fill = document.getElementById("artProgressFill");
+      if (fill) fill.style.width = w;
       var cur = secs[0];
       secs.forEach(function (s) { if (s.getBoundingClientRect().top <= 120) cur = s; });
       links.forEach(function (a) {
@@ -650,10 +671,14 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
         if (on) a.scrollIntoView({ block: "nearest" });
       });
     }
+    function scrollToTop() {
+      var st = window.scrollY || document.documentElement.scrollTop;
+      window.scrollTo({ top: 0, behavior: st > 600 ? "smooth" : "auto" });
+    }
     if (!spyInit) {
       window.addEventListener("scroll", onScroll, { passive: true });
       var top = document.getElementById("toTop");
-      if (top) top.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+      if (top) top.addEventListener("click", scrollToTop);
       spyInit = true;
     }
     onScroll();
@@ -664,7 +689,10 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
   else { applyHomepageOverrides(); applyDetailOverride(); }
   if (document.getElementById("progress")) initScrollspy();
   var topBtn = document.getElementById("toTop");
-  if (topBtn && !spyInit) topBtn.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+  if (topBtn && !spyInit) topBtn.addEventListener("click", function () {
+    var st = window.scrollY || document.documentElement.scrollTop;
+    window.scrollTo({ top: 0, behavior: st > 600 ? "smooth" : "auto" });
+  });
 
   /* Test hook (no-op in browsers): lets `node --check`-style tests require
      the pure functions without a DOM. */

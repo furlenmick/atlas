@@ -87,7 +87,13 @@ hr{border:none;border-top:1px solid var(--line);margin:28px 0}
 .pinned{display:inline-block;background:var(--accent);color:#fff;border-radius:4px;font-size:12px;padding:2px 8px;margin-left:8px;vertical-align:middle}
 .date{color:var(--muted);font-size:13px}
 /* --- detail --- */
-#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:50}
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:200;display:block;pointer-events:none}
+/* sticky article header carrying a second progress bar, so the bar stays
+   pinned at the top with the header even when the fixed #progress bar is
+   covered / stays at 0 in an app shell */
+.art-head{position:sticky;top:0;z-index:30;background:var(--paper);padding:10px 0 0}
+.art-progress{height:3px;background:transparent;margin-top:8px}
+#artProgressFill{display:block;height:3px;background:var(--accent);width:0}
 .layout{display:grid;grid-template-columns:240px 1fr;gap:32px;max-width:1080px;margin:0 auto;padding:24px}
 @media(max-width:860px){.layout{grid-template-columns:1fr}}
 .toc{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto;scrollbar-width:thin;align-self:start}
@@ -122,9 +128,9 @@ JS_DETAIL = """
 var bar=document.getElementById('progress');
 var links=Array.prototype.slice.call(document.querySelectorAll('.toc a'));
 var secs=links.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
-function onScroll(){var st=window.scrollY||document.documentElement.scrollTop;var h=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=(h>0?(st/h*100):0)+'%';var cur=secs[0];secs.forEach(function(s){if(s.getBoundingClientRect().top<=120)cur=s;});links.forEach(function(a){var on=a.getAttribute('href')==='#'+(cur&&cur.id);a.classList.toggle('active',on);if(on)a.scrollIntoView({block:'nearest'});});}
+function onScroll(){var st=window.scrollY||document.documentElement.scrollTop;var h=document.documentElement.scrollHeight-window.innerHeight;var pct=h>0?(st/h):0;var root=document.getElementById('artRoot');if(root){var r=root.getBoundingClientRect();var total=r.height-window.innerHeight;var artPct=total>0?Math.min(1,Math.max(0,-r.top/total)):(r.top<=0?1:0);pct=Math.max(pct,artPct);}var w=(pct*100)+'%';bar.style.width=w;var fill=document.getElementById('artProgressFill');if(fill)fill.style.width=w;var cur=secs[0];secs.forEach(function(s){if(s.getBoundingClientRect().top<=120)cur=s;});links.forEach(function(a){var on=a.getAttribute('href')==='#'+(cur&&cur.id);a.classList.toggle('active',on);if(on)a.scrollIntoView({block:'nearest'});});}
 window.addEventListener('scroll',onScroll,{passive:true});onScroll();
-document.getElementById('toTop').addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+document.getElementById('toTop').addEventListener('click',function(){var st=window.scrollY||document.documentElement.scrollTop;window.scrollTo({top:0,behavior:st>600?'smooth':'auto'});});
 """
 
 
@@ -389,10 +395,11 @@ def build_detail(a, arts):
         '<a href="%d.html">%s →</a>' % (next_a["id_int"], esc(next_a["title"])) if next_a else "")
     body = (
         '<div id="progress"></div><button id="toTop" title="回到顶部">↑</button>'
-        '<div class="layout"><aside>%s</aside><main class="article">'
-        '<nav class="back"><a href="../index.html">← 返回 Atlas</a> '
+        '<div class="layout"><aside>%s</aside><main class="article" id="artRoot">'
+        '<header class="art-head"><nav class="back"><a href="../index.html">← 返回 Atlas</a> '
         '<button class="btn" type="button" onclick="atlasEditCurrent()">编辑</button> '
         '<button class="btn btn-danger" type="button" onclick="atlasDeleteCurrent()">删除</button></nav>'
+        '<div class="art-progress"><div id="artProgressFill"></div></div></header>'
         '<div class="kicker">%s</div><h1>%s</h1><p class="lead">%s</p>'
         '<div id="article-tags">%s</div><p class="meta">约 %d 字 · 阅读约 %d 分钟 · 更新 %s</p>'
         '%s<div id="article-body">%s</div>%s</main></div>'
@@ -412,7 +419,7 @@ def build_view(arts):
     body = (
         '<div id="progress"></div><button id="toTop" title="回到顶部">↑</button>'
         '<div class="layout"><aside><nav class="toc" id="view-toc"></nav></aside>'
-        '<main class="article" id="view-main"><p>加载中…</p></main></div>')
+        '<main class="article" id="artRoot"><div id="view-main"><p>加载中…</p></div></main></div>')
     data = {"articles": [article_data(a) for a in arts],
             "categories": sorted({a["category"] for a in arts})}
     return page("Atlas", data_script(data) + body, ATLAS_JS)

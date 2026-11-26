@@ -68,7 +68,13 @@ hr{border:none;border-top:1px solid var(--line);margin:28px 0}
 .pinned{display:inline-block;background:var(--accent);color:#fff;border-radius:4px;font-size:12px;padding:2px 8px;margin-left:8px;vertical-align:middle}
 .date{color:var(--muted);font-size:13px}
 /* --- detail --- */
-#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:50}
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:200;display:block;pointer-events:none}
+/* sticky article header carrying a second progress bar, so the bar stays
+   pinned at the top with the header even when the fixed #progress bar is
+   covered / stays at 0 in an app shell */
+.art-head{position:sticky;top:0;z-index:30;background:var(--paper);padding:10px 0 0}
+.art-progress{height:3px;background:transparent;margin-top:8px}
+#artProgressFill{display:block;height:3px;background:var(--accent);width:0}
 .layout{display:grid;grid-template-columns:240px 1fr;gap:32px;max-width:1080px;margin:0 auto;padding:24px}
 @media(max-width:860px){.layout{grid-template-columns:1fr}}
 .toc{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto;scrollbar-width:thin;align-self:start}
@@ -95,7 +101,7 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
 </style>
 </head>
 <body>
-<script>window.ATLAS_CURRENT_ID=8;</script><script id="atlas-data" type="application/json">{"articles": [{"id": 8, "title": "Claude 账号防封与付款完整流程（定版）", "category": "账号与服务", "tags": ["Claude", "防封", "付款", "KYC", "住宅IP"], "summary": "从出口、账号、时区到付款与 KYC 的整套定级流程：保留旧号、住宅链式出口、iOS 礼品卡优先、月付 Pro 起步、KYC 弹窗先截图不交材料。", "pinned": true, "updated_at": "2026-11-26T04:51:42.795Z", "cover_key": "claude-account", "source_note": "整理自 2026-10-20 定级结论与 2026-10-23 时区 / KYC 细则，改写为可执行流程；不是对话原文。", "file": "08-claude-account.md", "body": "\n# Claude 账号防封与付款完整流程（定版）\n\n> 定版：2026-10-20 定级，2026-10-23 补时区与 KYC 执行细则。\n> 一句话原则：先在最终出口上把环境养稳，再付费；全程低频、一致、不折腾。\n\n## 背景结论（先认清，再动手）\n\n- 大陆 / 香港 / 澳门都是 Claude 不支持的地区，使用本身就带封号风险，违规终止不退款；其他原因退款按比例。\n- 最好的资产是干净的住宅出口：Verizon Business 静态住宅 IP，经 RackNerd 前置链式转发。机场共享节点和机房 IP 直连风险最高；VPS 直装已出局——唯一可接受的变体是 VPS 出站全部走 Verizon socks5 并带 kill-switch。\n- 付费 Pro 极可能触发 Stripe + Anthropic 全量复审，大陆卡是最大的风险因子。\n\n## 步骤一：账号——保留旧号，不开新号\n\n- 此前已用一条美区 ISP IP 注册过一个账号（非 Verizon 静态 IP，那条线路与账号详情未知）。默认保留旧账号，不另开新号：多开账号本身就是封号触发器，存活的老注册是资产。\n- 那条 ISP 线路若仍干净，就别迁移；若已脏，单向迁移到 Verizon 出口，轻度养号几天再付费。绝不在两个 IP 之间来回跳。\n- 只有四种情况才弃号重开：老账号已被封 / 被标、注册在脏 IP 上、账号不完全在自己控制下、登录历史已污染。\n\n## 步骤二：环境——本地 Win11 + 链式出口\n\n- 本地 Win11，桌面端 / CLI 为主力，配 v2rayN TUN 模式。主力工具定为 Claude Code + Design。\n- 时区跟随最终出口一次钉死，永不反复。兼职路线②的钉法：\n  - 系统时区留北京，Claude 进程单独用 `TZ=America/New_York` 从脚本启动；桌面版关掉自启，只从脚本启动。\n  - Claude 专用 Chrome Profile 把 en-US 置顶。注意：Chrome 在 Windows 上不吃 TZ 变量，网页版时区仍报北京，所以网页版只作登录 / OAuth 与少量使用，主力放 CLI + 桌面版。\n  - 验收标准：脚本启动的 CLI 显示美东时间（EST）。\n  - 配套：Windows 区域设 United States、浏览器语言 en-US 优先、自动校时打开、关掉自动设置时区与定位，不用 JS 时区伪装。\n\n## 步骤三：付款——顺序和铁律\n\n付款方式优先级（从优到次）：\n\n1. **iOS + 礼品卡**：已有美区 Apple ID；只在官方店购买、留好小票、分批兑换。灰卡有风险，不碰。\n2. **Starryblu**：SG BIN 万事达借记卡，大陆护照 + 手机号可开；作备用卡，只走官方渠道。\n3. **Bybit**：已有账户可用；不要为了这件事新开 Bybit 卡。\n4. 大陆卡（风险因子最大，尽量不用）。\n5. US PayPal（网页端只收卡，排最后）。\n\n价格参考（iOS 价）：Pro 年付 $214.99；Max 5x $124.99/月、20x $249.99/月（网页价 $100 / $200）。\n\n铁律：\n\n- 先月付 Pro $20 验证稳定性和用量，频繁撞限额再升 Max 5x；未验证稳定前不上 $100–200 的档。\n- 拒卡不要反复重试。\n- 出问题先申诉，绝不 chargeback。\n- 退款只走 Apple，且须单独取消订阅；退款退回美区 USD 余额，约 48 小时，退不回人民币。不要重复薅退款。\n\n## 步骤四：KYC 弹窗出现时怎么办\n\n背景：Anthropic 自 2026-04 起经 Persona 做选择性验证，要实体证件原件 + 活体自拍，不接受复印件 / 扫描 / 数字 ID。典型触发点：升 Max、高频使用、被风控标记；VPN / 位置与声明地址不符是典型情形。Persona 接受中国护照（查人证一致，不查居住地），但验证通过后仍可因在不支持地区使用被封；且提交真实身份是单向门——被封后换邮箱重开的空间大减。\n\n执行细则：\n\n1. 维持 Pro、不跳 Max，低频起步，尽量不触发。\n2. 真弹出来时先截图，别当场交材料，回来商量后再决定。\n3. 注册名必须与证件拼音一致（这一步在注册时就要对齐）。\n4. 验证时用链式出口的浏览器、关定位；手机扫码要在同一出口的 WiFi 下、关蜂窝、拒绝定位授权。\n5. 始终保持一致：IP、时区、语言、账单国家、声明地址，五样对得上。\n\n## 踩坑记录\n\n- **多开账号 = 自找封号**：新号没有历史积累，还多一个触发器；老号活着就是资产。\n- **付款方式比金额更重要**：大陆卡是全量复审里最大的风险因子，宁可用礼品卡绕开。\n- **时区反复横跳是大忌**：钉死一次就不要再改；网页版时区报北京是 Chrome 的固有限制，不是配置错误，别为它反复折腾。\n- **KYC 是单向门**：交了真实身份就回不去了，所以策略是\"不触发\"而不是\"准备好材料随时交\"。\n"}], "categories": ["AI 与 Agent", "创作与内容", "网站与项目", "网络与路由", "节点与代理", "账号与服务"]}</script><div id="progress"></div><button id="toTop" title="回到顶部">↑</button><div class="layout"><aside><nav class="toc"><h4>目录（6 节）</h4><ol><li style=""><a href="#sec-1"> 背景结论（先认清，再动手）</a></li><li style=""><a href="#sec-2"> 步骤一：账号——保留旧号，不开新号</a></li><li style=""><a href="#sec-3"> 步骤二：环境——本地 Win11 + 链式出口</a></li><li style=""><a href="#sec-4"> 步骤三：付款——顺序和铁律</a></li><li style=""><a href="#sec-5"> 步骤四：KYC 弹窗出现时怎么办</a></li><li style=""><a href="#sec-6"> 踩坑记录</a></li></ol></nav></aside><main class="article"><nav class="back"><a href="../index.html">← 返回 Atlas</a> <button class="btn" type="button" onclick="atlasEditCurrent()">编辑</button> <button class="btn btn-danger" type="button" onclick="atlasDeleteCurrent()">删除</button></nav><div class="kicker">账号与服务</div><h1>Claude 账号防封与付款完整流程（定版）</h1><p class="lead">从出口、账号、时区到付款与 KYC 的整套定级流程：保留旧号、住宅链式出口、iOS 礼品卡优先、月付 Pro 起步、KYC 弹窗先截图不交材料。</p><div id="article-tags"><span class="tag">Claude</span><span class="tag">防封</span><span class="tag">付款</span><span class="tag">KYC</span><span class="tag">住宅IP</span></div><p class="meta">约 1979 字 · 阅读约 4 分钟 · 更新 2026-11-26</p><div class="toc-mobile"><details><summary>目录（6 节）</summary><ol><li style=""><a href="#sec-1"> 背景结论（先认清，再动手）</a></li><li style=""><a href="#sec-2"> 步骤一：账号——保留旧号，不开新号</a></li><li style=""><a href="#sec-3"> 步骤二：环境——本地 Win11 + 链式出口</a></li><li style=""><a href="#sec-4"> 步骤三：付款——顺序和铁律</a></li><li style=""><a href="#sec-5"> 步骤四：KYC 弹窗出现时怎么办</a></li><li style=""><a href="#sec-6"> 踩坑记录</a></li></ol></details></div><div id="article-body">
+<script>window.ATLAS_CURRENT_ID=8;</script><script id="atlas-data" type="application/json">{"articles": [{"id": 8, "title": "Claude 账号防封与付款完整流程（定版）", "category": "账号与服务", "tags": ["Claude", "防封", "付款", "KYC", "住宅IP"], "summary": "从出口、账号、时区到付款与 KYC 的整套定级流程：保留旧号、住宅链式出口、iOS 礼品卡优先、月付 Pro 起步、KYC 弹窗先截图不交材料。", "pinned": true, "updated_at": "2026-11-26T04:51:42.795Z", "cover_key": "claude-account", "source_note": "整理自 2026-10-20 定级结论与 2026-10-23 时区 / KYC 细则，改写为可执行流程；不是对话原文。", "file": "08-claude-account.md", "body": "\n# Claude 账号防封与付款完整流程（定版）\n\n> 定版：2026-10-20 定级，2026-10-23 补时区与 KYC 执行细则。\n> 一句话原则：先在最终出口上把环境养稳，再付费；全程低频、一致、不折腾。\n\n## 背景结论（先认清，再动手）\n\n- 大陆 / 香港 / 澳门都是 Claude 不支持的地区，使用本身就带封号风险，违规终止不退款；其他原因退款按比例。\n- 最好的资产是干净的住宅出口：Verizon Business 静态住宅 IP，经 RackNerd 前置链式转发。机场共享节点和机房 IP 直连风险最高；VPS 直装已出局——唯一可接受的变体是 VPS 出站全部走 Verizon socks5 并带 kill-switch。\n- 付费 Pro 极可能触发 Stripe + Anthropic 全量复审，大陆卡是最大的风险因子。\n\n## 步骤一：账号——保留旧号，不开新号\n\n- 此前已用一条美区 ISP IP 注册过一个账号（非 Verizon 静态 IP，那条线路与账号详情未知）。默认保留旧账号，不另开新号：多开账号本身就是封号触发器，存活的老注册是资产。\n- 那条 ISP 线路若仍干净，就别迁移；若已脏，单向迁移到 Verizon 出口，轻度养号几天再付费。绝不在两个 IP 之间来回跳。\n- 只有四种情况才弃号重开：老账号已被封 / 被标、注册在脏 IP 上、账号不完全在自己控制下、登录历史已污染。\n\n## 步骤二：环境——本地 Win11 + 链式出口\n\n- 本地 Win11，桌面端 / CLI 为主力，配 v2rayN TUN 模式。主力工具定为 Claude Code + Design。\n- 时区跟随最终出口一次钉死，永不反复。兼职路线②的钉法：\n  - 系统时区留北京，Claude 进程单独用 `TZ=America/New_York` 从脚本启动；桌面版关掉自启，只从脚本启动。\n  - Claude 专用 Chrome Profile 把 en-US 置顶。注意：Chrome 在 Windows 上不吃 TZ 变量，网页版时区仍报北京，所以网页版只作登录 / OAuth 与少量使用，主力放 CLI + 桌面版。\n  - 验收标准：脚本启动的 CLI 显示美东时间（EST）。\n  - 配套：Windows 区域设 United States、浏览器语言 en-US 优先、自动校时打开、关掉自动设置时区与定位，不用 JS 时区伪装。\n\n## 步骤三：付款——顺序和铁律\n\n付款方式优先级（从优到次）：\n\n1. **iOS + 礼品卡**：已有美区 Apple ID；只在官方店购买、留好小票、分批兑换。灰卡有风险，不碰。\n2. **Starryblu**：SG BIN 万事达借记卡，大陆护照 + 手机号可开；作备用卡，只走官方渠道。\n3. **Bybit**：已有账户可用；不要为了这件事新开 Bybit 卡。\n4. 大陆卡（风险因子最大，尽量不用）。\n5. US PayPal（网页端只收卡，排最后）。\n\n价格参考（iOS 价）：Pro 年付 $214.99；Max 5x $124.99/月、20x $249.99/月（网页价 $100 / $200）。\n\n铁律：\n\n- 先月付 Pro $20 验证稳定性和用量，频繁撞限额再升 Max 5x；未验证稳定前不上 $100–200 的档。\n- 拒卡不要反复重试。\n- 出问题先申诉，绝不 chargeback。\n- 退款只走 Apple，且须单独取消订阅；退款退回美区 USD 余额，约 48 小时，退不回人民币。不要重复薅退款。\n\n## 步骤四：KYC 弹窗出现时怎么办\n\n背景：Anthropic 自 2026-04 起经 Persona 做选择性验证，要实体证件原件 + 活体自拍，不接受复印件 / 扫描 / 数字 ID。典型触发点：升 Max、高频使用、被风控标记；VPN / 位置与声明地址不符是典型情形。Persona 接受中国护照（查人证一致，不查居住地），但验证通过后仍可因在不支持地区使用被封；且提交真实身份是单向门——被封后换邮箱重开的空间大减。\n\n执行细则：\n\n1. 维持 Pro、不跳 Max，低频起步，尽量不触发。\n2. 真弹出来时先截图，别当场交材料，回来商量后再决定。\n3. 注册名必须与证件拼音一致（这一步在注册时就要对齐）。\n4. 验证时用链式出口的浏览器、关定位；手机扫码要在同一出口的 WiFi 下、关蜂窝、拒绝定位授权。\n5. 始终保持一致：IP、时区、语言、账单国家、声明地址，五样对得上。\n\n## 踩坑记录\n\n- **多开账号 = 自找封号**：新号没有历史积累，还多一个触发器；老号活着就是资产。\n- **付款方式比金额更重要**：大陆卡是全量复审里最大的风险因子，宁可用礼品卡绕开。\n- **时区反复横跳是大忌**：钉死一次就不要再改；网页版时区报北京是 Chrome 的固有限制，不是配置错误，别为它反复折腾。\n- **KYC 是单向门**：交了真实身份就回不去了，所以策略是\"不触发\"而不是\"准备好材料随时交\"。\n"}], "categories": ["AI 与 Agent", "创作与内容", "网站与项目", "网络与路由", "节点与代理", "账号与服务"]}</script><div id="progress"></div><button id="toTop" title="回到顶部">↑</button><div class="layout"><aside><nav class="toc"><h4>目录（6 节）</h4><ol><li style=""><a href="#sec-1"> 背景结论（先认清，再动手）</a></li><li style=""><a href="#sec-2"> 步骤一：账号——保留旧号，不开新号</a></li><li style=""><a href="#sec-3"> 步骤二：环境——本地 Win11 + 链式出口</a></li><li style=""><a href="#sec-4"> 步骤三：付款——顺序和铁律</a></li><li style=""><a href="#sec-5"> 步骤四：KYC 弹窗出现时怎么办</a></li><li style=""><a href="#sec-6"> 踩坑记录</a></li></ol></nav></aside><main class="article" id="artRoot"><header class="art-head"><nav class="back"><a href="../index.html">← 返回 Atlas</a> <button class="btn" type="button" onclick="atlasEditCurrent()">编辑</button> <button class="btn btn-danger" type="button" onclick="atlasDeleteCurrent()">删除</button></nav><div class="art-progress"><div id="artProgressFill"></div></div></header><div class="kicker">账号与服务</div><h1>Claude 账号防封与付款完整流程（定版）</h1><p class="lead">从出口、账号、时区到付款与 KYC 的整套定级流程：保留旧号、住宅链式出口、iOS 礼品卡优先、月付 Pro 起步、KYC 弹窗先截图不交材料。</p><div id="article-tags"><span class="tag">Claude</span><span class="tag">防封</span><span class="tag">付款</span><span class="tag">KYC</span><span class="tag">住宅IP</span></div><p class="meta">约 1979 字 · 阅读约 4 分钟 · 更新 2026-11-26</p><div class="toc-mobile"><details><summary>目录（6 节）</summary><ol><li style=""><a href="#sec-1"> 背景结论（先认清，再动手）</a></li><li style=""><a href="#sec-2"> 步骤一：账号——保留旧号，不开新号</a></li><li style=""><a href="#sec-3"> 步骤二：环境——本地 Win11 + 链式出口</a></li><li style=""><a href="#sec-4"> 步骤三：付款——顺序和铁律</a></li><li style=""><a href="#sec-5"> 步骤四：KYC 弹窗出现时怎么办</a></li><li style=""><a href="#sec-6"> 踩坑记录</a></li></ol></details></div><div id="article-body">
 <blockquote><p>定版：2026-10-20 定级，2026-10-23 补时区与 KYC 执行细则。<br>一句话原则：先在最终出口上把环境养稳，再付费；全程低频、一致、不折腾。</p></blockquote>
 <div class="sec-head" id="sec-1"><span class="badge">01</span><h2>背景结论（先认清，再动手）</h2></div>
 <ul><li>大陆 / 香港 / 澳门都是 Claude 不支持的地区，使用本身就带封号风险，违规终止不退款；其他原因退款按比例。</li><li>最好的资产是干净的住宅出口：Verizon Business 静态住宅 IP，经 RackNerd 前置链式转发。机场共享节点和机房 IP 直连风险最高；VPS 直装已出局——唯一可接受的变体是 VPS 出站全部走 Verizon socks5 并带 kill-switch。</li><li>付费 Pro 极可能触发 Stripe + Anthropic 全量复审，大陆卡是最大的风险因子。</li></ul>
@@ -605,9 +611,10 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
     var r = mdToHtml(a.body);
     var words = a.body.length;
     main.innerHTML =
-      '<nav class="back"><a href="../index.html">← 返回 Atlas</a> ' +
+      '<header class="art-head"><nav class="back"><a href="../index.html">← 返回 Atlas</a> ' +
       '<button class="btn" type="button" onclick="atlasEditCurrent()">编辑</button> ' +
       '<button class="btn btn-danger" type="button" onclick="atlasDeleteCurrent()">删除</button></nav>' +
+      '<div class="art-progress"><div id="artProgressFill"></div></div></header>' +
       '<div class="kicker">' + esc(a.category) + "</div><h1>" + esc(a.title) + "</h1>" +
       '<p class="lead">' + esc(a.summary) + "</p>" +
       '<div id="article-tags">' + (a.tags || []).map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("") + "</div>" +
@@ -634,7 +641,21 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
     function onScroll() {
       var st = window.scrollY || document.documentElement.scrollTop;
       var h = document.documentElement.scrollHeight - window.innerHeight;
-      bar.style.width = (h > 0 ? (st / h * 100) : 0) + "%";
+      var pct = h > 0 ? (st / h) : 0;
+      /* Progress from the article's actual position in the viewport: the
+         old window-only calculation stays at 0 / is covered in an app
+         shell, so take the max of the two. */
+      var root = document.getElementById("artRoot");
+      if (root) {
+        var r = root.getBoundingClientRect();
+        var total = r.height - window.innerHeight;
+        var artPct = total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : (r.top <= 0 ? 1 : 0);
+        pct = Math.max(pct, artPct);
+      }
+      var w = (pct * 100) + "%";
+      bar.style.width = w;
+      var fill = document.getElementById("artProgressFill");
+      if (fill) fill.style.width = w;
       var cur = secs[0];
       secs.forEach(function (s) { if (s.getBoundingClientRect().top <= 120) cur = s; });
       links.forEach(function (a) {
@@ -643,10 +664,14 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
         if (on) a.scrollIntoView({ block: "nearest" });
       });
     }
+    function scrollToTop() {
+      var st = window.scrollY || document.documentElement.scrollTop;
+      window.scrollTo({ top: 0, behavior: st > 600 ? "smooth" : "auto" });
+    }
     if (!spyInit) {
       window.addEventListener("scroll", onScroll, { passive: true });
       var top = document.getElementById("toTop");
-      if (top) top.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+      if (top) top.addEventListener("click", scrollToTop);
       spyInit = true;
     }
     onScroll();
@@ -657,7 +682,10 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
   else { applyHomepageOverrides(); applyDetailOverride(); }
   if (document.getElementById("progress")) initScrollspy();
   var topBtn = document.getElementById("toTop");
-  if (topBtn && !spyInit) topBtn.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+  if (topBtn && !spyInit) topBtn.addEventListener("click", function () {
+    var st = window.scrollY || document.documentElement.scrollTop;
+    window.scrollTo({ top: 0, behavior: st > 600 ? "smooth" : "auto" });
+  });
 
   /* Test hook (no-op in browsers): lets `node --check`-style tests require
      the pure functions without a DOM. */

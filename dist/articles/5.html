@@ -68,7 +68,13 @@ hr{border:none;border-top:1px solid var(--line);margin:28px 0}
 .pinned{display:inline-block;background:var(--accent);color:#fff;border-radius:4px;font-size:12px;padding:2px 8px;margin-left:8px;vertical-align:middle}
 .date{color:var(--muted);font-size:13px}
 /* --- detail --- */
-#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:50}
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:200;display:block;pointer-events:none}
+/* sticky article header carrying a second progress bar, so the bar stays
+   pinned at the top with the header even when the fixed #progress bar is
+   covered / stays at 0 in an app shell */
+.art-head{position:sticky;top:0;z-index:30;background:var(--paper);padding:10px 0 0}
+.art-progress{height:3px;background:transparent;margin-top:8px}
+#artProgressFill{display:block;height:3px;background:var(--accent);width:0}
 .layout{display:grid;grid-template-columns:240px 1fr;gap:32px;max-width:1080px;margin:0 auto;padding:24px}
 @media(max-width:860px){.layout{grid-template-columns:1fr}}
 .toc{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto;scrollbar-width:thin;align-self:start}
@@ -95,7 +101,7 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
 </style>
 </head>
 <body>
-<script>window.ATLAS_CURRENT_ID=5;</script><script id="atlas-data" type="application/json">{"articles": [{"id": 5, "title": "开题图文稿第 6 页：三行卡片做图版", "category": "创作与内容", "tags": ["小红书", "做图", "卡片版"], "summary": "第 6 页的做图替代方案：把原表格拆成 3 张卡片，避免手机上表格字糊；规格 3:4 竖版 1080×1440。", "pinned": false, "updated_at": "2026-11-26T04:51:42.795Z", "cover_key": "kaiti-cards", "source_note": "来源：your_files/xiaohongshu-kaiti-page6-cards.md，配合《小红书图文稿：毕设开题三段怎么写》使用，只替换第 6 页。", "file": "05-kaiti-cards.md", "body": "\n# 毕设开题第 6 页：做图版（三行卡片，替代原表格）\n\n图片规格：3:4 竖版 1080×1440，每张卡片只放一行。\n\n## 第 6 页标题（卡片上方共用）\n\n画出这张表，脱节一眼就能看出来\n\n---\n\n## 卡片 1\n\n问题：报名统计易错、签到排队\n目标：实现报名、签到、统计功能\n方法：需求访谈 + 原型开发\n\n## 卡片 2\n\n问题：事后统计靠人工、数据不准\n目标：统计结果自动生成、可导出\n方法：原型开发 + 功能测试\n\n## 卡片 3\n\n问题：不知道好不好用\n目标：完成一轮用户测试并修改\n方法：用户测试 + 修改记录\n\n---\n\n## 自查句（放在 3 张卡片下方）\n\n同一行讲不通，就改那一行，不要全篇重写。\n\n## 做图提醒\n\n- 每张卡片一行对应关系，不要把三行挤进一张图。\n- 卡片内三行顺序固定：问题 → 目标 → 方法。\n- 示例仍是“校园社团报名与签到小程序”的结构示范，换课题重填，不要直接抄。\n"}], "categories": ["AI 与 Agent", "创作与内容", "网站与项目", "网络与路由", "节点与代理", "账号与服务"]}</script><div id="progress"></div><button id="toTop" title="回到顶部">↑</button><div class="layout"><aside><nav class="toc"><h4>目录（6 节）</h4><ol><li style=""><a href="#sec-1"> 第 6 页标题（卡片上方共用）</a></li><li style=""><a href="#sec-2"> 卡片 1</a></li><li style=""><a href="#sec-3"> 卡片 2</a></li><li style=""><a href="#sec-4"> 卡片 3</a></li><li style=""><a href="#sec-5"> 自查句（放在 3 张卡片下方）</a></li><li style=""><a href="#sec-6"> 做图提醒</a></li></ol></nav></aside><main class="article"><nav class="back"><a href="../index.html">← 返回 Atlas</a> <button class="btn" type="button" onclick="atlasEditCurrent()">编辑</button> <button class="btn btn-danger" type="button" onclick="atlasDeleteCurrent()">删除</button></nav><div class="kicker">创作与内容</div><h1>开题图文稿第 6 页：三行卡片做图版</h1><p class="lead">第 6 页的做图替代方案：把原表格拆成 3 张卡片，避免手机上表格字糊；规格 3:4 竖版 1080×1440。</p><div id="article-tags"><span class="tag">小红书</span><span class="tag">做图</span><span class="tag">卡片版</span></div><p class="meta">约 351 字 · 阅读约 1 分钟 · 更新 2026-11-26</p><div class="toc-mobile"><details><summary>目录（6 节）</summary><ol><li style=""><a href="#sec-1"> 第 6 页标题（卡片上方共用）</a></li><li style=""><a href="#sec-2"> 卡片 1</a></li><li style=""><a href="#sec-3"> 卡片 2</a></li><li style=""><a href="#sec-4"> 卡片 3</a></li><li style=""><a href="#sec-5"> 自查句（放在 3 张卡片下方）</a></li><li style=""><a href="#sec-6"> 做图提醒</a></li></ol></details></div><div id="article-body">
+<script>window.ATLAS_CURRENT_ID=5;</script><script id="atlas-data" type="application/json">{"articles": [{"id": 5, "title": "开题图文稿第 6 页：三行卡片做图版", "category": "创作与内容", "tags": ["小红书", "做图", "卡片版"], "summary": "第 6 页的做图替代方案：把原表格拆成 3 张卡片，避免手机上表格字糊；规格 3:4 竖版 1080×1440。", "pinned": false, "updated_at": "2026-11-26T04:51:42.795Z", "cover_key": "kaiti-cards", "source_note": "来源：your_files/xiaohongshu-kaiti-page6-cards.md，配合《小红书图文稿：毕设开题三段怎么写》使用，只替换第 6 页。", "file": "05-kaiti-cards.md", "body": "\n# 毕设开题第 6 页：做图版（三行卡片，替代原表格）\n\n图片规格：3:4 竖版 1080×1440，每张卡片只放一行。\n\n## 第 6 页标题（卡片上方共用）\n\n画出这张表，脱节一眼就能看出来\n\n---\n\n## 卡片 1\n\n问题：报名统计易错、签到排队\n目标：实现报名、签到、统计功能\n方法：需求访谈 + 原型开发\n\n## 卡片 2\n\n问题：事后统计靠人工、数据不准\n目标：统计结果自动生成、可导出\n方法：原型开发 + 功能测试\n\n## 卡片 3\n\n问题：不知道好不好用\n目标：完成一轮用户测试并修改\n方法：用户测试 + 修改记录\n\n---\n\n## 自查句（放在 3 张卡片下方）\n\n同一行讲不通，就改那一行，不要全篇重写。\n\n## 做图提醒\n\n- 每张卡片一行对应关系，不要把三行挤进一张图。\n- 卡片内三行顺序固定：问题 → 目标 → 方法。\n- 示例仍是“校园社团报名与签到小程序”的结构示范，换课题重填，不要直接抄。\n"}], "categories": ["AI 与 Agent", "创作与内容", "网站与项目", "网络与路由", "节点与代理", "账号与服务"]}</script><div id="progress"></div><button id="toTop" title="回到顶部">↑</button><div class="layout"><aside><nav class="toc"><h4>目录（6 节）</h4><ol><li style=""><a href="#sec-1"> 第 6 页标题（卡片上方共用）</a></li><li style=""><a href="#sec-2"> 卡片 1</a></li><li style=""><a href="#sec-3"> 卡片 2</a></li><li style=""><a href="#sec-4"> 卡片 3</a></li><li style=""><a href="#sec-5"> 自查句（放在 3 张卡片下方）</a></li><li style=""><a href="#sec-6"> 做图提醒</a></li></ol></nav></aside><main class="article" id="artRoot"><header class="art-head"><nav class="back"><a href="../index.html">← 返回 Atlas</a> <button class="btn" type="button" onclick="atlasEditCurrent()">编辑</button> <button class="btn btn-danger" type="button" onclick="atlasDeleteCurrent()">删除</button></nav><div class="art-progress"><div id="artProgressFill"></div></div></header><div class="kicker">创作与内容</div><h1>开题图文稿第 6 页：三行卡片做图版</h1><p class="lead">第 6 页的做图替代方案：把原表格拆成 3 张卡片，避免手机上表格字糊；规格 3:4 竖版 1080×1440。</p><div id="article-tags"><span class="tag">小红书</span><span class="tag">做图</span><span class="tag">卡片版</span></div><p class="meta">约 351 字 · 阅读约 1 分钟 · 更新 2026-11-26</p><div class="toc-mobile"><details><summary>目录（6 节）</summary><ol><li style=""><a href="#sec-1"> 第 6 页标题（卡片上方共用）</a></li><li style=""><a href="#sec-2"> 卡片 1</a></li><li style=""><a href="#sec-3"> 卡片 2</a></li><li style=""><a href="#sec-4"> 卡片 3</a></li><li style=""><a href="#sec-5"> 自查句（放在 3 张卡片下方）</a></li><li style=""><a href="#sec-6"> 做图提醒</a></li></ol></details></div><div id="article-body">
 <p>图片规格：3:4 竖版 1080×1440，每张卡片只放一行。</p>
 <div class="sec-head" id="sec-1"><span class="badge">01</span><h2>第 6 页标题（卡片上方共用）</h2></div>
 <p>画出这张表，脱节一眼就能看出来</p>
@@ -601,9 +607,10 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
     var r = mdToHtml(a.body);
     var words = a.body.length;
     main.innerHTML =
-      '<nav class="back"><a href="../index.html">← 返回 Atlas</a> ' +
+      '<header class="art-head"><nav class="back"><a href="../index.html">← 返回 Atlas</a> ' +
       '<button class="btn" type="button" onclick="atlasEditCurrent()">编辑</button> ' +
       '<button class="btn btn-danger" type="button" onclick="atlasDeleteCurrent()">删除</button></nav>' +
+      '<div class="art-progress"><div id="artProgressFill"></div></div></header>' +
       '<div class="kicker">' + esc(a.category) + "</div><h1>" + esc(a.title) + "</h1>" +
       '<p class="lead">' + esc(a.summary) + "</p>" +
       '<div id="article-tags">' + (a.tags || []).map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("") + "</div>" +
@@ -630,7 +637,21 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
     function onScroll() {
       var st = window.scrollY || document.documentElement.scrollTop;
       var h = document.documentElement.scrollHeight - window.innerHeight;
-      bar.style.width = (h > 0 ? (st / h * 100) : 0) + "%";
+      var pct = h > 0 ? (st / h) : 0;
+      /* Progress from the article's actual position in the viewport: the
+         old window-only calculation stays at 0 / is covered in an app
+         shell, so take the max of the two. */
+      var root = document.getElementById("artRoot");
+      if (root) {
+        var r = root.getBoundingClientRect();
+        var total = r.height - window.innerHeight;
+        var artPct = total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : (r.top <= 0 ? 1 : 0);
+        pct = Math.max(pct, artPct);
+      }
+      var w = (pct * 100) + "%";
+      bar.style.width = w;
+      var fill = document.getElementById("artProgressFill");
+      if (fill) fill.style.width = w;
       var cur = secs[0];
       secs.forEach(function (s) { if (s.getBoundingClientRect().top <= 120) cur = s; });
       links.forEach(function (a) {
@@ -639,10 +660,14 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
         if (on) a.scrollIntoView({ block: "nearest" });
       });
     }
+    function scrollToTop() {
+      var st = window.scrollY || document.documentElement.scrollTop;
+      window.scrollTo({ top: 0, behavior: st > 600 ? "smooth" : "auto" });
+    }
     if (!spyInit) {
       window.addEventListener("scroll", onScroll, { passive: true });
       var top = document.getElementById("toTop");
-      if (top) top.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+      if (top) top.addEventListener("click", scrollToTop);
       spyInit = true;
     }
     onScroll();
@@ -653,7 +678,10 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
   else { applyHomepageOverrides(); applyDetailOverride(); }
   if (document.getElementById("progress")) initScrollspy();
   var topBtn = document.getElementById("toTop");
-  if (topBtn && !spyInit) topBtn.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+  if (topBtn && !spyInit) topBtn.addEventListener("click", function () {
+    var st = window.scrollY || document.documentElement.scrollTop;
+    window.scrollTo({ top: 0, behavior: st > 600 ? "smooth" : "auto" });
+  });
 
   /* Test hook (no-op in browsers): lets `node --check`-style tests require
      the pure functions without a DOM. */

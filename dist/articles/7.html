@@ -68,7 +68,13 @@ hr{border:none;border-top:1px solid var(--line);margin:28px 0}
 .pinned{display:inline-block;background:var(--accent);color:#fff;border-radius:4px;font-size:12px;padding:2px 8px;margin-left:8px;vertical-align:middle}
 .date{color:var(--muted);font-size:13px}
 /* --- detail --- */
-#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:50}
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:200;display:block;pointer-events:none}
+/* sticky article header carrying a second progress bar, so the bar stays
+   pinned at the top with the header even when the fixed #progress bar is
+   covered / stays at 0 in an app shell */
+.art-head{position:sticky;top:0;z-index:30;background:var(--paper);padding:10px 0 0}
+.art-progress{height:3px;background:transparent;margin-top:8px}
+#artProgressFill{display:block;height:3px;background:var(--accent);width:0}
 .layout{display:grid;grid-template-columns:240px 1fr;gap:32px;max-width:1080px;margin:0 auto;padding:24px}
 @media(max-width:860px){.layout{grid-template-columns:1fr}}
 .toc{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto;scrollbar-width:thin;align-self:start}
@@ -95,7 +101,7 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
 </style>
 </head>
 <body>
-<script>window.ATLAS_CURRENT_ID=7;</script><script id="atlas-data" type="application/json">{"articles": [{"id": 7, "title": "AX3600 代理链泄漏排查与 fail-closed 加固（定版）", "category": "网络与路由", "tags": ["AX3600", "OpenClash", "泄漏排查", "fail-closed", "DNS", "WebRTC"], "summary": "旁路由跑起来之后的安全定版：DNS 定版、STUN 端口 REJECT 堵 WebRTC 泄漏、删 lan→wan 转发实现核心崩溃时全网断流，含检测口径不一致的待确认项。", "pinned": true, "updated_at": "2026-11-26T04:51:42.795Z", "cover_key": "ax3600-leak", "source_note": "整理自 2026-10-23 至 10-29 的实测记录（泄漏排查与防火墙加固），改写为定版流程；不是对话原文。", "file": "07-ax3600-leak.md", "body": "\n# AX3600 代理链泄漏排查与 fail-closed 加固（定版）\n\n> 定版状态：2026-10-29 DNS 定版、2026-10-23 fail-closed 结构已实施。\n> 前置阅读：先完成《小米 AX3600 刷 OpenWrt 做旁路由完整教程》，本篇是在旁路由跑起来之后，把\"不泄漏\"和\"出故障时不出包\"这两件事做扎实。\n> 红线：在 RackNerd 前置链建成、策略组切回住宅链、复测全绿之前，不在这条连接上登录 Claude。\n\n## 当前链路状态（排查的起点）\n\n- AX3600 的 WAN 是 192.168.31.110/24，分流方式为 TCP Redirect + UDP TProxy。\n- DNS 走 Fake-IP，假地址段 198.18.0.0/16。\n- 当前出口是机场机房节点，不是 Verizon 住宅链——所以这条链目前只适合一般用途，不能碰地区敏感账号。\n\n## 步骤一：DNS 定版（2026-10-29 定版，不要再改）\n\n1. 只保留国外 DoH 作为解析上游，不混用国内解析。\n2. Fake-IP 保持开启。\n3. dnsmasq 的上游唯一指向 `127.0.0.1#7874`（本机 Clash 的 DNS 监听），不要再加第二个上游。\n\n验收：改完后用 browserleaks 重测。2026-10-29 实测结果干净（出口、DNS 均显示美国）。\n\n## 步骤二：堵 STUN / WebRTC 泄漏口（2026-10-27 定版）\n\n现象：Claude 的检测工具报告 DNS / WebRTC 可能泄漏，排查后定位到 STUN 流量绕过了代理。\n\n处理：在分流规则里把目标端口 3478 和 5349（STUN 常用端口）改为 **REJECT**。\n\n- 改完之后未再复发。\n- 代价（已知、接受）：这台 Chrome Profile 开不了网页版 Meet / Zoom 这类 P2P 通话。开会时走 BE7200 主网，或换一个浏览器。\n\n## 步骤三：fail-closed 结构加固（防\"故障\"，不防\"主动切直连\"）\n\n为什么要做：大陆 IP 碰一次 Anthropic 就可能封号。而 OpenClash 核心停止或崩溃时，劫持规则会被清理、路由器 NAT 还在，桌面版在托盘后台的连接就会以真实 IP 自己撞上 Anthropic。节点或订阅挂掉只是连接失败，那是安全态；核心死了才是危险态。\n\n做法（在 AX3600 防火墙里）：\n\n1. 删掉 lan → wan 的区域转发。\n2. 删掉 lan → wan6 的区域转发。\n3. 结果是 Zones 表里 lan ⇒ REJECT：核心一死，192.168.2.x 网段一个包都出不了 WAN。\n\n已知副作用（都可接受、且完全可逆）：\n\n- ICMP ping 不再可用。\n- 如果 2.x 网段访问主网段设备受影响，加两条放行规则：去 192.168.31.0/24、去 192.168.1.0/24。\n\n操作纪律：\n\n- 这套加固防的是核心故障，防不了人主动把模式切成直连。所以维护网络之前，先彻底退出 Claude 三端（桌面版、CLI、网页版）。\n- 待办：保存应用后做一次冒烟测试，再停掉核心做一次断网验收，确认 2.x 网段确实出不了包。\n\n## 踩坑记录\n\n- **检测口径不一致**：2026-10-29 同一天，browserleaks 重测已经干净，但 Claude 的检测工具仍报 DNS / WebRTC 可能泄漏。此条未最终确认——以后复测时以两个工具交叉验证为准，不要只信一边。\n- **STUN 端口 REJECT 是一把双刃剑**：堵住了泄漏，也堵掉了网页版视频会议的 P2P 通话。先想清楚哪台设备要开会，再决定规则加在哪个 Profile / 网段上。\n- **真正的风险不是节点挂掉，是核心死掉**：节点故障 = 连不上（安全）；核心崩溃 + NAT 还在 = 真实 IP 裸奔（危险）。加固要针对后者。\n"}], "categories": ["AI 与 Agent", "创作与内容", "网站与项目", "网络与路由", "节点与代理", "账号与服务"]}</script><div id="progress"></div><button id="toTop" title="回到顶部">↑</button><div class="layout"><aside><nav class="toc"><h4>目录（5 节）</h4><ol><li style=""><a href="#sec-1"> 当前链路状态（排查的起点）</a></li><li style=""><a href="#sec-2"> 步骤一：DNS 定版（2026-10-29 定版，不要再改）</a></li><li style=""><a href="#sec-3"> 步骤二：堵 STUN / WebRTC 泄漏口（2026-10-27 定版）</a></li><li style=""><a href="#sec-4"> 步骤三：fail-closed 结构加固（防&quot;故障&quot;，不防&quot;主动切直连&quot;）</a></li><li style=""><a href="#sec-5"> 踩坑记录</a></li></ol></nav></aside><main class="article"><nav class="back"><a href="../index.html">← 返回 Atlas</a> <button class="btn" type="button" onclick="atlasEditCurrent()">编辑</button> <button class="btn btn-danger" type="button" onclick="atlasDeleteCurrent()">删除</button></nav><div class="kicker">网络与路由</div><h1>AX3600 代理链泄漏排查与 fail-closed 加固（定版）</h1><p class="lead">旁路由跑起来之后的安全定版：DNS 定版、STUN 端口 REJECT 堵 WebRTC 泄漏、删 lan→wan 转发实现核心崩溃时全网断流，含检测口径不一致的待确认项。</p><div id="article-tags"><span class="tag">AX3600</span><span class="tag">OpenClash</span><span class="tag">泄漏排查</span><span class="tag">fail-closed</span><span class="tag">DNS</span><span class="tag">WebRTC</span></div><p class="meta">约 1597 字 · 阅读约 3 分钟 · 更新 2026-11-26</p><div class="toc-mobile"><details><summary>目录（5 节）</summary><ol><li style=""><a href="#sec-1"> 当前链路状态（排查的起点）</a></li><li style=""><a href="#sec-2"> 步骤一：DNS 定版（2026-10-29 定版，不要再改）</a></li><li style=""><a href="#sec-3"> 步骤二：堵 STUN / WebRTC 泄漏口（2026-10-27 定版）</a></li><li style=""><a href="#sec-4"> 步骤三：fail-closed 结构加固（防&quot;故障&quot;，不防&quot;主动切直连&quot;）</a></li><li style=""><a href="#sec-5"> 踩坑记录</a></li></ol></details></div><div id="article-body">
+<script>window.ATLAS_CURRENT_ID=7;</script><script id="atlas-data" type="application/json">{"articles": [{"id": 7, "title": "AX3600 代理链泄漏排查与 fail-closed 加固（定版）", "category": "网络与路由", "tags": ["AX3600", "OpenClash", "泄漏排查", "fail-closed", "DNS", "WebRTC"], "summary": "旁路由跑起来之后的安全定版：DNS 定版、STUN 端口 REJECT 堵 WebRTC 泄漏、删 lan→wan 转发实现核心崩溃时全网断流，含检测口径不一致的待确认项。", "pinned": true, "updated_at": "2026-11-26T04:51:42.795Z", "cover_key": "ax3600-leak", "source_note": "整理自 2026-10-23 至 10-29 的实测记录（泄漏排查与防火墙加固），改写为定版流程；不是对话原文。", "file": "07-ax3600-leak.md", "body": "\n# AX3600 代理链泄漏排查与 fail-closed 加固（定版）\n\n> 定版状态：2026-10-29 DNS 定版、2026-10-23 fail-closed 结构已实施。\n> 前置阅读：先完成《小米 AX3600 刷 OpenWrt 做旁路由完整教程》，本篇是在旁路由跑起来之后，把\"不泄漏\"和\"出故障时不出包\"这两件事做扎实。\n> 红线：在 RackNerd 前置链建成、策略组切回住宅链、复测全绿之前，不在这条连接上登录 Claude。\n\n## 当前链路状态（排查的起点）\n\n- AX3600 的 WAN 是 192.168.31.110/24，分流方式为 TCP Redirect + UDP TProxy。\n- DNS 走 Fake-IP，假地址段 198.18.0.0/16。\n- 当前出口是机场机房节点，不是 Verizon 住宅链——所以这条链目前只适合一般用途，不能碰地区敏感账号。\n\n## 步骤一：DNS 定版（2026-10-29 定版，不要再改）\n\n1. 只保留国外 DoH 作为解析上游，不混用国内解析。\n2. Fake-IP 保持开启。\n3. dnsmasq 的上游唯一指向 `127.0.0.1#7874`（本机 Clash 的 DNS 监听），不要再加第二个上游。\n\n验收：改完后用 browserleaks 重测。2026-10-29 实测结果干净（出口、DNS 均显示美国）。\n\n## 步骤二：堵 STUN / WebRTC 泄漏口（2026-10-27 定版）\n\n现象：Claude 的检测工具报告 DNS / WebRTC 可能泄漏，排查后定位到 STUN 流量绕过了代理。\n\n处理：在分流规则里把目标端口 3478 和 5349（STUN 常用端口）改为 **REJECT**。\n\n- 改完之后未再复发。\n- 代价（已知、接受）：这台 Chrome Profile 开不了网页版 Meet / Zoom 这类 P2P 通话。开会时走 BE7200 主网，或换一个浏览器。\n\n## 步骤三：fail-closed 结构加固（防\"故障\"，不防\"主动切直连\"）\n\n为什么要做：大陆 IP 碰一次 Anthropic 就可能封号。而 OpenClash 核心停止或崩溃时，劫持规则会被清理、路由器 NAT 还在，桌面版在托盘后台的连接就会以真实 IP 自己撞上 Anthropic。节点或订阅挂掉只是连接失败，那是安全态；核心死了才是危险态。\n\n做法（在 AX3600 防火墙里）：\n\n1. 删掉 lan → wan 的区域转发。\n2. 删掉 lan → wan6 的区域转发。\n3. 结果是 Zones 表里 lan ⇒ REJECT：核心一死，192.168.2.x 网段一个包都出不了 WAN。\n\n已知副作用（都可接受、且完全可逆）：\n\n- ICMP ping 不再可用。\n- 如果 2.x 网段访问主网段设备受影响，加两条放行规则：去 192.168.31.0/24、去 192.168.1.0/24。\n\n操作纪律：\n\n- 这套加固防的是核心故障，防不了人主动把模式切成直连。所以维护网络之前，先彻底退出 Claude 三端（桌面版、CLI、网页版）。\n- 待办：保存应用后做一次冒烟测试，再停掉核心做一次断网验收，确认 2.x 网段确实出不了包。\n\n## 踩坑记录\n\n- **检测口径不一致**：2026-10-29 同一天，browserleaks 重测已经干净，但 Claude 的检测工具仍报 DNS / WebRTC 可能泄漏。此条未最终确认——以后复测时以两个工具交叉验证为准，不要只信一边。\n- **STUN 端口 REJECT 是一把双刃剑**：堵住了泄漏，也堵掉了网页版视频会议的 P2P 通话。先想清楚哪台设备要开会，再决定规则加在哪个 Profile / 网段上。\n- **真正的风险不是节点挂掉，是核心死掉**：节点故障 = 连不上（安全）；核心崩溃 + NAT 还在 = 真实 IP 裸奔（危险）。加固要针对后者。\n"}], "categories": ["AI 与 Agent", "创作与内容", "网站与项目", "网络与路由", "节点与代理", "账号与服务"]}</script><div id="progress"></div><button id="toTop" title="回到顶部">↑</button><div class="layout"><aside><nav class="toc"><h4>目录（5 节）</h4><ol><li style=""><a href="#sec-1"> 当前链路状态（排查的起点）</a></li><li style=""><a href="#sec-2"> 步骤一：DNS 定版（2026-10-29 定版，不要再改）</a></li><li style=""><a href="#sec-3"> 步骤二：堵 STUN / WebRTC 泄漏口（2026-10-27 定版）</a></li><li style=""><a href="#sec-4"> 步骤三：fail-closed 结构加固（防&quot;故障&quot;，不防&quot;主动切直连&quot;）</a></li><li style=""><a href="#sec-5"> 踩坑记录</a></li></ol></nav></aside><main class="article" id="artRoot"><header class="art-head"><nav class="back"><a href="../index.html">← 返回 Atlas</a> <button class="btn" type="button" onclick="atlasEditCurrent()">编辑</button> <button class="btn btn-danger" type="button" onclick="atlasDeleteCurrent()">删除</button></nav><div class="art-progress"><div id="artProgressFill"></div></div></header><div class="kicker">网络与路由</div><h1>AX3600 代理链泄漏排查与 fail-closed 加固（定版）</h1><p class="lead">旁路由跑起来之后的安全定版：DNS 定版、STUN 端口 REJECT 堵 WebRTC 泄漏、删 lan→wan 转发实现核心崩溃时全网断流，含检测口径不一致的待确认项。</p><div id="article-tags"><span class="tag">AX3600</span><span class="tag">OpenClash</span><span class="tag">泄漏排查</span><span class="tag">fail-closed</span><span class="tag">DNS</span><span class="tag">WebRTC</span></div><p class="meta">约 1597 字 · 阅读约 3 分钟 · 更新 2026-11-26</p><div class="toc-mobile"><details><summary>目录（5 节）</summary><ol><li style=""><a href="#sec-1"> 当前链路状态（排查的起点）</a></li><li style=""><a href="#sec-2"> 步骤一：DNS 定版（2026-10-29 定版，不要再改）</a></li><li style=""><a href="#sec-3"> 步骤二：堵 STUN / WebRTC 泄漏口（2026-10-27 定版）</a></li><li style=""><a href="#sec-4"> 步骤三：fail-closed 结构加固（防&quot;故障&quot;，不防&quot;主动切直连&quot;）</a></li><li style=""><a href="#sec-5"> 踩坑记录</a></li></ol></details></div><div id="article-body">
 <blockquote><p>定版状态：2026-10-29 DNS 定版、2026-10-23 fail-closed 结构已实施。<br>前置阅读：先完成《小米 AX3600 刷 OpenWrt 做旁路由完整教程》，本篇是在旁路由跑起来之后，把&quot;不泄漏&quot;和&quot;出故障时不出包&quot;这两件事做扎实。<br>红线：在 RackNerd 前置链建成、策略组切回住宅链、复测全绿之前，不在这条连接上登录 Claude。</p></blockquote>
 <div class="sec-head" id="sec-1"><span class="badge">01</span><h2>当前链路状态（排查的起点）</h2></div>
 <ul><li>AX3600 的 WAN 是 192.168.31.110/24，分流方式为 TCP Redirect + UDP TProxy。</li><li>DNS 走 Fake-IP，假地址段 198.18.0.0/16。</li><li>当前出口是机场机房节点，不是 Verizon 住宅链——所以这条链目前只适合一般用途，不能碰地区敏感账号。</li></ul>
@@ -606,9 +612,10 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
     var r = mdToHtml(a.body);
     var words = a.body.length;
     main.innerHTML =
-      '<nav class="back"><a href="../index.html">← 返回 Atlas</a> ' +
+      '<header class="art-head"><nav class="back"><a href="../index.html">← 返回 Atlas</a> ' +
       '<button class="btn" type="button" onclick="atlasEditCurrent()">编辑</button> ' +
       '<button class="btn btn-danger" type="button" onclick="atlasDeleteCurrent()">删除</button></nav>' +
+      '<div class="art-progress"><div id="artProgressFill"></div></div></header>' +
       '<div class="kicker">' + esc(a.category) + "</div><h1>" + esc(a.title) + "</h1>" +
       '<p class="lead">' + esc(a.summary) + "</p>" +
       '<div id="article-tags">' + (a.tags || []).map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("") + "</div>" +
@@ -635,7 +642,21 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
     function onScroll() {
       var st = window.scrollY || document.documentElement.scrollTop;
       var h = document.documentElement.scrollHeight - window.innerHeight;
-      bar.style.width = (h > 0 ? (st / h * 100) : 0) + "%";
+      var pct = h > 0 ? (st / h) : 0;
+      /* Progress from the article's actual position in the viewport: the
+         old window-only calculation stays at 0 / is covered in an app
+         shell, so take the max of the two. */
+      var root = document.getElementById("artRoot");
+      if (root) {
+        var r = root.getBoundingClientRect();
+        var total = r.height - window.innerHeight;
+        var artPct = total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : (r.top <= 0 ? 1 : 0);
+        pct = Math.max(pct, artPct);
+      }
+      var w = (pct * 100) + "%";
+      bar.style.width = w;
+      var fill = document.getElementById("artProgressFill");
+      if (fill) fill.style.width = w;
       var cur = secs[0];
       secs.forEach(function (s) { if (s.getBoundingClientRect().top <= 120) cur = s; });
       links.forEach(function (a) {
@@ -644,10 +665,14 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
         if (on) a.scrollIntoView({ block: "nearest" });
       });
     }
+    function scrollToTop() {
+      var st = window.scrollY || document.documentElement.scrollTop;
+      window.scrollTo({ top: 0, behavior: st > 600 ? "smooth" : "auto" });
+    }
     if (!spyInit) {
       window.addEventListener("scroll", onScroll, { passive: true });
       var top = document.getElementById("toTop");
-      if (top) top.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+      if (top) top.addEventListener("click", scrollToTop);
       spyInit = true;
     }
     onScroll();
@@ -658,7 +683,10 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
   else { applyHomepageOverrides(); applyDetailOverride(); }
   if (document.getElementById("progress")) initScrollspy();
   var topBtn = document.getElementById("toTop");
-  if (topBtn && !spyInit) topBtn.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+  if (topBtn && !spyInit) topBtn.addEventListener("click", function () {
+    var st = window.scrollY || document.documentElement.scrollTop;
+    window.scrollTo({ top: 0, behavior: st > 600 ? "smooth" : "auto" });
+  });
 
   /* Test hook (no-op in browsers): lets `node --check`-style tests require
      the pure functions without a DOM. */

@@ -488,9 +488,10 @@
     var r = mdToHtml(a.body);
     var words = a.body.length;
     main.innerHTML =
-      '<nav class="back"><a href="../index.html">← 返回 Atlas</a> ' +
+      '<header class="art-head"><nav class="back"><a href="../index.html">← 返回 Atlas</a> ' +
       '<button class="btn" type="button" onclick="atlasEditCurrent()">编辑</button> ' +
       '<button class="btn btn-danger" type="button" onclick="atlasDeleteCurrent()">删除</button></nav>' +
+      '<div class="art-progress"><div id="artProgressFill"></div></div></header>' +
       '<div class="kicker">' + esc(a.category) + "</div><h1>" + esc(a.title) + "</h1>" +
       '<p class="lead">' + esc(a.summary) + "</p>" +
       '<div id="article-tags">' + (a.tags || []).map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("") + "</div>" +
@@ -517,7 +518,21 @@
     function onScroll() {
       var st = window.scrollY || document.documentElement.scrollTop;
       var h = document.documentElement.scrollHeight - window.innerHeight;
-      bar.style.width = (h > 0 ? (st / h * 100) : 0) + "%";
+      var pct = h > 0 ? (st / h) : 0;
+      /* Progress from the article's actual position in the viewport: the
+         old window-only calculation stays at 0 / is covered in an app
+         shell, so take the max of the two. */
+      var root = document.getElementById("artRoot");
+      if (root) {
+        var r = root.getBoundingClientRect();
+        var total = r.height - window.innerHeight;
+        var artPct = total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : (r.top <= 0 ? 1 : 0);
+        pct = Math.max(pct, artPct);
+      }
+      var w = (pct * 100) + "%";
+      bar.style.width = w;
+      var fill = document.getElementById("artProgressFill");
+      if (fill) fill.style.width = w;
       var cur = secs[0];
       secs.forEach(function (s) { if (s.getBoundingClientRect().top <= 120) cur = s; });
       links.forEach(function (a) {
@@ -526,10 +541,14 @@
         if (on) a.scrollIntoView({ block: "nearest" });
       });
     }
+    function scrollToTop() {
+      var st = window.scrollY || document.documentElement.scrollTop;
+      window.scrollTo({ top: 0, behavior: st > 600 ? "smooth" : "auto" });
+    }
     if (!spyInit) {
       window.addEventListener("scroll", onScroll, { passive: true });
       var top = document.getElementById("toTop");
-      if (top) top.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+      if (top) top.addEventListener("click", scrollToTop);
       spyInit = true;
     }
     onScroll();
@@ -540,7 +559,10 @@
   else { applyHomepageOverrides(); applyDetailOverride(); }
   if (document.getElementById("progress")) initScrollspy();
   var topBtn = document.getElementById("toTop");
-  if (topBtn && !spyInit) topBtn.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+  if (topBtn && !spyInit) topBtn.addEventListener("click", function () {
+    var st = window.scrollY || document.documentElement.scrollTop;
+    window.scrollTo({ top: 0, behavior: st > 600 ? "smooth" : "auto" });
+  });
 
   /* Test hook (no-op in browsers): lets `node --check`-style tests require
      the pure functions without a DOM. */

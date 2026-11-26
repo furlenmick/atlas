@@ -68,7 +68,13 @@ hr{border:none;border-top:1px solid var(--line);margin:28px 0}
 .pinned{display:inline-block;background:var(--accent);color:#fff;border-radius:4px;font-size:12px;padding:2px 8px;margin-left:8px;vertical-align:middle}
 .date{color:var(--muted);font-size:13px}
 /* --- detail --- */
-#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:50}
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:200;display:block;pointer-events:none}
+/* sticky article header carrying a second progress bar, so the bar stays
+   pinned at the top with the header even when the fixed #progress bar is
+   covered / stays at 0 in an app shell */
+.art-head{position:sticky;top:0;z-index:30;background:var(--paper);padding:10px 0 0}
+.art-progress{height:3px;background:transparent;margin-top:8px}
+#artProgressFill{display:block;height:3px;background:var(--accent);width:0}
 .layout{display:grid;grid-template-columns:240px 1fr;gap:32px;max-width:1080px;margin:0 auto;padding:24px}
 @media(max-width:860px){.layout{grid-template-columns:1fr}}
 .toc{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto;scrollbar-width:thin;align-self:start}
@@ -95,7 +101,7 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
 </style>
 </head>
 <body>
-<script>window.ATLAS_CURRENT_ID=13;</script><script id="atlas-data" type="application/json">{"articles": [{"id": 13, "title": "RedPocket $30/年 eSIM 使用手册（实测版）", "category": "账号与服务", "tags": ["RedPocket", "eSIM", "漫游", "WiFi Calling", "验证码"], "summary": "GSMA 线路与中国漫游的实测手册：网页开 Enable Roaming、漫游余额、WhatsApp 能收码而 Telegram 未收到、WiFi Calling 在中国必须走美国 IP 拉起。", "pinned": false, "updated_at": "2026-11-26T04:51:42.795Z", "cover_key": "redpocket-esim", "source_note": "整理自 2026-11-25 激活与实测记录；不是对话原文。", "file": "13-redpocket-esim.md", "body": "\n# RedPocket $30/年 eSIM 使用手册（实测版）\n\n> 状态：已激活，客服 Sean 重新应用套餐并修正日期后数据恢复正常。\n> 设备：iPhone XS Max（A2104）。登录 RedPocket 须关 VPN、换连接。\n\n## 套餐事实\n\n- 套餐：360 Day Unlimited Talk/Text + 200MB 5G，$30/年。\n- 数据：200MB/200MB（客服修正后恢复满额）。\n- WiFi Calling：已开启。\n- 余额续期：2026-12-26；下次付款：2027-11-25。\n\n## 线路铁律\n\n- 当前线路是 **GSMA（AT&T）**——唯一含国际漫游的网。别切到 GSMT / CDMA，切过去漫游就没了。\n- 漫游只有 GSMA 套餐有，CDMA / GSMT 没有。\n\n## 中国漫游（已实测可用）\n\n1. 官网 Roaming 页显示 CHINA included；Roaming Balances 为 100/100 Minutes。\n2. 必须在网页上点 **Enable Roaming** 开通，光插卡不会自动开。\n3. 官方说法是须在美国境内先选好目的地国家；但本人已在中国实测漫游可用——以实测为准，官方口径记录在此备查。\n4. 实测结论：没有 WiFi Calling 也打通了电话，蜂窝漫游本身能通话。\n\n## 收短信（注册验证码用）\n\n- WhatsApp 短信：已收到，收短信能力已证实。\n- Telegram 注册：未收到码。同一线路不同服务结果不同，注册前先想好备选验证方式。\n\n## WiFi Calling 在中国的限制（重点）\n\n- AT&T 官网明确：WiFi Calling 在中国不可用，中国 IP 直连会被拒签。\n- 拉起条件：必须走美国 IP——用支持 UDP 的美区节点做热点 / 旁路由，让手机流量从美国出口走。\n- 佐证：此前唯一一次状态栏出现 \"RedPocket Wi-Fi\" 时，手机正开着 VPN（美国 IP）。\n\n## 踩坑记录\n\n- **611 / 800 免费电话在境外常打不通**，不要拿它当\"线路是否正常\"的测试标准，会误判。\n- **套餐日期出过错**：初激活时日期不对，是客服 Sean 重新应用套餐才修正的——激活后第一件事核对数据余额和日期，不对立刻找客服。\n- **登录要关 VPN**：开着 VPN 登不上 RedPocket 账户，关掉并换一条连接再登。\n"}], "categories": ["AI 与 Agent", "创作与内容", "网站与项目", "网络与路由", "节点与代理", "账号与服务"]}</script><div id="progress"></div><button id="toTop" title="回到顶部">↑</button><div class="layout"><aside><nav class="toc"><h4>目录（6 节）</h4><ol><li style=""><a href="#sec-1"> 套餐事实</a></li><li style=""><a href="#sec-2"> 线路铁律</a></li><li style=""><a href="#sec-3"> 中国漫游（已实测可用）</a></li><li style=""><a href="#sec-4"> 收短信（注册验证码用）</a></li><li style=""><a href="#sec-5"> WiFi Calling 在中国的限制（重点）</a></li><li style=""><a href="#sec-6"> 踩坑记录</a></li></ol></nav></aside><main class="article"><nav class="back"><a href="../index.html">← 返回 Atlas</a> <button class="btn" type="button" onclick="atlasEditCurrent()">编辑</button> <button class="btn btn-danger" type="button" onclick="atlasDeleteCurrent()">删除</button></nav><div class="kicker">账号与服务</div><h1>RedPocket $30/年 eSIM 使用手册（实测版）</h1><p class="lead">GSMA 线路与中国漫游的实测手册：网页开 Enable Roaming、漫游余额、WhatsApp 能收码而 Telegram 未收到、WiFi Calling 在中国必须走美国 IP 拉起。</p><div id="article-tags"><span class="tag">RedPocket</span><span class="tag">eSIM</span><span class="tag">漫游</span><span class="tag">WiFi Calling</span><span class="tag">验证码</span></div><p class="meta">约 952 字 · 阅读约 2 分钟 · 更新 2026-11-26</p><div class="toc-mobile"><details><summary>目录（6 节）</summary><ol><li style=""><a href="#sec-1"> 套餐事实</a></li><li style=""><a href="#sec-2"> 线路铁律</a></li><li style=""><a href="#sec-3"> 中国漫游（已实测可用）</a></li><li style=""><a href="#sec-4"> 收短信（注册验证码用）</a></li><li style=""><a href="#sec-5"> WiFi Calling 在中国的限制（重点）</a></li><li style=""><a href="#sec-6"> 踩坑记录</a></li></ol></details></div><div id="article-body">
+<script>window.ATLAS_CURRENT_ID=13;</script><script id="atlas-data" type="application/json">{"articles": [{"id": 13, "title": "RedPocket $30/年 eSIM 使用手册（实测版）", "category": "账号与服务", "tags": ["RedPocket", "eSIM", "漫游", "WiFi Calling", "验证码"], "summary": "GSMA 线路与中国漫游的实测手册：网页开 Enable Roaming、漫游余额、WhatsApp 能收码而 Telegram 未收到、WiFi Calling 在中国必须走美国 IP 拉起。", "pinned": false, "updated_at": "2026-11-26T04:51:42.795Z", "cover_key": "redpocket-esim", "source_note": "整理自 2026-11-25 激活与实测记录；不是对话原文。", "file": "13-redpocket-esim.md", "body": "\n# RedPocket $30/年 eSIM 使用手册（实测版）\n\n> 状态：已激活，客服 Sean 重新应用套餐并修正日期后数据恢复正常。\n> 设备：iPhone XS Max（A2104）。登录 RedPocket 须关 VPN、换连接。\n\n## 套餐事实\n\n- 套餐：360 Day Unlimited Talk/Text + 200MB 5G，$30/年。\n- 数据：200MB/200MB（客服修正后恢复满额）。\n- WiFi Calling：已开启。\n- 余额续期：2026-12-26；下次付款：2027-11-25。\n\n## 线路铁律\n\n- 当前线路是 **GSMA（AT&T）**——唯一含国际漫游的网。别切到 GSMT / CDMA，切过去漫游就没了。\n- 漫游只有 GSMA 套餐有，CDMA / GSMT 没有。\n\n## 中国漫游（已实测可用）\n\n1. 官网 Roaming 页显示 CHINA included；Roaming Balances 为 100/100 Minutes。\n2. 必须在网页上点 **Enable Roaming** 开通，光插卡不会自动开。\n3. 官方说法是须在美国境内先选好目的地国家；但本人已在中国实测漫游可用——以实测为准，官方口径记录在此备查。\n4. 实测结论：没有 WiFi Calling 也打通了电话，蜂窝漫游本身能通话。\n\n## 收短信（注册验证码用）\n\n- WhatsApp 短信：已收到，收短信能力已证实。\n- Telegram 注册：未收到码。同一线路不同服务结果不同，注册前先想好备选验证方式。\n\n## WiFi Calling 在中国的限制（重点）\n\n- AT&T 官网明确：WiFi Calling 在中国不可用，中国 IP 直连会被拒签。\n- 拉起条件：必须走美国 IP——用支持 UDP 的美区节点做热点 / 旁路由，让手机流量从美国出口走。\n- 佐证：此前唯一一次状态栏出现 \"RedPocket Wi-Fi\" 时，手机正开着 VPN（美国 IP）。\n\n## 踩坑记录\n\n- **611 / 800 免费电话在境外常打不通**，不要拿它当\"线路是否正常\"的测试标准，会误判。\n- **套餐日期出过错**：初激活时日期不对，是客服 Sean 重新应用套餐才修正的——激活后第一件事核对数据余额和日期，不对立刻找客服。\n- **登录要关 VPN**：开着 VPN 登不上 RedPocket 账户，关掉并换一条连接再登。\n"}], "categories": ["AI 与 Agent", "创作与内容", "网站与项目", "网络与路由", "节点与代理", "账号与服务"]}</script><div id="progress"></div><button id="toTop" title="回到顶部">↑</button><div class="layout"><aside><nav class="toc"><h4>目录（6 节）</h4><ol><li style=""><a href="#sec-1"> 套餐事实</a></li><li style=""><a href="#sec-2"> 线路铁律</a></li><li style=""><a href="#sec-3"> 中国漫游（已实测可用）</a></li><li style=""><a href="#sec-4"> 收短信（注册验证码用）</a></li><li style=""><a href="#sec-5"> WiFi Calling 在中国的限制（重点）</a></li><li style=""><a href="#sec-6"> 踩坑记录</a></li></ol></nav></aside><main class="article" id="artRoot"><header class="art-head"><nav class="back"><a href="../index.html">← 返回 Atlas</a> <button class="btn" type="button" onclick="atlasEditCurrent()">编辑</button> <button class="btn btn-danger" type="button" onclick="atlasDeleteCurrent()">删除</button></nav><div class="art-progress"><div id="artProgressFill"></div></div></header><div class="kicker">账号与服务</div><h1>RedPocket $30/年 eSIM 使用手册（实测版）</h1><p class="lead">GSMA 线路与中国漫游的实测手册：网页开 Enable Roaming、漫游余额、WhatsApp 能收码而 Telegram 未收到、WiFi Calling 在中国必须走美国 IP 拉起。</p><div id="article-tags"><span class="tag">RedPocket</span><span class="tag">eSIM</span><span class="tag">漫游</span><span class="tag">WiFi Calling</span><span class="tag">验证码</span></div><p class="meta">约 952 字 · 阅读约 2 分钟 · 更新 2026-11-26</p><div class="toc-mobile"><details><summary>目录（6 节）</summary><ol><li style=""><a href="#sec-1"> 套餐事实</a></li><li style=""><a href="#sec-2"> 线路铁律</a></li><li style=""><a href="#sec-3"> 中国漫游（已实测可用）</a></li><li style=""><a href="#sec-4"> 收短信（注册验证码用）</a></li><li style=""><a href="#sec-5"> WiFi Calling 在中国的限制（重点）</a></li><li style=""><a href="#sec-6"> 踩坑记录</a></li></ol></details></div><div id="article-body">
 <blockquote><p>状态：已激活，客服 Sean 重新应用套餐并修正日期后数据恢复正常。<br>设备：iPhone XS Max（A2104）。登录 RedPocket 须关 VPN、换连接。</p></blockquote>
 <div class="sec-head" id="sec-1"><span class="badge">01</span><h2>套餐事实</h2></div>
 <ul><li>套餐：360 Day Unlimited Talk/Text + 200MB 5G，$30/年。</li><li>数据：200MB/200MB（客服修正后恢复满额）。</li><li>WiFi Calling：已开启。</li><li>余额续期：2026-12-26；下次付款：2027-11-25。</li></ul>
@@ -599,9 +605,10 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
     var r = mdToHtml(a.body);
     var words = a.body.length;
     main.innerHTML =
-      '<nav class="back"><a href="../index.html">← 返回 Atlas</a> ' +
+      '<header class="art-head"><nav class="back"><a href="../index.html">← 返回 Atlas</a> ' +
       '<button class="btn" type="button" onclick="atlasEditCurrent()">编辑</button> ' +
       '<button class="btn btn-danger" type="button" onclick="atlasDeleteCurrent()">删除</button></nav>' +
+      '<div class="art-progress"><div id="artProgressFill"></div></div></header>' +
       '<div class="kicker">' + esc(a.category) + "</div><h1>" + esc(a.title) + "</h1>" +
       '<p class="lead">' + esc(a.summary) + "</p>" +
       '<div id="article-tags">' + (a.tags || []).map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("") + "</div>" +
@@ -628,7 +635,21 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
     function onScroll() {
       var st = window.scrollY || document.documentElement.scrollTop;
       var h = document.documentElement.scrollHeight - window.innerHeight;
-      bar.style.width = (h > 0 ? (st / h * 100) : 0) + "%";
+      var pct = h > 0 ? (st / h) : 0;
+      /* Progress from the article's actual position in the viewport: the
+         old window-only calculation stays at 0 / is covered in an app
+         shell, so take the max of the two. */
+      var root = document.getElementById("artRoot");
+      if (root) {
+        var r = root.getBoundingClientRect();
+        var total = r.height - window.innerHeight;
+        var artPct = total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : (r.top <= 0 ? 1 : 0);
+        pct = Math.max(pct, artPct);
+      }
+      var w = (pct * 100) + "%";
+      bar.style.width = w;
+      var fill = document.getElementById("artProgressFill");
+      if (fill) fill.style.width = w;
       var cur = secs[0];
       secs.forEach(function (s) { if (s.getBoundingClientRect().top <= 120) cur = s; });
       links.forEach(function (a) {
@@ -637,10 +658,14 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
         if (on) a.scrollIntoView({ block: "nearest" });
       });
     }
+    function scrollToTop() {
+      var st = window.scrollY || document.documentElement.scrollTop;
+      window.scrollTo({ top: 0, behavior: st > 600 ? "smooth" : "auto" });
+    }
     if (!spyInit) {
       window.addEventListener("scroll", onScroll, { passive: true });
       var top = document.getElementById("toTop");
-      if (top) top.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+      if (top) top.addEventListener("click", scrollToTop);
       spyInit = true;
     }
     onScroll();
@@ -651,7 +676,10 @@ footer{color:var(--muted);font-size:13px;margin-top:56px;border-top:1px solid va
   else { applyHomepageOverrides(); applyDetailOverride(); }
   if (document.getElementById("progress")) initScrollspy();
   var topBtn = document.getElementById("toTop");
-  if (topBtn && !spyInit) topBtn.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+  if (topBtn && !spyInit) topBtn.addEventListener("click", function () {
+    var st = window.scrollY || document.documentElement.scrollTop;
+    window.scrollTo({ top: 0, behavior: st > 600 ? "smooth" : "auto" });
+  });
 
   /* Test hook (no-op in browsers): lets `node --check`-style tests require
      the pure functions without a DOM. */
