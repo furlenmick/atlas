@@ -156,7 +156,15 @@
       }
       if (line.trim() === "---" || line.trim() === "***" || line.trim() === "___") { out.push("<hr>"); i++; continue; }
       var im = line.match(/^!\[([^\]]*)\]\(([^)]+)\)\s*$/);
-      if (im) { out.push('<div class="img-note">🖼 ' + esc(im[1]) + "（配图 " + esc(im[2]) + "，未包含在导出中）</div>"); i++; continue; }
+      if (im) {
+        var imgSrc = im[2].indexOf("kbimg:") === 0 ? im[2].slice(6) : im[2];
+        if (imgSrc && imgSrc.indexOf("/") === -1) {
+          out.push('<figure><img src="/assets/images/' + esc(imgSrc) + '" alt="' + esc(im[1]) + '" loading="lazy"><figcaption>' + esc(im[1]) + "</figcaption></figure>");
+        } else {
+          out.push('<div class="img-note">🖼 ' + esc(im[1]) + "（配图 " + esc(im[2]) + "，未包含在导出中）</div>");
+        }
+        i++; continue;
+      }
       if (/^\s*[-*]\s+/.test(line)) {
         var items = [];
         while (i < lines.length && /^\s*[-*]\s+/.test(lines[i])) { items.push(lines[i].replace(/^\s*[-*]\s+/, "")); i++; }

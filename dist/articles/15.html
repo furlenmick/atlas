@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Codex CLI 在 Windows 上的安装流程（进行中） · Atlas</title>
+<link rel="stylesheet" href="/assets/fonts.css">
 <style>
 :root{--ink:#26221e;--muted:#6f6a63;--paper:#faf7f2;--surface:#fff;--line:#e8e0d5;
 --accent:#d94f30;--accent-soft:#fdeee9;--pine:#2e6b4f;--pine-soft:#e8f2ec}
@@ -24,6 +25,8 @@ th,td{border:1px solid var(--line);padding:8px 12px;text-align:left}
 th{background:#f1ece4}
 img{max-width:100%}
 figure{margin:20px 0;text-align:center}
+figure.cover{margin:24px 0 8px}
+figure.cover img{border-radius:12px;box-shadow:0 2px 12px rgba(38,34,30,.12)}
 figcaption{color:var(--muted);font-size:14px;margin-top:8px}
 hr{border:none;border-top:1px solid var(--line);margin:28px 0}
 .tag{display:inline-block;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:2px 10px;font-size:13px;margin:0 6px 6px 0;color:var(--muted);font-family:ui-monospace,"JetBrains Mono",Menlo,monospace}
@@ -295,7 +298,15 @@ footer.site-footer a:hover{color:var(--accent)}
       }
       if (line.trim() === "---" || line.trim() === "***" || line.trim() === "___") { out.push("<hr>"); i++; continue; }
       var im = line.match(/^!\[([^\]]*)\]\(([^)]+)\)\s*$/);
-      if (im) { out.push('<div class="img-note">🖼 ' + esc(im[1]) + "（配图 " + esc(im[2]) + "，未包含在导出中）</div>"); i++; continue; }
+      if (im) {
+        var imgSrc = im[2].indexOf("kbimg:") === 0 ? im[2].slice(6) : im[2];
+        if (imgSrc && imgSrc.indexOf("/") === -1) {
+          out.push('<figure><img src="/assets/images/' + esc(imgSrc) + '" alt="' + esc(im[1]) + '" loading="lazy"><figcaption>' + esc(im[1]) + "</figcaption></figure>");
+        } else {
+          out.push('<div class="img-note">🖼 ' + esc(im[1]) + "（配图 " + esc(im[2]) + "，未包含在导出中）</div>");
+        }
+        i++; continue;
+      }
       if (/^\s*[-*]\s+/.test(line)) {
         var items = [];
         while (i < lines.length && /^\s*[-*]\s+/.test(lines[i])) { items.push(lines[i].replace(/^\s*[-*]\s+/, "")); i++; }

@@ -121,3 +121,9 @@ GitHub 就是可信来源：本地改完不推，别人拉到的还是旧版；�
 - 原文内嵌配图（`kbimg:`）不在仓库里，详情页里以文字占位注明。
 - 字体只写字体名、不加载外部字体文件，在没装 Noto 的 Windows 上会回退
   到系统宋体/黑体。
+
+## 统一代码（2026-11-26）
+- 空间 Atlas、GitHub、atlas.yanchs.com 三处跑同一套代码，唯一源头是本仓库的 `articles/` + `scripts/build.py`，生成 `dist/` 后部署。
+- 字体：`assets/fonts/` 内含 Noto Serif SC / Noto Sans SC / JetBrains Mono 的 208 个 woff2 子集（可变字体，wght 200–900），由 Google Fonts API 下载，`dist/assets/fonts.css` 用 `@font-face` 本地加载，页面零外部请求。
+- 配图：`assets/images/` 内含 Grok 文章的 9 张图（封面 + 8 张正文图，源自原文 pbs.twimg.com，已按 SHA256 与本地离线版核对一致）与 Harness 流程图；正文 `kbimg:` 引用会渲染为真实图片。其余 15 篇的封面图本地没有原图，暂无配图，不编造。
+- 改完后：`python3 scripts/build.py` → 提交推送 → 用 `deploy-atlas.py` 重新部署到 atlas.yanchs.com。

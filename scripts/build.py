@@ -23,6 +23,12 @@ DIST_DIR = os.path.join(ROOT, "dist")
 with open(os.path.join(ROOT, "scripts", "atlas.js"), encoding="utf-8") as _f:
     ATLAS_JS = _f.read()
 
+# Article cover images bundled in assets/images/ (keyed by cover_key).
+# Only Grok's cover exists locally; all other articles have no cover file
+# on disk, so they render without a cover image (no invented images).
+COVER_FILES = {"grok-harness": "01-cover.jpg"}
+ASSETS_DIR = os.path.join(ROOT, "assets")
+
 CSS = """
 :root{--ink:#26221e;--muted:#6f6a63;--paper:#faf7f2;--surface:#fff;--line:#e8e0d5;
 --accent:#d94f30;--accent-soft:#fdeee9;--pine:#2e6b4f;--pine-soft:#e8f2ec}
@@ -43,6 +49,8 @@ th,td{border:1px solid var(--line);padding:8px 12px;text-align:left}
 th{background:#f1ece4}
 img{max-width:100%}
 figure{margin:20px 0;text-align:center}
+figure.cover{margin:24px 0 8px}
+figure.cover img{border-radius:12px;box-shadow:0 2px 12px rgba(38,34,30,.12)}
 figcaption{color:var(--muted);font-size:14px;margin-top:8px}
 hr{border:none;border-top:1px solid var(--line);margin:28px 0}
 .tag{display:inline-block;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:2px 10px;font-size:13px;margin:0 6px 6px 0;color:var(--muted);font-family:ui-monospace,"JetBrains Mono",Menlo,monospace}
@@ -281,11 +289,16 @@ def md_to_html(body):
             out.append("<hr>")
             i += 1
             continue
-        # image (kbimg: placeholders — images are not in the repo)
+        # image: kbimg: placeholders resolve to bundled files in
+        # assets/images/; anything not bundled keeps the text placeholder
         m = re.match(r"^!\[([^\]]*)\]\(([^)]+)\)\s*$", line)
         if m:
             alt, src = m.group(1), m.group(2)
-            out.append('<div class="img-note">🖼 %s（配图 %s，未包含在导出中）</div>' % (esc(alt), esc(src)))
+            fname = src[6:] if src.startswith("kbimg:") else src
+            if fname and os.path.basename(fname) == fname and os.path.exists(os.path.join(ASSETS_DIR, "images", fname)):
+                out.append('<figure><img src="/assets/images/%s" alt="%s" loading="lazy"><figcaption>%s</figcaption></figure>' % (esc(fname), esc(alt), esc(alt)))
+            else:
+                out.append('<div class="img-note">🖼 %s（配图 %s，未包含在导出中）</div>' % (esc(alt), esc(src)))
             i += 1
             continue
         # unordered list
@@ -342,7 +355,7 @@ def footer_html(n_articles, n_cats):
 def page(title, body_html, extra_js=""):
     return ("<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"utf-8\">\n"
             "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
-            "<title>%s · Atlas</title>\n<style>%s</style>\n</head>\n<body>\n%s\n<script>%s</script>\n</body>\n</html>\n"
+            "<title>%s · Atlas</title>\n<link rel=\"stylesheet\" href=\"/assets/fonts.css\">\n<style>%s</style>\n</head>\n<body>\n%s\n<script>%s</script>\n</body>\n</html>\n"
             % (esc(title), CSS, body_html, extra_js))
 
 
@@ -419,6 +432,11 @@ def build_home(arts):
 
 
 def build_detail(a, arts):
+    cover_html = ""
+    cover_file = COVER_FILES.get(a.get("cover_key", ""))
+    if cover_file and os.path.exists(os.path.join(ASSETS_DIR, "images", cover_file)):
+        cover_html = ('<figure class="cover"><img src="/assets/images/%s" alt="%s" loading="lazy"></figure>'
+                      % (esc(cover_file), esc(a["title"])))
     body_html, toc = md_to_html(a["body"])
     # drop the duplicate in-body H1 (title is already in the header)
     body_html = re.sub(r"<h1>.*?</h1>", "", body_html, count=1, flags=re.S)
@@ -444,10 +462,11 @@ def build_detail(a, arts):
         '<div class="art-progress"><div id="artProgressFill"></div></div></header>'
         '<div class="kicker">%s</div><h1>%s</h1><p class="lead">%s</p>'
         '<div id="article-tags">%s</div><p class="meta">约 %d 字 · 阅读约 %d 分钟 · 更新 %s</p>'
-        '%s<div id="article-body">%s</div>%s%s</main></div>'
+        '%s%s<div id="article-body">%s</div>%s%s</main></div>'
         % (toc_html, esc(a["category"]), esc(a["title"]), esc(a["summary"]),
            "".join('<span class="tag">%s</span>' % esc(t) for t in a["tags_list"]),
            words, minutes, esc(a.get("updated_at", "")[:10]),
+           cover_html,
            ('<div class="toc-mobile"><details><summary>目录（%d 节）</summary><ol>%s</ol></details></div>' % (len(toc), toc_items)) if toc else "",
            body_html, pager,
            footer_html(len(arts), len({x["category"] for x in arts}))))
@@ -477,6 +496,11 @@ def main():
     if os.path.exists(DIST_DIR):
         shutil.rmtree(DIST_DIR)
     os.makedirs(os.path.join(DIST_DIR, "articles"))
+    # bundled assets (fonts + images) are copied into dist/ as-is
+    if os.path.exists(ASSETS_DIR):
+        shutil.copytree(ASSETS_DIR, os.path.join(DIST_DIR, "assets"))
+    shutil.copy(os.path.join(ROOT, "scripts", "fonts.css"),
+                os.path.join(DIST_DIR, "assets", "fonts.css"))
     with open(os.path.join(DIST_DIR, "index.html"), "w", encoding="utf-8") as f:
         f.write(build_home(arts))
     with open(os.path.join(DIST_DIR, "articles", "view.html"), "w", encoding="utf-8") as f:
