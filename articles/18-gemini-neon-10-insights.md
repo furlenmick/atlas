@@ -4,20 +4,13 @@ title: "Gemini 4 Neon 十条实战心得：拿它做点能卖的东西"
 category: "AI 与 Agent"
 tags: ["Gemini", "Neon", "Antigravity", "AI Studio", "副业"]
 pinned: false
+cover_key: gemini-neon-10-insights
 summary: "读 Greg Isenberg 帖子后自己重写的学习笔记：连续用 Neon 5 天的 10 条心得——/swarm 连夜干活、物理仿真先验证想法、发票做成财务模型、本地商家网站变计算器，配上 Orchestrator 加 Hydrogen 的省钱分工。"
 source_note: "来源：X 帖子《10 insights using Gemini 4 Neon》（Greg Isenberg @gregisenberg），原文 https://x.com/gregisenberg/status/2123943441017028866 ，发布于 2026-11-21。本文是读帖子文字后用自己的话重写的学习笔记，不是原文翻译；帖子附带的 16 分钟视频没有完整看完，本文只按帖子文字总结。帖子标注为付费合作（paid partnership）。"
 updated_at: "2026-11-27T09:00:00.000Z"
 ---
 
 # Gemini 4 Neon 十条实战心得：拿它做点能卖的东西
-
-## 先说前提：5 天试用、付费合作披露 <!-- toc: 先说前提 -->
-
-这篇笔记的来源是一条 X 帖子，不是长文。作者 Greg Isenberg 说，他连续用了 Gemini 4 Neon 5 天，Google 给了他提前体验资格，并且赞助了那期节目。帖子本身也标注了 paid partnership（付费合作）。
-
-所以读这十条要带一个前提：**作者是在被赞助的情况下试用的**，热情要打个折再听。但十条里大部分是具体做法——让它连夜干活、拿发票做财务模型、把通话记录倒进去找承诺——这些做法本身能不能用，不依赖于赞助关系，可以一条一条自己试。
-
-帖子的数据（2026-11-27 快照）：85 条回复、60 次转帖、811 个赞、1,044 个收藏、约 12 万浏览。附带一个 16 分钟的视频，本文只按帖子文字总结，视频没有完整看完。
 
 ## 十条实战心得 <!-- toc: 十条实战心得 -->
 
@@ -112,4 +105,4 @@ updated_at: "2026-11-27T09:00:00.000Z"
 
 ---
 
-来源：X 帖子《10 insights using Gemini 4 Neon》（Greg Isenberg @gregisenberg），https://x.com/gregisenberg/status/2123943441017028866 ，发布于 2026-11-21。帖子标注为付费合作（paid partnership）；作者称连续试用 Neon 5 天，Google 提供了提前体验资格并赞助了相关节目。帖子附带的 16 分钟视频没有完整看完，本文只按帖子文字总结。帖子还提到完整节目在 YouTube（@startupideaspod），以及节目里讲的“5 种最能发挥价值的用法”和“5 种赚钱方法”，不在本文讨论范围。无配图：原文只有视频，没有静态图片，因此本文没有封面图。
+来源：X 帖子《10 insights using Gemini 4 Neon》（Greg Isenberg @gregisenberg），https://x.com/gregisenberg/status/2123943441017028866 ，发布于 2026-11-21。帖子标注为付费合作（paid partnership）；作者称连续试用 Neon 5 天，Google 提供了提前体验资格并赞助了相关节目。帖子附带的 16 分钟视频没有完整看完，本文只按帖子文字总结。帖子还提到完整节目在 YouTube（@startupideaspod），以及节目里讲的“5 种最能发挥价值的用法”和“5 种赚钱方法”，不在本文讨论范围。封面图为按文章内容生成的插画：原文只有视频，没有静态图片。
