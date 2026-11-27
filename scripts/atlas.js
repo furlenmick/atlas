@@ -628,7 +628,11 @@
       if (o.deleted.indexOf(a.id) >= 0) return;
       list.push(effectiveArticle(a));
     });
-    list.sort(function (x, y) { return x.id - y.id; });
+    // Newest first: updated date descending, id descending as tie-breaker.
+    list.sort(function (x, y) {
+      if (x.updated !== y.updated) return x.updated < y.updated ? 1 : -1;
+      return y.id - x.id;
+    });
     ARTICLES.length = 0;
     list.forEach(function (a) { a._text = stripHtml(a.html); ARTICLES.push(a); });
     refreshCatOrder();

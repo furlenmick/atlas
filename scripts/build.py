@@ -276,7 +276,9 @@ def load_articles():
         meta["file"] = fn
         meta["body"] = body
         arts.append(meta)
-    arts.sort(key=lambda a: a["id_int"])
+    # Newest first: updated date descending, article id descending
+    # as the tie-breaker (articles 1-16 share one updated date).
+    arts.sort(key=lambda a: (a.get("updated_at", ""), a["id_int"]), reverse=True)
     return arts
 
 
