@@ -394,8 +394,9 @@
   function renderArticle(id) {
     var a = byId(id);
     if (!a) { goHome(); return; }
-    // Detail pages show the top scroll progress bar again.
-    if (progressEl) progressEl.style.display = '';
+    // Keep #progress hidden on article pages too: the header-bottom bar
+    // (.art-progress) is the only red line, so there are not two.
+    if (progressEl) progressEl.style.display = 'none';
     var idx = ARTICLES.indexOf(a);
     var prev = ARTICLES[idx - 1], next = ARTICLES[idx + 1];
     var chars = stripHtml(a.html).replace(/\s/g, '').length;
